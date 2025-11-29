@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: finup
+
+  config: # 사용 설정 파일
+    import:
+      - classpath:settings/application-db.yml
+      - classpath:settings/application-web.yml
+      - classpath:settings/application-mail.yml
+      - classpath:settings/application-security.yml
+      - classpath:settings/application-ai.yml
+      - classpath:settings/application-cache.yml
+
+  profiles: # 활성 프로필 (local, prod)
+    active: ${ACTIVE_PROFILE}
+
+
+### 서버 포트 ###
+
+server:
+  port: ${SERVER_PORT} # 서버 포트
+
+### 특정 기술에 속하지 않는 커스텀 상수 ###
+
+app:
+  domain: ${APP_DOMAIN} # 백엔드 도메인
+
+file:
+  dir: ${FILE_DIR} # 파일 경로
+  domain: ${FILE_DOMAIN} # 파일 접근 도메인
+  handler: ${FILE_HANDLER:} # 로컬 핸들러 경로 (기본값 설정)
+
+jwt:
+  cookie-name: ${JWT_COOKIE_NAME}
+  expiration:
+    access-token: ${JWT_EXPIRATION_ACCESS_TOKEN}
+    refresh-token: ${JWT_EXPIRATION_REFRESH_TOKEN}
+    cookie: ${JWT_EXPIRATION_COOKIE}

@@ -1,0 +1,30 @@
+# ===============================
+# common
+# ===============================
+
+#spring:
+#  ai:
+#    openai:
+#      api-key: ${OPENAI_API_KEY}
+#      chat:
+#        options:
+#          model: ${OPENAI_CHAT_MODEL}
+
+
+# ===============================
+# profile - local
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+# ===============================
+# profile - prod
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod

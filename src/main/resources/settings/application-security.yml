@@ -1,0 +1,29 @@
+# ===============================
+# common
+# ===============================
+
+
+# ===============================
+# profile - local
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+logging:
+  level:
+    org.springframework.security: INFO #DEBUG
+    org.springframework.web.servlet.resource: INFO #TRACE
+
+
+# ===============================
+# profile - prod
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+

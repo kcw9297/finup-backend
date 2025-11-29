@@ -1,0 +1,62 @@
+# ===============================
+# common
+# ===============================
+
+spring:
+  # 공용 설정 - Redis Cache 사용
+  cache:
+    type: redis
+
+  # 공용 설정 - Redis
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD:}
+
+      repositories:
+        enabled: false
+
+# ===============================
+# profile - local
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  # redis 추가 설정
+  data:
+    redis:
+      timeout: 5000
+      ssl:
+        enabled: false
+
+      lettuce:
+        pool:
+          max-active: 4
+          max-idle: 2
+          min-idle: 1
+
+# ===============================
+# profile - prod
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # redis 추가 설정
+  data:
+    redis:
+      timeout: 10000
+      ssl:
+        enabled: true  # ssl 암호화 연결 여부 (AWS ElastiCache 에선 true, 로컬에선 false)
+
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2

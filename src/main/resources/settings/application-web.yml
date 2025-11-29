@@ -1,0 +1,53 @@
+# ===============================
+# common
+# ===============================
+
+spring:
+
+  # 공용 설정 - file
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+# ===============================
+# profile - local
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+server:
+
+  # tomcat thread 설정
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+
+# ===============================
+# profile - prod
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+server:
+  forward-headers-strategy: native
+  #use-forward-headers: true
+
+  # tomcat thread 설정
+  tomcat:
+    threads:
+      max: 300
+      min-spare: 30
+    max-connections: 10000          # 최대 연결 수
+    accept-count: 100               # 대기 큐 크기
+    connection-timeout: 20000       # 연결 타임아웃 (20초)
+    max-swallow-size: -1            # 업로드 크기 무제한
+    max-http-form-post-size: -1     # POST 크기 무제한

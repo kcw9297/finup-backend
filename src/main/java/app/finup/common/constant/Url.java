@@ -1,0 +1,43 @@
+package app.finup.common.constant;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class Url {
+
+    /* BASIC */
+    public static final String API = "/api";
+    public static final String OAUTH = "/oauth";
+    public static final String PUBLIC = "/public";
+    public static final String ADMIN = "/admin";
+
+    /* LOGIN, LOGOUT */
+    public static final String LOGIN = API + "/login";
+    public static final String LOGOUT = API + "/logout";
+
+    /* BASIC - PATTERN */
+    public static final String PATTERN_API = API + "/**";
+    public static final String PATTERN_OAUTH = OAUTH + "/**";
+    public static final String PATTERN_PUBLIC = PUBLIC + "/**";
+    public static final String PATTERN_ADMIN = ADMIN + "/**";
+
+    /* DOMAIN (팀원 작성 영역) */
+
+    // auth
+    public static final String AUTH = API + "/auth";
+
+    // reboard
+    public static final String REBOARD = API + "/reboards";
+    public static final String REBOARD_PUBLIC = PUBLIC + REBOARD;
+
+    // member
+    public static final String MEMBER = API + "/members";
+    public static final String MEMBER_ADMIN = ADMIN + MEMBER;
+    public static final String MEMBER_PUBLIC = PUBLIC + MEMBER;
+
+
+    /* DOMAIN - PATTERN */
+    public static final String PATTERN_AUTH = AUTH + "/**";
+
+}

@@ -1,0 +1,74 @@
+# ===============================
+# common
+# ===============================
+
+spring:
+
+  # 공용 DBCP 설정
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    hikari:
+      connection-test-query: SELECT 1
+      validation-timeout: 1000
+      auto-commit: false
+
+  # 공용 JPA 설정
+  jpa:
+    open-in-view: false
+
+    properties:
+      hibernate:
+        default_batch_fetch_size: 1000
+        connection:
+          provider_disables_autocommit: true
+
+
+# ===============================
+# profile - local
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 5
+      connection-timeout: 10000
+
+  jpa:
+    hibernate:
+      ddl-auto: update #update
+
+    show-sql: false
+
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: false
+
+# ===============================
+# profile - prod
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10 # 최소 10개 커넥션은 늘 유지
+      connection-timeout: 20000
+      leak-detection-threshold: 60000
+      max-lifetime: 1800000 # 최대 30분동안 커넥션 보존
+
+  jpa:
+    hibernate:
+      ddl-auto: create #update

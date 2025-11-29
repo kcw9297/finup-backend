@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.finup.layer.domain.reboard.mapper.ReboardMapper">
+
+    <!-- 검색 메소드 -->
+    <select id="search" resultType="ReboardSummary">
+        SELECT r.idx, r.name, r.subject, r.regdate
+        FROM reboard r
+        WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
+        <if test="filter neq null and keyword neq null and keyword neq ''">
+            <choose>
+                <when test="filter eq 'idx'">
+                    AND r.idx = #{keyword}
+                </when>
+                <when test="filter eq 'name'">
+                    AND r.name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'subject'">
+                    AND r.subject LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'content'">
+                    AND r.content LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'subjectContent'">
+                    AND (r.subject LIKE CONCAT('%', #{keyword}, '%') OR r.content LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+            </choose>
+        </if>
+        ORDER BY
+        <choose>
+            <when test="order neq null and order neq ''">
+                <choose>
+                    <when test="order eq 'latest'">
+                        r.idx DESC
+                    </when>
+                    <when test="order eq 'oldest'">
+                        r.idx ASC
+                    </when>
+                    <otherwise>
+                        r.idx DESC
+                    </otherwise>
+                </choose>
+            </when>
+            <otherwise>
+                r.idx DESC
+            </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 검색 메소드 카운트 쿼리 -->
+    <select id="searchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM reboard r
+        WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
+        <if test="filter neq null and keyword neq null and keyword neq ''">
+            <choose>
+                <when test="filter eq 'idx'">
+                    AND r.idx = #{keyword}
+                </when>
+                <when test="filter eq 'name'">
+                    AND r.name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'subject'">
+                    AND r.subject LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'content'">
+                    AND r.content LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'subjectContent'">
+                    AND (r.subject LIKE CONCAT('%', #{keyword}, '%') OR r.content LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

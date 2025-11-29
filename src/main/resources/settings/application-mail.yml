@@ -1,0 +1,47 @@
+# ===============================
+# common
+# ===============================
+
+spring:
+
+  # 메일 공용 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_MAIL_USERNAME}
+    password: ${SMTP_MAIL_APP_PASSWORD}
+    properties:
+      mail:
+        transport.protocol: smtp
+        smtp.auth: true # 아이디, 비밀번호 기반 로그인 인증
+        smtp.starttls.enable: true # 암호화 활성화
+        smtp.ssl.trust: smtp.gmail.com
+        smtp.ssl.enable: false # 구글은 false
+
+
+# ===============================
+# profile - local
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  mail:
+    properties:
+      mail.debug: false # true
+
+
+# ===============================
+# profile - prod
+# ===============================
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  mail:
+    properties:
+      mail.debug: false
