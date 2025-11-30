@@ -5,6 +5,12 @@ import app.finup.layer.domain.reboard.dto.ReboardDto;
 
 import java.util.List;
 
+/**
+ * 게시판 비즈니스 로직 인터페이스
+ * @author kcw
+ * @since 2025-11-24
+ */
+
 public interface ReboardService {
 
     /**

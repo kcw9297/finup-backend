@@ -6,17 +6,6 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-/*
- * ================================================================
- *  Change Log
- *  Date        Author      Description
- * ---------------------------------------------------------------
- *  2025-11-23  kcw         최초 작성
- *  2025-11-24  khj         SummaryForAdmin 추가
- *  2025-11-25  oyh         Search 변수 변경 (order 삭제, pageSize 기본 값 변경)
- * ================================================================
- */
-
 /**
  * 게시판 DTO 클래스
  * @author kcw
@@ -81,16 +70,6 @@ public final class ReboardDto {
             this.order = "latest";  // 기본 정렬 : 최신순
             this.pageNum = 0;       // 기본 페이지 : 0 (서버 기준)
             this.pageSize = 5;      // 기본 사이즈 : 5
-        }
-
-        // 검색어 필터
-        public void setFilter(String filter) {
-            this.order = Objects.isNull(filter) ? "" : filter.toLowerCase();
-        }
-
-        // 정렬
-        public void setOrder(String order) {
-            this.order = Objects.isNull(order) ? "latest" : order.toLowerCase();
         }
 
         // 만약 클라이언트에서 페이지 번호를 보낸 경우, 클라이언트에선 1부터 시작하므로 -1

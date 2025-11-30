@@ -9,12 +9,20 @@ import app.finup.layer.domain.reboard.dto.ReboardDtoMapper;
 import app.finup.layer.domain.reboard.mapper.ReboardMapper;
 import app.finup.layer.domain.reboard.repository.ReboardRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * ReboardService 구현 클래스
+ * @author kcw
+ * @since 2025-11-24
+ */
+
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
