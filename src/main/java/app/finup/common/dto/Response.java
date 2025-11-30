@@ -8,6 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ * REST API 응답 스펙 클래스
+ * @param <T> 응답 데이터 클래스 타입
+ */
+
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
