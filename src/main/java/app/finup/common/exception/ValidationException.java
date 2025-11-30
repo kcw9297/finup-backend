@@ -5,12 +5,6 @@ import lombok.Getter;
 
 import java.util.Map;
 
-
-/*
- * [수정 이력]
- *  ▶ ver 1.0 (2025-11-24) : kcw97 최초 작성
- */
-
 /**
  * 유효성 검사 예외 (= Bean Validation)
  * @author kcw

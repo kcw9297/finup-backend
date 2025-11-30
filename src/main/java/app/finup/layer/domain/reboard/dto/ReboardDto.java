@@ -10,8 +10,8 @@ import java.util.Objects;
  * 게시판 DTO 클래스
  * @author kcw
  * @since 2025-11-26
- * @since 2025-11-23
  */
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReboardDto {
 

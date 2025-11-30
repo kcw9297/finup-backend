@@ -16,11 +16,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
-/*
- * [수정 이력]
- *  ▶ ver 1.0 (2025-11-24) : kcw97 최초 작성
- */
-
 /**
  * REST API 응답 전용 클래스
  * @author kcw

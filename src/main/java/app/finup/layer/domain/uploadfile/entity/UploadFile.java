@@ -7,15 +7,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
-/*
- * [수정 이력]
- *  ▶ ver 1.0 (2025-10-13) : kcw97 최초 작성
- *  ▶ ver 1.1 (2025-10-22) : kcw97 FileType 추가
- */
-
 /**
  * 파일 엔티티 클래스
- * @version 1.1
  * @author kcw
  * @since 2025-11-26
  */
