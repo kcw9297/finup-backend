@@ -6,14 +6,13 @@ import app.finup.layer.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "notice")
 @DynamicUpdate
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true, exclude = "admin")
+@EqualsAndHashCode(callSuper = true, exclude = "admin")
 @AllArgsConstructor
 @NoArgsConstructor
 public class Notice extends BaseEntity {
@@ -39,9 +38,8 @@ public class Notice extends BaseEntity {
         this.admin = admin;
     }
 
-    public void update(String title, String content, Member admin) {
+    public void update(String title, String content) {
         this.title = title;
         this.content = content;
-        this.admin = admin;
     }
 }

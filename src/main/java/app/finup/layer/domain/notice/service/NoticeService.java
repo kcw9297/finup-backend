@@ -2,7 +2,6 @@ package app.finup.layer.domain.notice.service;
 
 import app.finup.common.dto.Page;
 import app.finup.layer.domain.notice.dto.NoticeDto;
-import org.springframework.data.domain.Pageable;
 
 /**
  * 공지사항 게시판 비즈니스 로직 인터페이스
@@ -40,9 +39,14 @@ public interface NoticeService {
 
     /**
      * 게시글 목록 일괄 조회
-     * @return 조회된 게시글 DTO 리스트
+     * @return 조회된 게시글 DTO 페이지 리스트
      */
-    // Page<NoticeDto.NoticeList> getList();
+    Page<NoticeDto.NoticeList> getList(NoticeDto.NoticeList rq);
 
-    Page<NoticeDto.NoticeList> getList(NoticeDto.);
+
+    /**
+     * 게시글 검색
+     * @return 검색된 게시글 DTO 페이지 리스트
+     */
+    Page<NoticeDto.NoticeList> search(NoticeDto.Search rq);
 }
