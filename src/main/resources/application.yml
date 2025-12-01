@@ -36,3 +36,8 @@ jwt:
     access-token: ${JWT_EXPIRATION_ACCESS_TOKEN}
     refresh-token: ${JWT_EXPIRATION_REFRESH_TOKEN}
     cookie: ${JWT_EXPIRATION_COOKIE}
+
+naver:
+  client:
+    id: xmHeauhFxFymWAK1HbVY
+    secret: QF51vmfFXL
