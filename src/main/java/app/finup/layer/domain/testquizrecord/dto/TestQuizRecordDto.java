@@ -10,4 +10,19 @@ import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TestQuizRecordDto {
+    /**
+     * 테스트를 위한 문제 상세 조회 (정답 제외)
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Detail {
+        private Long testQuizRecordId;
+        private String content;
+        private String choice1;
+        private String choice2;
+        private String choice3;
+        private String choice4;
+    }
 }
