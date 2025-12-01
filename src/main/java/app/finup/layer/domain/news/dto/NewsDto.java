@@ -23,24 +23,4 @@ public final class NewsDto {
         private LocalDateTime publishedAt;
     }
 
-    public static final List<String> ALLOWED_PRESS = List.of(
-            "한국경제",
-            "매일경제",
-            "연합뉴스",
-            "조선비즈",
-            "서울경제"
-    );
-
-    public static final List<String> SubKeywords(String keyword){
-        return List.of(
-                keyword,
-                keyword + " 전망",
-                keyword + " 분석",
-                keyword + " 실적",
-                keyword + " 주가",
-                keyword + " 증시",
-                keyword + " 투자"
-        );
-    }
-
 }
