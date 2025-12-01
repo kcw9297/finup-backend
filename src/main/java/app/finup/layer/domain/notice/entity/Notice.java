@@ -4,18 +4,18 @@ package app.finup.layer.domain.notice.entity;
 import app.finup.layer.base.entity.BaseEntity;
 import app.finup.layer.domain.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "notice")
 @DynamicUpdate
-@NoArgsConstructor
 @Getter
-@EntityListeners(AuditingEntityListener.class)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
 public class Notice extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
