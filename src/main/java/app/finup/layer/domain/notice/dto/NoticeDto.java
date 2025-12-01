@@ -1,7 +1,6 @@
 package app.finup.layer.domain.notice.dto;
 
 import lombok.*;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
