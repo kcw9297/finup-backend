@@ -5,12 +5,6 @@ import lombok.Getter;
 
 import java.util.Map;
 
-
-/*
- * [수정 이력]
- *  ▶ ver 1.0 (2025-11-24) : kcw97 최초 작성
- */
-
 /**
  * 애플리케이션 전반에서 발생한 예외 처리 (커스텀 예외 중 최상위 예외)
  * <br>사용 코드 목록 : {@link AppStatus}

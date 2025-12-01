@@ -4,6 +4,12 @@ import app.finup.layer.domain.reboard.entity.Reboard;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/**
+ * Reboard Entity -> DTO 매퍼 클래스
+ * @author kcw
+ * @since 2025-11-24
+ */
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReboardDtoMapper {
 

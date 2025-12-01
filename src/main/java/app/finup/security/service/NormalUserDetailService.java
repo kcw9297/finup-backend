@@ -33,7 +33,7 @@ public class NormalUserDetailService implements UserDetailsService {
 
         // [1] 회원 로그인
         Member member = memberRepository
-                .findByEmail(username)
+                .findByEmailWithProfileImage(username)
                 .orElseThrow(() -> new UsernameNotFoundException(""));
 
         // [2] UserDetails 객체 생성 및 반환

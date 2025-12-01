@@ -11,6 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * 게시글 공개용 REST API 클래스
+ * @author kcw
+ * @since 2025-11-24
+ */
+
 @Slf4j
 @RestController
 @RequestMapping(Url.REBOARD_PUBLIC)

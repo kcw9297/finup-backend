@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * CSRF 토큰 자동 생성처리 필터
@@ -27,7 +28,7 @@ public class CsrfVerificationFilter extends OncePerRequestFilter {
         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 
         // [2] 만약 토큰 값이 없는 경우 (최초 HTTP 요청인 경우) 새롭게 생성 처리
-        if (csrfToken != null) csrfToken.getToken();
+        if (Objects.nonNull(csrfToken)) csrfToken.getToken();
         filterChain.doFilter(request, response); // 필터 진행
 
     }

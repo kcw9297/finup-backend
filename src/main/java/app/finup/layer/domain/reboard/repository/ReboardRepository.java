@@ -9,6 +9,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Reboard Entity 조회 레포지토리 인터페이스
+ * @author kcw
+ * @since 2025-11-25
+ */
 
 public interface ReboardRepository extends JpaRepository<Reboard, Long> {
 

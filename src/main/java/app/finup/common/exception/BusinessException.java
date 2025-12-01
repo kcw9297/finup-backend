@@ -3,11 +3,6 @@ package app.finup.common.exception;
 import app.finup.common.enums.AppStatus;
 import lombok.Getter;
 
-/*
- * [수정 이력]
- *  ▶ ver 1.0 (2025-11-24) : kcw97 최초 작성
- */
-
 /**
  * 비즈니스 로직 예외
  * @author kcw
