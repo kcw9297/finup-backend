@@ -37,6 +37,9 @@ public class Url {
     public static final String MEMBER_ADMIN = ADMIN + MEMBER;
     public static final String MEMBER_PUBLIC = PUBLIC + MEMBER;
 
+    /* stocks */
+    public static final String STOCKS = API + "/stocks";
+
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */
