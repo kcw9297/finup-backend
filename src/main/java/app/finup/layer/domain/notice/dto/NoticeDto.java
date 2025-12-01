@@ -69,4 +69,9 @@ public class NoticeDto {
         private String title;
         private String content;
     }
+    
+    /**
+     * 검색을 위해 사용
+     */
+    
 }
