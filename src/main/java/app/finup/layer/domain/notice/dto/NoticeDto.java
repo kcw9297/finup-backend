@@ -1,6 +1,9 @@
 package app.finup.layer.domain.notice.dto;
 
 import lombok.*;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
 
 /**
  * 공지사항 DTO 클래스
@@ -23,9 +26,23 @@ public class NoticeDto {
         private String title;
         private String content;
         private String admin;
+        private LocalDateTime cdate;
+        private LocalDateTime udate;
     }
 
     /**
      * 리스트(페이징) 결과로 사용
      */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class NoticeList {
+        private Long noticeId;
+        private String title;
+        private String content;
+        private String admin;
+        private LocalDateTime cdate;
+        private LocalDateTime udate;
+    }
 }
