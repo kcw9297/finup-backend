@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.finup.layer.domain.notice.mapper.NoticeMapper">
+
+    <!-- 공통 SELECT 절 -->
+    <sql id="noticeColumns">
+        n.notice_id      AS noticeId,
+        n.title          AS title,
+        n.content        AS content,
+        n.member_id      AS adminId,
+        n.cdate          AS cdate,
+        n.udate          AS udate
+    </sql>
+
+    <!-- 목록 조회 -->
+    <select id="search" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search"
+            resultType="app.finup.layer.domain.notice.dto.NoticeDto$NoticeList">
+        SELECT
+        <include refid="noticeColumns"/>
+        FROM notice n
+        WHERE 1 = 1
+
+        <!-- 필터 & 키워드 -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="filter == 'title'">
+                    AND n.title LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter == 'content'">
+                    AND n.content LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter == 'admin'">
+                    AND n.admin LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <otherwise>
+                    AND (n.title LIKE CONCAT('%', #{keyword}, '%')
+                    OR n.content LIKE CONCAT('%', #{keyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+
+        <!-- 정렬 -->
+        <choose>
+            <when test="order == 'oldest'">
+                ORDER BY n.cdate ASC
+            </when>
+            <otherwise>
+                ORDER BY n.cdate DESC
+            </otherwise>
+        </choose>
+
+        <!-- 페이징 -->
+        LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <!-- 총 개수 계산 -->
+    <select id="count" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="long">
+        SELECT COUNT(*)
+        FROM notice n
+        WHERE 1 = 1
+
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="filter == 'title'">
+                    AND n.title LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter == 'content'">
+                    AND n.content LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter == 'admin'">
+                    AND n.admin LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <otherwise>
+                    AND (n.title LIKE CONCAT('%', #{keyword}, '%')
+                    OR n.content LIKE CONCAT('%', #{keyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

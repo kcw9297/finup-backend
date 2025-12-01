@@ -8,6 +8,7 @@ import app.finup.layer.domain.member.repository.MemberRepository;
 import app.finup.layer.domain.notice.dto.NoticeDto;
 import app.finup.layer.domain.notice.dto.NoticeDtoMapper;
 import app.finup.layer.domain.notice.entity.Notice;
+import app.finup.layer.domain.notice.mapper.NoticeMapper;
 import app.finup.layer.domain.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +32,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 
-    private final NoticeRepository noticeRepository;     // === ReboardMapper와 동일 역할
+    private final NoticeRepository noticeRepository;
     private final MemberRepository memberRepository; // 작성자(admin) 조회
+    private final NoticeMapper noticeMapper;
 
     @Override
     public Long write(NoticeDto.Write rq) {
@@ -81,12 +83,9 @@ public class NoticeServiceImpl implements NoticeService {
     @Override
     @Transactional(readOnly = true)
     public Page<NoticeDto.NoticeList> search(NoticeDto.Search rq) {
-        List<Notice> list = noticeRepository.search(rq);
-        Long count = noticeRepository.searchCount(rq);
-
-        List<NoticeDto.NoticeList> dto =
-                list.stream().map(NoticeDtoMapper::toListDto).toList();
+        List<NoticeDto.NoticeList> list = noticeMapper.search(rq);
+        Long count = noticeMapper.searchCount(rq);
         // count.intValue() 변환하여 전달
-        return Page.of(dto, count.intValue(), rq.getPageNum(), rq.getPageSize());
+        return Page.of(list, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }
 }

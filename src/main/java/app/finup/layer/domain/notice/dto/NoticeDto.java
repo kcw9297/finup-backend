@@ -41,7 +41,7 @@ public class NoticeDto {
         private Long noticeId;
         private String title;
         private String content;
-        private String admin;
+        private Long adminId;
         private LocalDateTime cdate;
         private LocalDateTime udate;
     }

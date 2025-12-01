@@ -31,7 +31,7 @@ public final class NoticeDtoMapper {
                 .noticeId(entity.getNoticeId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
-                .admin(entity.getAdmin().getNickname())
+                .adminId(entity.getAdmin().getMemberId())
                 .cdate(entity.getCdate())
                 .udate(entity.getUdate())
                 .build();
