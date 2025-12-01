@@ -44,4 +44,29 @@ public class NoticeDto {
         private LocalDateTime cdate;
         private LocalDateTime udate;
     }
+
+    /**
+     * 작성 요청을 위해 사용
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Write {
+        private String title;
+        private String content;
+    }
+
+    /**
+     * 수정 요청을 위해 사용
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Edit {
+        private Long noticeId;
+        private String title;
+        private String content;
+    }
 }
