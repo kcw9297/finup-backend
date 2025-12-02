@@ -2,13 +2,13 @@
 # common
 # ===============================
 
-#spring:
-#  ai:
-#    openai:
-#      api-key: ${OPENAI_API_KEY}
-#      chat:
-#        options:
-#          model: ${OPENAI_CHAT_MODEL}
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL}
 
 
 # ===============================

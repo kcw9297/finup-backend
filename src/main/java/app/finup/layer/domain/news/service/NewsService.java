@@ -5,5 +5,6 @@ import app.finup.layer.domain.news.dto.NewsDto;
 import java.util.List;
 
 public interface NewsService {
-    List<NewsDto.Summary> getNews(int page, String keyword);
+    List<NewsDto.Summary> getNews(int page, String keyword, String sort);
+
 }
