@@ -52,3 +52,4 @@ api:
     client:
       id: ${API_NAVER_NEWS_CLIENT_ID}
       secret: ${API_NAVER_NEWS_CLIENT_SECRET}
+
