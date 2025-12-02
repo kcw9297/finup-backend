@@ -30,8 +30,11 @@ public class Bookmark extends BaseEntity {
     private Long bookmarkId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private BookmarkTarget bookmarkTarget;
+
+    @Column(nullable = false, updatable = false)
+    private Long targetId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -39,8 +42,9 @@ public class Bookmark extends BaseEntity {
     private Member member; // 북마크한 회원
 
     @Builder
-    public Bookmark(BookmarkTarget bookmarkTarget, Member member) {
+    public Bookmark(BookmarkTarget bookmarkTarget, Long targetId, Member member) {
         this.bookmarkTarget = bookmarkTarget;
+        this.targetId = targetId;
         this.member = member;
     }
 }

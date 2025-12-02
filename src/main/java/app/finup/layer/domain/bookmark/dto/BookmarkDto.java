@@ -14,6 +14,20 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BookmarkDto {
 
+    /**
+     * 북마크 정보 일괄 조회용
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Summary {
+
+        private Long bookmarkId;
+        private Long targetId;
+        private String bookmarkTarget;
+    }
+
 
     /**
      * 검색 파라미터를 담기 위해 사용
