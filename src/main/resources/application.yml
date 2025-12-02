@@ -42,7 +42,13 @@ jwt:
 api:
   kis:
     endpoint: ${API_KIS_ENDPOINT}
-    client-id: ${API_KIS_CLIENT_ID}
-    client-secret: ${API_KIS_CLIENT_SECRET}
+    client:
+      id: ${API_KIS_CLIENT_ID}
+      secret: ${API_KIS_CLIENT_SECRET}
     local:
-      access-token: ${API_KIS_LOCAL_ACCESS_TOKEN:} # 로컬에서 사용할 임시 토큰 (23시간마다 만료됨)
+      access-token: ${API_KIS_LOCAL_ACCESS_TOKEN:}  # 로컬에서 사용할 임시 토큰 (23시간마다 만료됨)
+
+  naver-news:
+    client:
+      id: ${API_NAVER_NEWS_CLIENT_ID}
+      secret: ${API_NAVER_NEWS_CLIENT_SECRET}
