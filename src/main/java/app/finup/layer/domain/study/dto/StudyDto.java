@@ -18,7 +18,7 @@ public final class StudyDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Summary {
+    public static class Row {
 
         private Long studyId;
         private String name;

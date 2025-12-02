@@ -40,7 +40,7 @@ public final class ReboardDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Summary {
+    public static class Row {
 
         private Long idx;
         private String name;

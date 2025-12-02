@@ -17,7 +17,7 @@ public class StocksDto {
      * 종목 리스트 조회 RequestHeader를 담기 위해 사용
      */
     @Data
-    public class Summary {
+    public class Row {
         private String contentType = "application/json; charset=utf-8";       // content-type
         private String authorization;     // 접근토큰
         private String appkey;            // 앱키

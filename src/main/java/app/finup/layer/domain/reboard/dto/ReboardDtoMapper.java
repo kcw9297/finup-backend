@@ -24,9 +24,9 @@ public final class ReboardDtoMapper {
                 .build();
     }
 
-    public static ReboardDto.Summary toSummary(Reboard entity) {
+    public static ReboardDto.Row toRow(Reboard entity) {
 
-        return ReboardDto.Summary.builder()
+        return ReboardDto.Row.builder()
                 .idx(entity.getIdx())
                 .name(entity.getName())
                 .subject(entity.getSubject())

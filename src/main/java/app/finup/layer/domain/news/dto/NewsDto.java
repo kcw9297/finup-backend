@@ -13,7 +13,7 @@ public final class NewsDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Summary{
+    public static class Row {
         private String title;
         private String summary;
         private String thumbnail;

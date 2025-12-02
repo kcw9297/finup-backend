@@ -40,7 +40,7 @@ public class NoticeDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Summary {
+    public static class Row {
         private Long noticeId;
         private String title;
         private String content;
