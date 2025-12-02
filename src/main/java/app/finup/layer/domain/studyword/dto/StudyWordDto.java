@@ -65,7 +65,7 @@ public final class StudyWordDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class reorder {
+    public static class Reorder {
 
         private Long studyWordId;
         private Long beforeStudyWordId;
