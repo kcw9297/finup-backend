@@ -20,9 +20,9 @@ public final class StudyDto {
     @NoArgsConstructor
     public static class Summary {
 
-        private Long levelId;
+        private Long studyId;
         private String name;
         private String description;
-        private Integer levelNumber;
+        private Integer level;
     }
 }
