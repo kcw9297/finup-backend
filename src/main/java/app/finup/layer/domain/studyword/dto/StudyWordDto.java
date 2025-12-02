@@ -44,7 +44,7 @@ public final class StudyWordDto {
 
 
     /**
-     * 새로운 단어 추가
+     * 단어 정보 수정
      */
     @Data
     @Builder
@@ -52,14 +52,14 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Edit {
 
-        private Long videoLinkId;
+        private Long studyWordId;
         private String name;
         private String meaning;
     }
 
 
     /**
-     * 새로운 단어 추가
+     * 단어 순서 재정렬
      */
     @Data
     @Builder
@@ -67,9 +67,9 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class reorder {
 
-        private Long videoLinkId;
-        private Long beforeVideoLinkId;
-        private Long afterVideoLinkId;
+        private Long studyWordId;
+        private Long beforeStudyWordId;
+        private Long afterStudyWordId;
     }
 
 }
