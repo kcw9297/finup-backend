@@ -1,7 +1,7 @@
-package app.finup.layer.domain.studybookmark.entity;
+package app.finup.layer.domain.bookmark.entity;
 
 import app.finup.layer.base.entity.BaseEntity;
-import app.finup.layer.domain.study.entity.Study;
+import app.finup.layer.domain.bookmark.enums.BookmarkTarget;
 import app.finup.layer.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
@@ -10,39 +10,38 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 /**
- * 단계별 학습 북마크 엔티티 클래스
+ * 북마크 엔티티 클래스
  * @author kcw
  * @since 2025-12-02
  */
 
 @Entity
-@Table(name = "study_bookmark")
+@Table(name = "bookmark")
 @DynamicUpdate
 @Getter
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudyBookmark extends BaseEntity {
+public class Bookmark extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long levelBookmarkId;
+    private Long bookmarkId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BookmarkTarget bookmarkTarget;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "member_id", updatable = false)
     private Member member; // 북마크한 회원
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "study_id", updatable = false)
-    private Study study; // 북마크한 회원
-
     @Builder
-    public StudyBookmark(Member member, Study study) {
+    public Bookmark(BookmarkTarget bookmarkTarget, Member member) {
+        this.bookmarkTarget = bookmarkTarget;
         this.member = member;
-        this.study = study;
     }
 }
 

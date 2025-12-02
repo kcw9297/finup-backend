@@ -1,37 +1,19 @@
-package app.finup.layer.domain.studybookmark.dto;
+package app.finup.layer.domain.bookmark.dto;
 
-import app.finup.layer.domain.study.dto.StudyDto;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import app.finup.layer.domain.bookmark.enums.BookmarkTarget;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * 개념학습 북마크 DTO 클래스
+ * 북마크 DTO 클래스
  * @author kcw
  * @since 2025-12-01
  */
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class StudyBookmarkDto {
+public final class BookmarkDto {
 
-    /**
-     * 리스트 결과로 사용
-     */
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Summary {
-
-        private Long studyBookmarkId;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-        private LocalDateTime cdate;
-
-        private StudyDto.Summary study;
-    }
 
     /**
      * 검색 파라미터를 담기 위해 사용
@@ -43,6 +25,8 @@ public final class StudyBookmarkDto {
         private String order;
         private Integer pageNum;
         private Integer pageSize;
+        private BookmarkTarget bookmarkTarget;
+
 
         // 빈 퍼블릭 생성자가 있으면, Jackson 라이브러리가 우선적으로 사용
         public Search() {
@@ -65,5 +49,19 @@ public final class StudyBookmarkDto {
         public int getLimit() {
             return pageSize;
         }
+    }
+
+
+    /**
+     * 북마크 요청
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Bookmark {
+
+        private Long memberId;
+        private BookmarkTarget bookmarkTarget;
     }
 }
