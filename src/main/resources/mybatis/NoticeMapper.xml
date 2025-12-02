@@ -16,7 +16,7 @@
 
     <!-- 목록 조회 -->
     <select id="search" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search"
-            resultType="app.finup.layer.domain.notice.dto.NoticeDto$NoticeList">
+            resultType="app.finup.layer.domain.notice.dto.NoticeDto$Summary">
         SELECT
         <include refid="noticeColumns"/>
         FROM notice n
@@ -57,7 +57,7 @@
     </select>
 
     <!-- 총 개수 계산 -->
-    <select id="count" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="long">
+    <select id="searchCount" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="long">
         SELECT COUNT(*)
         FROM notice n
         WHERE 1 = 1
@@ -80,5 +80,4 @@
             </choose>
         </if>
     </select>
-
 </mapper>

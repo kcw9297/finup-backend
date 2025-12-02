@@ -40,3 +40,6 @@ out/
 src/main/resources/.env
 docker-compose.yml
 init.sql
+
+### ddl-auto 로컬 옵션 바뀌는 거 때문에 넣음 ###
+application-db-local.yml

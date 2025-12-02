@@ -44,7 +44,7 @@ public class Url {
     public static final String STOCKS = API + "/stocks";
 
     /* notice */
-    public static final String NOTICE_ADMIN = ADMIN + "/notices";
+    public static final String NOTICE_ADMIN_API = ADMIN + API + "/notices";
 
     /* ======================================== 작성 영역 끝 ========================================================= */
 

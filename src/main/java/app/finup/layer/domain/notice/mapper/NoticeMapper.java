@@ -5,6 +5,6 @@ import app.finup.layer.domain.notice.dto.NoticeDto;
 import java.util.List;
 
 public interface NoticeMapper {
-    List<NoticeDto.NoticeList> search(NoticeDto.Search rq);
+    List<NoticeDto.Summary> search(NoticeDto.Search rq);
     Long searchCount(NoticeDto.Search rq);
 }
