@@ -24,7 +24,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(Url.NOTICE_ADMIN)
+@RequestMapping(Url.NOTICE_ADMIN_API)
 @RequiredArgsConstructor
 public class NoticeController {
     private final NoticeService noticeService;
@@ -34,17 +34,17 @@ public class NoticeController {
      * [GET] /admin/notices
      * @param rq 게시글 조회 요청 DTO
      */
-    
+/*
     @GetMapping
-    public ResponseEntity<?> getList(NoticeDto.NoticeList rq) {
+    public ResponseEntity<?> getList(NoticeDto.Search rq) {
 
         // [1] 요청
-        Page<NoticeDto.NoticeList> rp = noticeService.getList(rq);
+        Page<NoticeDto.NoticeList> rp = noticeService.search(rq);
 
         // [2] 페이징 응답 전달
         return Api.ok(rp.getList(), Pagination.of(rp));
     }
-
+*/
     /**
      * 게시글 검색 API
      * [GET] /admin/notices/search
@@ -54,9 +54,22 @@ public class NoticeController {
     public ResponseEntity<?> search(NoticeDto.Search rq) {
 
         // [1] 요청
-        Page<NoticeDto.NoticeList> rp = noticeService.search(rq);
+        Page<NoticeDto.Summary> rp = noticeService.search(rq);
 
         // [2] 페이징 응답 전달
         return Api.ok(rp.getList(), Pagination.of(rp));
+    }
+
+    /**
+     * 공지사항 상세 조회 API
+     * [GET] /admin/notices/detail?noticeId={id}
+     */
+    @GetMapping("/detail")
+    public ResponseEntity<?> detail(@RequestParam Long noticeId) {
+        // [1] 상세 조회 요청
+        NoticeDto.Detail detail = noticeService.getDetail(noticeId);
+
+        // [2] 데이터 반환
+        return Api.ok(detail);
     }
 }

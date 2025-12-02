@@ -1,5 +1,6 @@
 package app.finup.layer.domain.notice.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -26,7 +27,9 @@ public class NoticeDto {
         private String title;
         private String content;
         private String admin;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime cdate;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime udate;
     }
 
@@ -37,12 +40,14 @@ public class NoticeDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class NoticeList {
+    public static class Summary {
         private Long noticeId;
         private String title;
         private String content;
         private Long adminId;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime cdate;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime udate;
     }
 

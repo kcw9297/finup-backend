@@ -71,10 +71,10 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NoticeDto.NoticeList> getList(NoticeDto.NoticeList rq) {
+    public Page<NoticeDto.Summary> getList(NoticeDto.Summary rq) {
         List<Notice> list = noticeRepository.findAll(Sort.by(Sort.Direction.ASC, "noticeId"));
 
-        List<NoticeDto.NoticeList> dto =
+        List<NoticeDto.Summary> dto =
                 list.stream().map(NoticeDtoMapper::toListDto).toList();
 
         return Page.of(dto, dto.size(), 0, dto.size());
@@ -82,8 +82,8 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NoticeDto.NoticeList> search(NoticeDto.Search rq) {
-        List<NoticeDto.NoticeList> list = noticeMapper.search(rq);
+    public Page<NoticeDto.Summary> search(NoticeDto.Search rq) {
+        List<NoticeDto.Summary> list = noticeMapper.search(rq);
         Long count = noticeMapper.searchCount(rq);
         // count.intValue() 변환하여 전달
         return Page.of(list, count.intValue(), rq.getPageNum(), rq.getPageSize());

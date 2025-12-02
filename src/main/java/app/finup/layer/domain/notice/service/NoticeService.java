@@ -41,12 +41,12 @@ public interface NoticeService {
      * 게시글 목록 일괄 조회
      * @return 조회된 게시글 DTO 페이지 리스트
      */
-    Page<NoticeDto.NoticeList> getList(NoticeDto.NoticeList rq);
+    Page<NoticeDto.Summary> getList(NoticeDto.Summary rq);
 
 
     /**
      * 게시글 검색
      * @return 검색된 게시글 DTO 페이지 리스트
      */
-    Page<NoticeDto.NoticeList> search(NoticeDto.Search rq);
+    Page<NoticeDto.Summary> search(NoticeDto.Search rq);
 }
