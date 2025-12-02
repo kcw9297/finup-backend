@@ -28,10 +28,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class NewsServiceImpl implements NewsService {
 
-    @Value("${naver.client.id}")
+    @Value("${api.naver-news.client.id}")
     private String clientId;
 
-    @Value("${naver.client.secret}")
+    @Value("${api.naver-news.client.secret}")
     private String clientSecret;
 
     private final ObjectMapper objectMapper;
