@@ -1,4 +1,4 @@
-package app.finup.layer.domain.memberstudy.enums;
+package app.finup.layer.domain.studyprogress.enums;
 
 import lombok.Getter;
 
