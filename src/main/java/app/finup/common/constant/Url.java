@@ -40,6 +40,12 @@ public class Url {
     /* news */
     public static final String NEWS = API + "/news";
     public static final String NEWS_PUBLIC = PUBLIC + NEWS;
+    /* stocks */
+    public static final String STOCKS = API + "/stocks";
+
+    /* notice */
+    public static final String NOTICE_ADMIN = ADMIN + "/notices";
+
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */

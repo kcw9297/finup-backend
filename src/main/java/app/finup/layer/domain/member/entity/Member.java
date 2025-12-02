@@ -4,7 +4,6 @@ import app.finup.layer.base.entity.BaseEntity;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.layer.domain.member.enums.MemberSocial;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -33,11 +32,10 @@ public class Member extends BaseEntity {
 
     private String email;
 
-    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @Column(nullable = false, columnDefinition = "TINYINT(1)")
