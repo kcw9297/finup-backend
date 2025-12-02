@@ -21,7 +21,7 @@ public final class BookmarkDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Summary {
+    public static class Row {
 
         private Long bookmarkId;
         private Long targetId;

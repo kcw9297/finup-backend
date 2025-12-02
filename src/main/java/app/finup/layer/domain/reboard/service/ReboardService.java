@@ -37,7 +37,7 @@ public interface ReboardService {
      * @param rq 검색 요청 DTO
      * @return 페이징된 DTO 리스트
      */
-    Page<ReboardDto.Summary> search(ReboardDto.Search rq);
+    Page<ReboardDto.Row> search(ReboardDto.Search rq);
 
     /**
      * 게시글 상세 조회
@@ -50,5 +50,5 @@ public interface ReboardService {
      * 게시글 목록 일괄 조회
      * @return 조회된 게시글 DTO 리스트
      */
-    List<ReboardDto.Summary> getList();
+    List<ReboardDto.Row> getList();
 }

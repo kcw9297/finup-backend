@@ -1,5 +1,6 @@
 package app.finup.config;
 
+import app.finup.layer.domain.notice.dto.NoticeDto;
 import app.finup.layer.domain.reboard.dto.ReboardDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,8 @@ public class DatabaseConfig {
         TypeAliasRegistry registry = configuration.getTypeAliasRegistry();
 
         // 각 도메인의 DTO 패키지에서 매퍼에 사용할 내부클래스 등록
-        registry.registerAlias("ReboardSummary", ReboardDto.Summary.class);
+        registry.registerAlias("ReboardRow", ReboardDto.Row.class);
+        registry.registerAlias("NoticeRow", NoticeDto.Row.class);
     }
 
 }

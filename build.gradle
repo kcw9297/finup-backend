@@ -40,7 +40,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // OAuth2
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA
 
-    // util - ..env 환경설정 파일
+    // util - env 환경설정 파일
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     // util - ItextPDF (PDF 출력)
