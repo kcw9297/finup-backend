@@ -21,5 +21,4 @@ public class AdminReboardController {
 
     private final ReboardService reboardService;
 
-
 }

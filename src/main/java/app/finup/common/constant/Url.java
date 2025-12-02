@@ -37,6 +37,9 @@ public class Url {
     public static final String MEMBER_ADMIN = ADMIN + MEMBER;
     public static final String MEMBER_PUBLIC = PUBLIC + MEMBER;
 
+    /* news */
+    public static final String NEWS = API + "/news";
+    public static final String NEWS_PUBLIC = PUBLIC + NEWS;
     /* stocks */
     public static final String STOCKS = API + "/stocks";
 

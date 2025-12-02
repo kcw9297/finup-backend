@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping(Url.REBOARD_ADMIN)
+@RequestMapping(Url.REBOARD)
 @RequiredArgsConstructor
 public class ReboardController {
 
