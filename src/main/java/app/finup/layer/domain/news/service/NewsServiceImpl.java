@@ -2,8 +2,8 @@ package app.finup.layer.domain.news.service;
 
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.dto.NewsDtoMapper;
+import app.finup.layer.domain.news.util.KeywordUtils;
 import app.finup.layer.domain.news.util.NewsScraper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -40,11 +39,13 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public List<NewsDto.Summary> getNews(int page, String keyword) {
-        String responseJson = fetchNewsJson(page, keyword);
-        if (responseJson == null) return List.of();
-
-        List<NewsDto.Summary> list = parseNewsJson(responseJson);
+        keyword = "국내주식";
+        String json = fetchNewsJson(page, keyword);
+        if(json == null) return List.of();
+        List<NewsDto.Summary> list = parseNewsJson(json);
+        //언론사 필터링
         list = filterAllowedPress(list);
+        //url 기준 중복 삭제
         list = distinctByUrl(list);
 
         return list;
@@ -116,6 +117,7 @@ public class NewsServiceImpl implements NewsService {
                 .filter(item -> NewsDto.ALLOWED_PRESS.contains(item.getPublisher()))
                 .toList();
     }
+
     private List<NewsDto.Summary> distinctByUrl(List<NewsDto.Summary> list) {
         Set<String> seen = new HashSet<>();
         return list.stream()

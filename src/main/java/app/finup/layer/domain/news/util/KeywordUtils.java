@@ -11,7 +11,6 @@ public final class KeywordUtils {
                 keyword + " 분석",
                 keyword + " 실적",
                 keyword + " 주가",
-                keyword + " 증시",
                 keyword + " 투자"
         );
     }
