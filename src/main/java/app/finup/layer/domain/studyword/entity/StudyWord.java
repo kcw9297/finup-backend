@@ -2,7 +2,7 @@ package app.finup.layer.domain.studyword.entity;
 
 import app.finup.layer.base.entity.BaseEntity;
 import app.finup.layer.domain.study.entity.Study;
-import app.finup.layer.domain.member.entity.Member;
+import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -35,10 +35,19 @@ public class StudyWord extends BaseEntity {
     @Column(nullable = false)
     private String meaning;
 
+    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @OneToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
+            orphanRemoval = true // null 설정 시 이미지 엔티티 자동 삭제 처리
+    )
+    @JoinColumn(name = "word_image_id")
+    private UploadFile wordImageFile; // 단어 이미지
+
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "study_id", updatable = false)
-    private Study study; // 북마크한 회원
+    @JoinColumn(name = "study_id", nullable = false, updatable = false)
+    private Study study;
 
     @Builder
     public StudyWord(String name, String meaning, Study study) {
@@ -46,6 +55,14 @@ public class StudyWord extends BaseEntity {
         this.meaning = meaning;
         this.study = study;
     }
+
+    /* 연관관계 메소드 */
+
+    public void setImage(UploadFile wordImageFile) {
+        this.wordImageFile = wordImageFile;
+    }
+
+
 }
 
 
