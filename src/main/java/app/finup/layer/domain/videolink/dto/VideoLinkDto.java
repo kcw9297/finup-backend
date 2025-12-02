@@ -33,4 +33,84 @@ public final class VideoLinkDto {
         private String title;
         private Double displayOrder;
     }
+
+
+    /**
+     * 링크 목록에 추가
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Add {
+
+        // 프론트에서 얻어오는 정보
+        private Long ownerId; // 주인이 HOME인 경우 null
+        private VideoLinkOwner videoLinkOwner;
+        private String videoUrl;
+
+        // 하단 정보는 유튜브 API에서 제공 받은 후 채우는 정보
+        private String videoId;
+        private String thumbnailUrl;
+        private String title;
+
+        /**
+         * API에서 얻어온 정보 추가
+         * @param videoId 영상 고유번호
+         * @param thumbnailUrl 썸네일 이미지 주소
+         * @param title 영상 제목
+         */
+        public void setApiInfo(String videoId, String thumbnailUrl, String title) {
+            this.videoId = videoId;
+            this.thumbnailUrl = thumbnailUrl;
+            this.title = title;
+        }
+    }
+
+
+    /**
+     * 링크 정보 수정
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Edit {
+
+        // 프론트에서 얻어오는 정보
+        private Long videoLinkId;
+        private String videoUrl;
+
+        // 하단 정보는 유튜브 API에서 제공 받은 후 채우는 정보
+        private String videoId;
+        private String thumbnailUrl;
+        private String title;
+
+        /**
+         * API에서 얻어온 정보 추가
+         * @param videoId 영상 고유번호
+         * @param thumbnailUrl 썸네일 이미지 주소
+         * @param title 영상 제목
+         */
+        public void setApiInfo(String videoId, String thumbnailUrl, String title) {
+            this.videoId = videoId;
+            this.thumbnailUrl = thumbnailUrl;
+            this.title = title;
+        }
+    }
+
+
+    /**
+     * 링크 정보 수정
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Reorder {
+
+        private Long videoLinkId;
+        private Long beforeVideoLinkId;
+        private Long afterVideoLinkId;
+    }
 }

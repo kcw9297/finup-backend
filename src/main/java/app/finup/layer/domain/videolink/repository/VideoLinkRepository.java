@@ -15,6 +15,7 @@ import java.util.List;
  */
 public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
 
+
     @Query("""
         SELECT vl
         FROM VideoLink vl
@@ -22,6 +23,7 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
         ORDER BY vl.displayOrder
     """)
     List<VideoLink> findByVideoLinkOwnerAndOwnerId(VideoLinkOwner videoLinkOwner, Long ownerId);
+
 
     @Modifying // 변경 로직
     @Query("""

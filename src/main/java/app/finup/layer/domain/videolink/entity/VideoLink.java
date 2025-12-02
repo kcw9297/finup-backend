@@ -30,7 +30,7 @@ public class VideoLink extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long videoLinkId;
 
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false) // HOME이 소유주인 경우 null
     private Long ownerId; // 소유주는 갱신 불가
 
     @Enumerated(value = EnumType.STRING)
@@ -41,7 +41,7 @@ public class VideoLink extends BaseEntity {
     private String videoUrl;
 
     @Column(nullable = false)
-    private Long videoId; // youtube video Id 등 영상 고유 번호
+    private String videoId; // youtube video Id 등 영상 고유 번호
 
     @Column(nullable = false)
     private String thumbnailUrl;
@@ -53,7 +53,7 @@ public class VideoLink extends BaseEntity {
     private Double displayOrder;  // 정렬 순서
 
     @Builder
-    public VideoLink(Long ownerId, VideoLinkOwner videoLinkOwner, String videoUrl, Long videoId, String thumbnailUrl, String title, Double displayOrder) {
+    public VideoLink(Long ownerId, VideoLinkOwner videoLinkOwner, String videoUrl, String videoId, String thumbnailUrl, String title, Double displayOrder) {
         this.ownerId = ownerId;
         this.videoLinkOwner = videoLinkOwner;
         this.videoUrl = videoUrl;
@@ -80,7 +80,7 @@ public class VideoLink extends BaseEntity {
      * @param thumbnailUrl API에서 제공받은 썸네일 이미지 URL
      * @param title API에서 제공받은 비디오 제목
      */
-    public void update(String videoUrl, Long videoId, String thumbnailUrl, String title) {
+    public void update(String videoUrl, String videoId, String thumbnailUrl, String title) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
         this.thumbnailUrl = thumbnailUrl;
