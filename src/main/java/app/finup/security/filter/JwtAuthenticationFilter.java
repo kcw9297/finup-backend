@@ -75,12 +75,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰 인증에 실패하거나, 재발급 실패 시 실패 응답 반환
         } catch (JwtVerifyException e) {
             LogUtils.showWarn(this.getClass(), "JWT 인증 실패 - 미인증 상태로 처리: %s", e.getAppStatus().getInfo());
+            cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
             request.setAttribute(AppStatus.TOKEN_EXPIRED.name(), true); // 토큰이 만료되었음을 안내하는 속성 추가
             filterChain.doFilter(request, response); // 미인증 상태로 그대로 통과
 
             // 예기치 않은 오류가 발생한 경우
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "JWT 인증 실패 - 요청 중단 : %s", e.getMessage());
+            cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
             Api.writeFail(response, AppStatus.SERVER_ERROR); // 필터 처리 중단 (로직 실행하지 않음)
         }
     }
@@ -113,20 +115,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtVerifyException e) {
 
             // [2] 만료 이외의 사유로 토큰 유효성 검사에 실패한 경우, 그대로 예외 던짐
-            if (!StrUtils.equalsStatus(e.getAppStatus(), AppStatus.TOKEN_EXPIRED)) {
-                cookieManager.invalidateCookie(response, jwtCookieName);
-                throw e;
-            }
+            if (!StrUtils.equalsStatus(e.getAppStatus(), AppStatus.TOKEN_EXPIRED)) throw e;
 
             // [3] Claims 조회 시도
-            try {
-                return reissueAndGetClaims(response, at);
-            } catch (JwtVerifyException reissueEx) {
-
-                // [4] RT 만료 등으로 재발급도 실패한 경우, 쿠키를 삭제하고 예외 반환
-                cookieManager.invalidateCookie(response, jwtCookieName);
-                throw reissueEx;
-            }
+            return reissueAndGetClaims(response, at);
         }
     }
 
