@@ -6,10 +6,9 @@ import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Slf4j
 @RequestMapping(Url.NEWS_PUBLIC)
@@ -24,4 +23,11 @@ public class PublicNewsController {
         return Api.ok(newsService.getNews(page, keyword, category));
 
     }
+
+    @GetMapping("/detail")
+    public ResponseEntity<?> getArticle(@RequestParam String url){
+        return Api.ok(newsService.extractArticle(url));
+    }
+
+
 }

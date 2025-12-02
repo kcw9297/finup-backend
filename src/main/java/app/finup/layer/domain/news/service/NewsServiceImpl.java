@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
@@ -50,6 +52,27 @@ public class NewsServiceImpl implements NewsService {
 
         return list;
     }
+
+    @Override
+    public String extractArticle(String url) {
+        try {
+            // User-Agent 지정 중요 (언론사 일부 bot 차단 있음)
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                    .timeout(5000)
+                    .get();
+
+            // 언론사별 본문 CSS 선택자 시도
+            String content = tryExtractContent(doc);
+
+            return content;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ""; // 오류 시 빈 문자열
+        }
+    }
+
     private String fetchNewsJson(int page, String keyword, String category) {
         int display = 20;
         int start = (page-1) * display + 1;
@@ -123,6 +146,59 @@ public class NewsServiceImpl implements NewsService {
         return list.stream()
                 .filter(item -> seen.add(item.getLink()))
                 .toList();
+    }
+
+    private String tryExtractContent(Document doc) {
+
+        // 연합뉴스
+        Element yna = doc.selectFirst("article#articleWrap");
+        if (yna != null) return yna.text();
+
+        // 한국경제
+        Element hk = doc.selectFirst("div#articletxt, div.article-body");
+        if (hk != null) return hk.text();
+
+        // 조선비즈
+        Element cbiz = doc.selectFirst("div#news_body_id, div.article-body");
+        if (cbiz != null) return cbiz.text();
+
+        // 매일경제
+        Element mk = doc.selectFirst("div#article_body, div#article_body_id, section.article");
+        if (mk != null) return mk.text();
+
+        // 머니투데이
+        Element mt = doc.selectFirst("div#article, div#textBody");
+        if (mt != null) return mt.text();
+
+        // 아시아경제
+        Element asiae = doc.selectFirst("div#articleBody, div#txt_content");
+        if (asiae != null) return asiae.text();
+
+        // 뉴시스
+        Element newsis = doc.selectFirst("div#content, div.viewBox");
+        if (newsis != null) return newsis.text();
+
+        // 파이낸셜뉴스
+        Element fn = doc.selectFirst("div#article_content, div#article_body");
+        if (fn != null) return fn.text();
+
+        // 디지털타임스
+        Element dt = doc.selectFirst("div#articleBody, div.article_txt");
+        if (dt != null) return dt.text();
+
+        // 전자신문
+        Element et = doc.selectFirst("div#articleBody, div#articleTxt");
+        if (et != null) return et.text();
+
+        // 헤럴드경제
+        Element herald = doc.selectFirst("div#articleText, div.article-text");
+        if (herald != null) return herald.text();
+
+        // 그 외 기본적인 기사 body 후보들
+        Element generic = doc.selectFirst("article, div.article, div#content, div.story-body, section");
+        if (generic != null) return generic.text();
+
+        return "";
     }
 
 

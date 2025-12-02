@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface NewsService {
     List<NewsDto.Summary> getNews(int page, String keyword, String sort);
-
+    String extractArticle(String url);
 }
