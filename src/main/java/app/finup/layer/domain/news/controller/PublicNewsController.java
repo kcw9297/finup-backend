@@ -6,6 +6,7 @@ import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,8 +20,8 @@ public class PublicNewsController {
     private final NewsService newsService;
 
     @GetMapping("/list")
-    public ResponseEntity<?> getNews(int page, String keyword) {
-        return Api.ok(newsService.getNews(page, keyword));
+    public ResponseEntity<?> getNews(int page, String keyword, String category) {
+        return Api.ok(newsService.getNews(page, keyword, category));
 
     }
 }

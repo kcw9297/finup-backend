@@ -2,7 +2,6 @@ package app.finup.layer.domain.news.service;
 
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.dto.NewsDtoMapper;
-import app.finup.layer.domain.news.util.KeywordUtils;
 import app.finup.layer.domain.news.util.NewsScraper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,9 +37,10 @@ public class NewsServiceImpl implements NewsService {
     private final NewsScraper newsScraper;
 
     @Override
-    public List<NewsDto.Summary> getNews(int page, String keyword) {
+    public List<NewsDto.Summary> getNews(int page, String keyword, String category) {
         keyword = "국내주식";
-        String json = fetchNewsJson(page, keyword);
+
+        String json = fetchNewsJson(page, keyword, category);
         if(json == null) return List.of();
         List<NewsDto.Summary> list = parseNewsJson(json);
         //언론사 필터링
@@ -50,7 +50,7 @@ public class NewsServiceImpl implements NewsService {
 
         return list;
     }
-    private String fetchNewsJson(int page, String keyword) {
+    private String fetchNewsJson(int page, String keyword, String category) {
         int display = 20;
         int start = (page-1) * display + 1;
 
@@ -66,7 +66,7 @@ public class NewsServiceImpl implements NewsService {
                         .path("/v1/search/news.json")
                         .queryParam("query", keyword)
                         .queryParam("display", display)
-                        .queryParam("sort", "date")
+                        .queryParam("sort", category)
                         .queryParam("start", start)
                         .build()
                 )

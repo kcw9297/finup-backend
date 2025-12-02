@@ -26,8 +26,8 @@ public final class NoticeDtoMapper {
                 .build();
     }
 
-    public static NoticeDto.NoticeList toListDto(Notice entity) {
-        return NoticeDto.NoticeList.builder()
+    public static NoticeDto.Summary toListDto(Notice entity) {
+        return NoticeDto.Summary.builder()
                 .noticeId(entity.getNoticeId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
