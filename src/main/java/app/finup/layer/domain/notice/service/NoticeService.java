@@ -21,7 +21,7 @@ public interface NoticeService {
      * 게시글 수정
      * @param rq 수정 요청 DTO
      */
-    void edit(NoticeDto.Edit rq);
+    NoticeDto.Detail edit(NoticeDto.Edit rq);
 
     /**
      * 게시글 삭제

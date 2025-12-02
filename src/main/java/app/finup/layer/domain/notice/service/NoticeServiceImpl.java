@@ -10,8 +10,10 @@ import app.finup.layer.domain.notice.dto.NoticeDtoMapper;
 import app.finup.layer.domain.notice.entity.Notice;
 import app.finup.layer.domain.notice.mapper.NoticeMapper;
 import app.finup.layer.domain.notice.repository.NoticeRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +53,14 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public void edit(NoticeDto.Edit rq) {
+    @Transactional
+    public NoticeDto.Detail edit(NoticeDto.Edit rq) {
         Notice notice = noticeRepository.findById(rq.getNoticeId())
                 .orElseThrow(() -> new BusinessException(AppStatus.NOTICE_NOT_FOUND));
+        // [1] 수정 로직
+        notice.update(rq.getTitle(), rq.getContent());
+
+        return NoticeDtoMapper.toDetailDto(notice);
     }
 
     @Override
