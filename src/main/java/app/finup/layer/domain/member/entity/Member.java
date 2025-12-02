@@ -46,14 +46,18 @@ public class Member extends BaseEntity {
     private MemberRole role;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private MemberSocial social;
 
     @Column(updatable = false)
     private String socialId;
 
+    @OneToOne(
+            fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
+            orphanRemoval = true // null 설정 시 이미지 엔티티 자동 삭제 처리
+    )
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_image_id")
     private UploadFile profileImage;
 
