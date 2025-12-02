@@ -38,7 +38,7 @@ public class Bookmark extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "member_id", updatable = false)
+    @JoinColumn(name = "member_id", nullable = false, updatable = false)
     private Member member; // 북마크한 회원
 
     @Builder

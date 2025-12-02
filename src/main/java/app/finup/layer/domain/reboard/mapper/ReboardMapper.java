@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ReboardMapper {
 
-    List<ReboardDto.Summary> search(ReboardDto.Search rq);
+    List<ReboardDto.Row> search(ReboardDto.Search rq);
 
     Integer searchCount(ReboardDto.Search rq);
 }

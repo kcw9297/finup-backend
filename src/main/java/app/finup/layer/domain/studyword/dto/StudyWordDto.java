@@ -12,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StudyWordDto {
 
-
     /**
      * 리스트 결과로 사용
      */
@@ -20,11 +19,12 @@ public final class StudyWordDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Summary {
+    public static class Row {
 
         private Long studyWordId;
         private String name;
         private String meaning;
+        private String imageUrl;
     }
 
 

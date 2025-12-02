@@ -15,8 +15,7 @@
     </sql>
 
     <!-- 목록 조회 -->
-    <select id="search" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search"
-            resultType="app.finup.layer.domain.notice.dto.NoticeDto$Summary">
+    <select id="search" resultType="NoticeRow">
         SELECT
         <include refid="noticeColumns"/>
         FROM notice n

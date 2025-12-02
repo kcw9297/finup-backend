@@ -21,9 +21,9 @@ public class TestQuiz extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long testQuizId;
 
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "member_id", updatable = false, nullable = false)
     private Member member;
 
     @Column(nullable = false)

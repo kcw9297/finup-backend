@@ -35,7 +35,7 @@ public class NoticeController {
     public ResponseEntity<?> search(NoticeDto.Search rq) {
 
         // [1] 요청
-        Page<NoticeDto.Summary> rp = noticeService.search(rq);
+        Page<NoticeDto.Row> rp = noticeService.search(rq);
 
         // [2] 페이징 응답 전달
         return Api.ok(rp.getList(), Pagination.of(rp));

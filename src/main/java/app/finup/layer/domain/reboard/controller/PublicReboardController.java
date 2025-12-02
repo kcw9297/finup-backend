@@ -34,7 +34,7 @@ public class PublicReboardController {
     public ResponseEntity<?> search(ReboardDto.Search rq) {
 
         // [1] 요청
-        Page<ReboardDto.Summary> rp = reboardService.search(rq);
+        Page<ReboardDto.Row> rp = reboardService.search(rq);
 
         // [2] 페이징 응답 전달
         return Api.ok(rp.getList(), Pagination.of(rp));

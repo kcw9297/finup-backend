@@ -13,6 +13,7 @@ import lombok.Getter;
 public enum FileOwner {
 
     MEMBER("member"),
+    STUDY_WORD("studyWord"),
     UNKNOWN("unknown");
 
     private final String name;

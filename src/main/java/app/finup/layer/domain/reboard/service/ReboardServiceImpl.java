@@ -62,10 +62,10 @@ public class ReboardServiceImpl implements ReboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ReboardDto.Summary> search(ReboardDto.Search rq) {
+    public Page<ReboardDto.Row> search(ReboardDto.Search rq) {
 
         // [1] 검색
-        List<ReboardDto.Summary> rp = reboardMapper.search(rq);
+        List<ReboardDto.Row> rp = reboardMapper.search(rq);
         Integer count = reboardMapper.searchCount(rq);
 
         // [2] 검색 결과 반환 (페이징 객체 변환)
@@ -85,12 +85,12 @@ public class ReboardServiceImpl implements ReboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReboardDto.Summary> getList() {
+    public List<ReboardDto.Row> getList() {
 
         return reboardRepository
                 .findAll(Sort.by(Sort.Direction.DESC, "idx"))
                 .stream()
-                .map(ReboardDtoMapper::toSummary)
+                .map(ReboardDtoMapper::toRow)
                 .toList();
     }
 }

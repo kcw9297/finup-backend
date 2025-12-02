@@ -1,4 +1,4 @@
-package app.finup.layer.domain.study.enums;
+package app.finup.layer.domain.studyprogress.enums;
 
 import lombok.Getter;
 
@@ -10,7 +10,7 @@ import lombok.Getter;
 public enum StudyStatus {
 
     BEFORE("학습 전"),
-    PROGRESS("학습 중"),
+    IN_PROGRESS("학습 중"),
     COMPLETED("학습 완료");
 
     private final String value;

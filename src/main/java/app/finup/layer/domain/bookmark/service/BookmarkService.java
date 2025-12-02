@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface BookmarkService {
 
-    List<BookmarkDto.Summary> getList();
+    List<BookmarkDto.Row> getList();
 
     void bookmark(BookmarkDto.Bookmark rq);
 
