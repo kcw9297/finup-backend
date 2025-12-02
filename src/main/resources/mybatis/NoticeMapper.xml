@@ -32,7 +32,7 @@
                     AND n.content LIKE CONCAT('%', #{keyword}, '%')
                 </when>
                 <when test="filter == 'admin'">
-                    AND n.admin LIKE CONCAT('%', #{keyword}, '%')
+                    AND n.member_id = #{keyword}
                 </when>
                 <otherwise>
                     AND (n.title LIKE CONCAT('%', #{keyword}, '%')
@@ -71,7 +71,7 @@
                     AND n.content LIKE CONCAT('%', #{keyword}, '%')
                 </when>
                 <when test="filter == 'admin'">
-                    AND n.admin LIKE CONCAT('%', #{keyword}, '%')
+                    AND n.member_id = #{keyword}
                 </when>
                 <otherwise>
                     AND (n.title LIKE CONCAT('%', #{keyword}, '%')
