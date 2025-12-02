@@ -6,7 +6,7 @@
 <mapper namespace="app.finup.layer.domain.reboard.mapper.ReboardMapper">
 
     <!-- 검색 메소드 -->
-    <select id="search" resultType="ReboardSummary">
+    <select id="search" resultType="ReboardRow">
         SELECT r.idx, r.name, r.subject, r.regdate
         FROM reboard r
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->

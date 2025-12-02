@@ -37,12 +37,12 @@ public class NewsServiceImpl implements NewsService {
     private final NewsScraper newsScraper;
 
     @Override
-    public List<NewsDto.Summary> getNews(int page, String keyword, String category) {
+    public List<NewsDto.Row> getNews(int page, String keyword, String category) {
         keyword = "국내주식";
 
         String json = fetchNewsJson(page, keyword, category);
         if(json == null) return List.of();
-        List<NewsDto.Summary> list = parseNewsJson(json);
+        List<NewsDto.Row> list = parseNewsJson(json);
         //언론사 필터링
         list = filterAllowedPress(list);
         //url 기준 중복 삭제
@@ -74,8 +74,8 @@ public class NewsServiceImpl implements NewsService {
                 .bodyToMono(String.class)
                 .block();
     }
-    private List<NewsDto.Summary> parseNewsJson(String json) {
-        List<NewsDto.Summary> result = new ArrayList<>();
+    private List<NewsDto.Row> parseNewsJson(String json) {
+        List<NewsDto.Row> result = new ArrayList<>();
 
         try {
             JsonNode root = objectMapper.readTree(json);
@@ -94,7 +94,7 @@ public class NewsServiceImpl implements NewsService {
                         DateTimeFormatter.RFC_1123_DATE_TIME
                 );
 
-                NewsDto.Summary dto = NewsDtoMapper.toSummary(
+                NewsDto.Row dto = NewsDtoMapper.toRow(
                         title,
                         summary,
                         thumbnail,
@@ -112,13 +112,13 @@ public class NewsServiceImpl implements NewsService {
 
         return result;
     }
-    private List<NewsDto.Summary> filterAllowedPress(List<NewsDto.Summary> list) {
+    private List<NewsDto.Row> filterAllowedPress(List<NewsDto.Row> list) {
         return list.stream()
                 .filter(item -> NewsDto.ALLOWED_PRESS.contains(item.getPublisher()))
                 .toList();
     }
 
-    private List<NewsDto.Summary> distinctByUrl(List<NewsDto.Summary> list) {
+    private List<NewsDto.Row> distinctByUrl(List<NewsDto.Row> list) {
         Set<String> seen = new HashSet<>();
         return list.stream()
                 .filter(item -> seen.add(item.getLink()))
