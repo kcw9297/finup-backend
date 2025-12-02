@@ -9,10 +9,7 @@ import app.finup.layer.domain.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,39 +21,62 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping(Url.NOTICE_ADMIN)
+@RequestMapping(Url.NOTICE_ADMIN_API)
 @RequiredArgsConstructor
 public class NoticeController {
     private final NoticeService noticeService;
 
     /**
-     * 게시글 조회 API
-     * [GET] /admin/notices
-     * @param rq 게시글 조회 요청 DTO
+     * 게시글 검색 API
+     * [GET] /admin/api/notices/search
+     * @param rq 게시글 검색 요청 DTO
      */
-    
     @GetMapping
-    public ResponseEntity<?> getList(NoticeDto.NoticeList rq) {
+    public ResponseEntity<?> search(NoticeDto.Search rq) {
 
         // [1] 요청
-        Page<NoticeDto.NoticeList> rp = noticeService.getList(rq);
+        Page<NoticeDto.Summary> rp = noticeService.search(rq);
 
         // [2] 페이징 응답 전달
         return Api.ok(rp.getList(), Pagination.of(rp));
     }
 
     /**
-     * 게시글 검색 API
-     * [GET] /admin/notices/search
-     * @param rq 게시글 검색 요청 DTO
+     * 공지사항 상세 조회 API
+     * [GET] /admin/api/notices/{noticeId}
      */
-    @GetMapping("/search")
-    public ResponseEntity<?> search(NoticeDto.Search rq) {
+    @GetMapping("/{noticeId}")
+    public ResponseEntity<?> getDetail(@PathVariable Long noticeId) {
+        // [1] 상세 조회 요청
+        NoticeDto.Detail detail = noticeService.getDetail(noticeId);
 
-        // [1] 요청
-        Page<NoticeDto.NoticeList> rp = noticeService.search(rq);
+        // [2] 데이터 반환
+        return Api.ok(detail);
+    }
 
-        // [2] 페이징 응답 전달
-        return Api.ok(rp.getList(), Pagination.of(rp));
+    /**
+     * 공지사항 수정
+     * [PUT] /admin/api/notices/{noticeId}
+     */
+
+    @PutMapping("/{noticeId}")
+    public ResponseEntity<?> editDetail(@PathVariable Long noticeId,
+                                        @RequestBody NoticeDto.Edit rq) {
+        rq.setNoticeId(noticeId);
+        NoticeDto.Detail rp = noticeService.edit(rq);
+
+        return Api.ok(rp);
+    }
+
+
+    /**
+     * 공지사항 삭제
+     * [DELETE] /admin/api/notices/{noticeId}
+     */
+
+    @DeleteMapping("/{noticeId}")
+    public ResponseEntity<?> removeDetail(@PathVariable Long noticeId) {
+        noticeService.remove(noticeId);
+        return Api.ok();
     }
 }

@@ -29,7 +29,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Value("${api.naver-news.client.id}")
     private String clientId;
-//
+
     @Value("${api.naver-news.client.secret}")
     private String clientSecret;
 

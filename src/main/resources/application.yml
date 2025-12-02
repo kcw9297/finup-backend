@@ -10,6 +10,8 @@ spring:
       - classpath:settings/application-security.yml
       - classpath:settings/application-ai.yml
       - classpath:settings/application-cache.yml
+        # ddl-auto 문제 생기지 않도록
+      - optional:classpath:settings/application-db-local.yml
 
   profiles: # 활성 프로필 (local, prod)
     active: ${ACTIVE_PROFILE}
@@ -37,4 +39,19 @@ jwt:
     refresh-token: ${JWT_EXPIRATION_REFRESH_TOKEN}
     cookie: ${JWT_EXPIRATION_COOKIE}
 
+### 외부 API 호출을 위한 상수 ###
+
+api:
+  kis:
+    endpoint: ${API_KIS_ENDPOINT}
+    client:
+      id: ${API_KIS_CLIENT_ID}
+      secret: ${API_KIS_CLIENT_SECRET}
+    local:
+      access-token: ${API_KIS_LOCAL_ACCESS_TOKEN:}  # 로컬에서 사용할 임시 토큰 (23시간마다 만료됨)
+
+  naver-news:
+    client:
+      id: ${API_NAVER_NEWS_CLIENT_ID}
+      secret: ${API_NAVER_NEWS_CLIENT_SECRET}
 

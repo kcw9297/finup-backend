@@ -10,8 +10,10 @@ import app.finup.layer.domain.notice.dto.NoticeDtoMapper;
 import app.finup.layer.domain.notice.entity.Notice;
 import app.finup.layer.domain.notice.mapper.NoticeMapper;
 import app.finup.layer.domain.notice.repository.NoticeRepository;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +53,14 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     @Override
-    public void edit(NoticeDto.Edit rq) {
+    @Transactional
+    public NoticeDto.Detail edit(NoticeDto.Edit rq) {
         Notice notice = noticeRepository.findById(rq.getNoticeId())
                 .orElseThrow(() -> new BusinessException(AppStatus.NOTICE_NOT_FOUND));
+        // [1] 수정 로직
+        notice.update(rq.getTitle(), rq.getContent());
+
+        return NoticeDtoMapper.toDetailDto(notice);
     }
 
     @Override
@@ -71,10 +78,10 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NoticeDto.NoticeList> getList(NoticeDto.NoticeList rq) {
+    public Page<NoticeDto.Summary> getList(NoticeDto.Summary rq) {
         List<Notice> list = noticeRepository.findAll(Sort.by(Sort.Direction.ASC, "noticeId"));
 
-        List<NoticeDto.NoticeList> dto =
+        List<NoticeDto.Summary> dto =
                 list.stream().map(NoticeDtoMapper::toListDto).toList();
 
         return Page.of(dto, dto.size(), 0, dto.size());
@@ -82,8 +89,8 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NoticeDto.NoticeList> search(NoticeDto.Search rq) {
-        List<NoticeDto.NoticeList> list = noticeMapper.search(rq);
+    public Page<NoticeDto.Summary> search(NoticeDto.Search rq) {
+        List<NoticeDto.Summary> list = noticeMapper.search(rq);
         Long count = noticeMapper.searchCount(rq);
         // count.intValue() 변환하여 전달
         return Page.of(list, count.intValue(), rq.getPageNum(), rq.getPageSize());
