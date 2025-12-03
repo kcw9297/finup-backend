@@ -24,6 +24,7 @@ public final class StudyDto {
 
         private Long studyId;
         private String name;
+        private String summary;
         private Integer level;
     }
 
@@ -39,6 +40,7 @@ public final class StudyDto {
 
         private Long studyId;
         private String name;
+        private String summary;
         private String description;
         private Integer level;
     }
@@ -88,6 +90,7 @@ public final class StudyDto {
     public static class Add {
 
         private String name;
+        private String summary;
         private String description;
         private Integer level;
     }
@@ -102,8 +105,11 @@ public final class StudyDto {
     @NoArgsConstructor
     public static class Edit {
 
+        private Long studyId;
         private String name;
+        private String summary;
         private String description;
+        private Integer level;
     }
 
 

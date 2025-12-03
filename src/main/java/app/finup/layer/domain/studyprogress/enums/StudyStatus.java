@@ -4,6 +4,8 @@ import lombok.Getter;
 
 /**
  * 개념 학습 진도를 나타낼 열거형 상수 클래스
+ * @author kcw
+ * @since 2025-12-02
  */
 
 @Getter

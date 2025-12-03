@@ -37,7 +37,7 @@ public class PublicReboardController {
         Page<ReboardDto.Row> rp = reboardService.search(rq);
 
         // [2] 페이징 응답 전달
-        return Api.ok(rp.getList(), Pagination.of(rp));
+        return Api.ok(rp.getRows(), Pagination.of(rp));
     }
 
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.finup.layer.domain.study.mapper.StudyMapper">
+
+    <!-- 검색 메소드 -->
+    <select id="search" resultType="StudyRow">
+        SELECT s.study_id, s.name, s.summary, s.level
+        FROM study s
+        ORDER BY
+        <trim suffixOverrides=","> <!-- IDE 자동완성을 위해 추가 -->
+            <choose>
+                <when test="order neq null and order neq ''">
+                    <choose>
+                        <when test="order eq 'latest'">
+                            s.cdate DESC,
+                        </when>
+                        <when test="order eq 'levelDesc'">
+                            s.level DESC,
+                        </when>
+                        <when test="order eq 'levelAsc'">
+                            s.level,
+                        </when>
+                        <otherwise>
+                            s.cdate DESC,
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    s.cdate DESC,
+                </otherwise>
+            </choose>
+        </trim>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 검색 메소드 카운트 쿼리 -->
+    <select id="countForSearch" resultType="int">
+        SELECT COUNT(*)
+        FROM reboard r
+        <!-- 현재는 파라미터 직접 입력이 없어서, 전체 카운트만 함 -->
+    </select>
+
+</mapper>

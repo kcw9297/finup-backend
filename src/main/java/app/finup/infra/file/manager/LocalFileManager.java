@@ -28,12 +28,11 @@ import java.util.Objects;
 @Component
 public class LocalFileManager implements FileManager {
 
-    @Value("${file.dir}") // properties(yml) 파일 내 프로퍼티 값을 직접 사용 (빈 주입 시기에 같이 삽입)
+    @Value("${file.dir}")
     private String fileDir;
 
-    @Value("${file.domain}") // properties(yml) 파일 내 프로퍼티 값을 직접 사용 (빈 주입 시기에 같이 삽입)
+    @Value("${file.domain}")
     private String fileDomain;
-
 
     @Override
     public String upload(MultipartFile file, String storeName, String entityName) {

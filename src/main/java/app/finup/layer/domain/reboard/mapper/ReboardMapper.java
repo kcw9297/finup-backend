@@ -12,5 +12,5 @@ public interface ReboardMapper {
 
     List<ReboardDto.Row> search(ReboardDto.Search rq);
 
-    Integer searchCount(ReboardDto.Search rq);
+    Integer countForSearch(ReboardDto.Search rq);
 }
