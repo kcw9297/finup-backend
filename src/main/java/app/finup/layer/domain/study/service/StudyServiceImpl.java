@@ -60,7 +60,7 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public void add(StudyDto.Add rq) {
 
-        // [1] DTO -> Entity 변환
+        // [1] 엔티티 생성
         Study study = Study.builder()
                 .name(rq.getName())
                 .summary(rq.getSummary())

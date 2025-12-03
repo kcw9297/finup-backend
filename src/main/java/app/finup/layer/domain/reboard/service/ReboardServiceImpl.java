@@ -34,7 +34,7 @@ public class ReboardServiceImpl implements ReboardService {
     @Override
     public Long write(ReboardDto.Write rq) {
 
-        // [1] DTO -> Entity 변환
+        // [1] 엔티티 생성
         Reboard entity = Reboard.builder()
                 .name(rq.getName())
                 .subject(rq.getSubject())

@@ -18,9 +18,9 @@ public interface FileManager {
      */
     String upload(MultipartFile file, String storeName, String entityName);
 
+
     /**
      * 파일 다운로드
-     *
      * @param storeName  저장 파일명
      * @param entityName 저장된 파일이 속하는 엔티티 타입명
      * @return 파일 바이트 문자열 반환
@@ -34,6 +34,7 @@ public interface FileManager {
      * @param entityName 저장된 파일이 속하는 엔티티 타입명
      */
     void remove(String storeName, String entityName);
+
 
     /**
      * 파일 삭제
