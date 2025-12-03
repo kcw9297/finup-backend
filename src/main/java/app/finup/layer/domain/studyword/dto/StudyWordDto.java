@@ -40,6 +40,7 @@ public final class StudyWordDto {
         private String name;
         private String meaning;
         private Long studyId;
+        private Long lastStudyWordId; // 추가 하기 직전, 가장 마지막에 있던 단어번호
     }
 
 
@@ -68,8 +69,8 @@ public final class StudyWordDto {
     public static class Reorder {
 
         private Long studyWordId;
-        private Long beforeStudyWordId;
-        private Long afterStudyWordId;
+        private Long prevStudyWordId;
+        private Long nextStudyWordId;
     }
 
 }

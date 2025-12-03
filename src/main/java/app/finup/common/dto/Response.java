@@ -10,6 +10,8 @@ import java.util.Map;
 
 /**
  * REST API 응답 스펙 클래스
+ * @author kcw
+ * @since 2025-11-24
  * @param <T> 응답 데이터 클래스 타입
  */
 

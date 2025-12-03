@@ -11,9 +11,26 @@ import java.util.List;
  */
 public interface StudyProgressService {
 
+    /**
+     * 특정 회원의 진도 목록 일괄 조회
+     * @param memberId 회원번호
+     * @return 회원 진도 목록
+     */
     List<StudyProgressDto.Row> getListByMemberId(Long memberId);
 
+
+    /**
+     * 학습 진도를 "학습 중" 상태로 변경
+     * @param studyId 단계학습번호
+     * @param memberId 회원번호
+     */
     void progress(Long studyId, Long memberId);
 
-    void complete(Long studyProgressId);
+
+    /**
+     * 학습 진도를 "학습 완료" 상태로 변경
+     * @param studyId 단계학습번호
+     * @param memberId 회원번호
+     */
+    void complete(Long studyId, Long memberId);
 }

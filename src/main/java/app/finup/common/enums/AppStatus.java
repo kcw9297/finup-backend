@@ -44,7 +44,16 @@ public enum AppStatus {
     REBOARD_OK_EDIT(200, "게시글을 수정했습니다.", "REBOARD_OK_EDIT"),
 
     /* 회원 Member */
-    MEMBER_NOT_FOUND(400, "존재하지 않거나 이미 탈퇴한 회원입니다.", "MEMBER_NOT_FOUND"),
+    MEMBER_NOT_FOUND(400, "회원 정보가 존재하지 않습니다.", "MEMBER_NOT_FOUND"),
+
+    /* 단계 학습 Study */
+    STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),
+
+    /* 학습 단어 StudyWord */
+    STUDY_WORD_NOT_FOUND(400, "단어 목록이 갱신되었습니다. 새로고침 후 다시 시도해주세요.", "STUDY_WORD_NOT_FOUND"),
+
+    /* 단계 학습 진도 StudyProgress */
+
 
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),

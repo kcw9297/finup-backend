@@ -2,6 +2,7 @@ package app.finup.config;
 
 import app.finup.layer.domain.notice.dto.NoticeDto;
 import app.finup.layer.domain.reboard.dto.ReboardDto;
+import app.finup.layer.domain.study.dto.StudyDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -52,6 +53,7 @@ public class DatabaseConfig {
         // 각 도메인의 DTO 패키지에서 매퍼에 사용할 내부클래스 등록
         registry.registerAlias("ReboardRow", ReboardDto.Row.class);
         registry.registerAlias("NoticeRow", NoticeDto.Row.class);
+        registry.registerAlias("StudyRow", StudyDto.Row.class);
     }
 
 }

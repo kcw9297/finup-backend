@@ -45,25 +45,13 @@ public class StudyProgress extends BaseEntity {
     private Study study;
 
     @Builder
-    public StudyProgress(Member member, Study study) {
+    public StudyProgress(Member member, Study study, StudyStatus studyStatus) {
         this.member = member;
         this.study = study;
-        setDefault();
+        this.studyStatus = studyStatus;
     }
 
-    // 기본 값 설정
-    private void setDefault() {
-        this.studyStatus = StudyStatus.BEFORE;
-    }
-
-    /* 연관관계 메소드 */
-
-    /**
-     * 진행 상태로 변경
-     */
-    public void progress() {
-        this.studyStatus = StudyStatus.IN_PROGRESS;
-    }
+    /* 갱신 메소드 */
 
     /**
      * 완료 상태로 변경

@@ -11,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * 관리자 공지사항 컨트롤러 클래스
  * @author khj
@@ -38,13 +36,14 @@ public class NoticeController {
         Page<NoticeDto.Row> rp = noticeService.search(rq);
 
         // [2] 페이징 응답 전달
-        return Api.ok(rp.getList(), Pagination.of(rp));
+        return Api.ok(rp.getRows(), Pagination.of(rp));
     }
 
     /**
      * 공지사항 상세 조회 API
      * [GET] /admin/api/notices/{noticeId}
      */
+
     @GetMapping("/{noticeId}")
     public ResponseEntity<?> getDetail(@PathVariable Long noticeId) {
         // [1] 상세 조회 요청
@@ -78,5 +77,15 @@ public class NoticeController {
     public ResponseEntity<?> removeDetail(@PathVariable Long noticeId) {
         noticeService.remove(noticeId);
         return Api.ok();
+    }
+
+    /**
+     * 공지사항 추가
+     * [POST] /admin/api/notices/
+     */
+    @PostMapping
+    public ResponseEntity<?> addNotice(@RequestBody NoticeDto.Write rq) {
+        NoticeDto.Detail saved = noticeService.write(rq);
+        return Api.ok(saved);
     }
 }
