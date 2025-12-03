@@ -5,6 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 필요 페이징 값을 계산 및 반환을 위한 페이징 클래스
+ * @author kcw
+ * @since 2025-11-24
+ */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
