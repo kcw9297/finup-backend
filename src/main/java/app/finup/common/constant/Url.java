@@ -40,8 +40,10 @@ public class Url {
     /* news */
     public static final String NEWS = API + "/news";
     public static final String NEWS_PUBLIC = PUBLIC + NEWS;
+
     /* stocks */
     public static final String STOCKS = API + "/stocks";
+    public static final String STOCKS_PUBLIC = PUBLIC + STOCKS;
 
     /* notice */
     public static final String NOTICE_ADMIN_API = ADMIN + API + "/notices";
