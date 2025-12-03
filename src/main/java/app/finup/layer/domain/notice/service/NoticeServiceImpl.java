@@ -50,7 +50,8 @@ public class NoticeServiceImpl implements NoticeService {
                 .admin(admin)
                 .build();
 
-        return noticeRepository.save(entity);
+        Notice saved = noticeRepository.save(entity);
+        return NoticeDtoMapper.toDetailDto(saved);
     }
 
     @Override
