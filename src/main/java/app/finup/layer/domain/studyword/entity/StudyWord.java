@@ -35,6 +35,9 @@ public class StudyWord extends BaseEntity {
     @Column(nullable = false)
     private String meaning;
 
+    @Column(nullable = false)
+    private Double displayOrder; // 정렬 순서
+
     @OneToOne(
             fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
@@ -49,11 +52,13 @@ public class StudyWord extends BaseEntity {
     @JoinColumn(name = "study_id", nullable = false, updatable = false)
     private Study study;
 
+
     @Builder
-    public StudyWord(String name, String meaning, Study study) {
+    public StudyWord(String name, String meaning, Study study, Double displayOrder) {
         this.name = name;
         this.meaning = meaning;
         this.study = study;
+        this.displayOrder = displayOrder;
     }
 
     /* 갱신 메소드 */
@@ -66,12 +71,14 @@ public class StudyWord extends BaseEntity {
         this.wordImageFile = wordImageFile;
     }
 
+
     /**
      * 현재 단어 내 등록 이미지 제거 (연관관계 해제)
      */
     public void removeImage() {
         this.wordImageFile = null;
     }
+
 
     /**
      * 단어명 수정
@@ -81,6 +88,15 @@ public class StudyWord extends BaseEntity {
     public void edit(String name, String meaning) {
         this.name = name;
         this.meaning = meaning;
+    }
+
+
+    /**
+     * 순서 재정렬 (정렬순서 변경)
+     * @param displayOrder 정렬 순서 값
+     */
+    public void reorder(Double displayOrder) {
+        this.displayOrder = displayOrder;
     }
 
 
