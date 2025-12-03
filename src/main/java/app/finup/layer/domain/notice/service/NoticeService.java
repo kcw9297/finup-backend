@@ -41,7 +41,7 @@ public interface NoticeService {
      * 게시글 목록 일괄 조회
      * @return 조회된 게시글 DTO 페이지 리스트
      */
-    Page<NoticeDto.Row> getList(NoticeDto.Row rq);
+    Page<NoticeDto.Row> getList(NoticeDto.Search rq);
 
 
     /**

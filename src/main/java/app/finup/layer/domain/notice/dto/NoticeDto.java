@@ -84,6 +84,7 @@ public class NoticeDto {
     @Data
     @AllArgsConstructor
     public static class Search {
+        // [1] 프론트엔드 파라미터
         private String filter;
         private String keyword;
         private String order;

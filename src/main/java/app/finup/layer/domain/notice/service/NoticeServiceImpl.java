@@ -80,20 +80,20 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NoticeDto.Row> getList(NoticeDto.Row rq) {
-        List<Notice> list = noticeRepository.findAll(Sort.by(Sort.Direction.ASC, "noticeId"));
+    public Page<NoticeDto.Row> getList(NoticeDto.Search rq) {
+        // [1] MyBatis 호출
+        List<NoticeDto.Row> list = noticeMapper.search(rq);
+        Integer totalCount = noticeMapper.countForSearch(rq);
 
-        List<NoticeDto.Row> dto =
-                list.stream().map(NoticeDtoMapper::toListDto).toList();
-
-        return Page.of(dto, dto.size(), 0, dto.size());
+        // [2] 반환
+        return Page.of(list, totalCount, rq.getPageNum(), list.size());
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<NoticeDto.Row> search(NoticeDto.Search rq) {
         List<NoticeDto.Row> list = noticeMapper.search(rq);
-        Long count = noticeMapper.countForSearch(rq);
+        Integer count = noticeMapper.countForSearch(rq);
         // count.intValue() 변환하여 전달
         return Page.of(list, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }

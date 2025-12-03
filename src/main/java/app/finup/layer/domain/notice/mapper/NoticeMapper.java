@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface NoticeMapper {
     List<NoticeDto.Row> search(NoticeDto.Search rq);
-    Long countForSearch(NoticeDto.Search rq);
+    Integer countForSearch(NoticeDto.Search rq);
 }

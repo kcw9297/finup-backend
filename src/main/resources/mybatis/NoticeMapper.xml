@@ -68,7 +68,7 @@
     </select>
 
     <!-- 총 개수 계산 -->
-    <select id="countForSearch" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="long">
+    <select id="countForSearch" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="int">
         SELECT COUNT(*)
         FROM notice n
         WHERE 1 = 1
