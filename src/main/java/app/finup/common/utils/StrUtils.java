@@ -134,11 +134,6 @@ public final class StrUtils {
         }
     }
 
-    public static String extractFileExt(String originalFilename) {
-        return Objects.isNull(originalFilename) || originalFilename.isBlank() ?
-                "" : originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-    }
-
     public static String createUUID() {
         return UUID.randomUUID().toString().replace("-", "");
     }

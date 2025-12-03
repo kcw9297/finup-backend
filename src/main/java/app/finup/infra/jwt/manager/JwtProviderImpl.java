@@ -5,7 +5,7 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.JwtVerifyException;
 import app.finup.infra.jwt.dto.JwtClaims;
 import app.finup.infra.jwt.utils.JwtUtils;
-import app.finup.infra.redis.manager.RedisJwtManager;
+import app.finup.infra.jwt.redis.RedisJwtStorage;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +27,9 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class JwtManagerImpl implements JwtManager {
+public class JwtProviderImpl implements JwtProvider {
 
-    private final RedisJwtManager redisJwtManager;
+    private final RedisJwtStorage redisJwtStorage;
 
     @Value("${jwt.expiration.access-token}")
     public Duration expirationAt;
@@ -51,7 +51,7 @@ public class JwtManagerImpl implements JwtManager {
         String at = JwtUtils.generateToken(claims, Date.from(now.plus(expirationAt)));
 
         // [3] RT Redis 내 저장
-        redisJwtManager.save(jti, rt);
+        redisJwtStorage.save(jti, rt);
 
         // [4] 로그인 처리 완료 후, 쿠키에 담을 AT 반환
         return at;
@@ -65,7 +65,7 @@ public class JwtManagerImpl implements JwtManager {
         String jti = JwtUtils.getExpiredJti(at);
 
         // [2] jti 기반 Redis 내 RT 조회
-        String rt = redisJwtManager.get(jti);
+        String rt = redisJwtStorage.get(jti);
 
         // [3] RT 검증 수행
         if (Objects.isNull(rt)) throw new JwtVerifyException(AppStatus.TOKEN_EXPIRED); // 조회 결과가 null 이면 만료된 인증
@@ -89,7 +89,7 @@ public class JwtManagerImpl implements JwtManager {
         String jti = JwtUtils.verifyAndGetJti(at);
 
         // [2] Redis 내 RT 무효화
-        redisJwtManager.delete(jti);
+        redisJwtStorage.delete(jti);
     }
 
 }

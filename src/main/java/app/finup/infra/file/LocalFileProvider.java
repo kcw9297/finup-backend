@@ -1,4 +1,4 @@
-package app.finup.infra.file.manager;
+package app.finup.infra.file;
 
 import app.finup.common.utils.LogUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.Objects;
 @Profile(Env.PROFILE_LOCAL)
 @Slf4j
 @Component
-public class LocalFileManager implements FileManager {
+public class LocalFileProvider implements FileProvider {
 
     @Value("${file.dir}")
     private String fileDir;

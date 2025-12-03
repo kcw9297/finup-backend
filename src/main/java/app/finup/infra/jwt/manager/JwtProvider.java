@@ -3,7 +3,7 @@ package app.finup.infra.jwt.manager;
 import app.finup.infra.jwt.dto.JwtClaims;
 import app.finup.security.dto.CustomUserDetails;
 
-public interface JwtManager {
+public interface JwtProvider {
 
     /**
      * 로그인 - AccessToken, RefreshToken 발급
