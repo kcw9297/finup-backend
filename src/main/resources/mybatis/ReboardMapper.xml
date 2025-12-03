@@ -30,29 +30,31 @@
             </choose>
         </if>
         ORDER BY
-        <choose>
-            <when test="order neq null and order neq ''">
-                <choose>
-                    <when test="order eq 'latest'">
-                        r.idx DESC
-                    </when>
-                    <when test="order eq 'oldest'">
-                        r.idx ASC
-                    </when>
-                    <otherwise>
-                        r.idx DESC
-                    </otherwise>
-                </choose>
-            </when>
-            <otherwise>
-                r.idx DESC
-            </otherwise>
-        </choose>
+        <trim suffixOverrides=","> <!-- IDE 자동완성을 위해 추가 -->
+            <choose>
+                <when test="order neq null and order neq ''">
+                    <choose>
+                        <when test="order eq 'latest'">
+                            r.idx DESC,
+                        </when>
+                        <when test="order eq 'oldest'">
+                            r.idx,
+                        </when>
+                        <otherwise>
+                            r.idx DESC,
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    r.idx DESC,
+                </otherwise>
+            </choose>
+        </trim>
         LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <!-- 검색 메소드 카운트 쿼리 -->
-    <select id="searchCount" parameterType="map" resultType="int">
+    <select id="countForSearch" resultType="int">
         SELECT COUNT(*)
         FROM reboard r
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->

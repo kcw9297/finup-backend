@@ -66,7 +66,7 @@ public class ReboardServiceImpl implements ReboardService {
 
         // [1] 검색
         List<ReboardDto.Row> rp = reboardMapper.search(rq);
-        Integer count = reboardMapper.searchCount(rq);
+        Integer count = reboardMapper.countForSearch(rq);
 
         // [2] 검색 결과 반환 (페이징 객체 변환)
         return Page.of(rp, count, rq.getPageNum(), rq.getPageSize());
