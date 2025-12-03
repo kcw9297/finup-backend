@@ -56,7 +56,7 @@ public class StudyProgress extends BaseEntity {
         this.studyStatus = StudyStatus.BEFORE;
     }
 
-    /* 연관관계 메소드 */
+    /* 갱신 메소드 */
 
     /**
      * 진행 상태로 변경

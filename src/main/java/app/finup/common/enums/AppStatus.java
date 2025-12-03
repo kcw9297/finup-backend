@@ -46,6 +46,9 @@ public enum AppStatus {
     /* 회원 Member */
     MEMBER_NOT_FOUND(400, "존재하지 않거나 이미 탈퇴한 회원입니다.", "MEMBER_NOT_FOUND"),
 
+    /* 단계 학습 Study */
+    STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),
+
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),
 

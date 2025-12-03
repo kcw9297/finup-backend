@@ -20,11 +20,11 @@ public interface StudyWordService {
 
     void add(StudyWordDto.Add rq);
 
-    void addImage(Long studyWordId, MultipartFile file);
+    void uploadImage(Long studyWordId, MultipartFile file);
 
     void edit(StudyWordDto.Edit rq);
 
-    void editImage(Long studyWordId, MultipartFile file);
+    void alternateImage(Long studyWordId, MultipartFile file);
 
     void reorder(StudyWordDto.Reorder rq);
 
