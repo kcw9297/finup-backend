@@ -27,11 +27,6 @@ public class PublicNewsController {
 
     }
 
-    @GetMapping("/detail")
-    public ResponseEntity<?> getArticle(@RequestParam String url){
-        return Api.ok(newsService.extractArticle(url));
-    }
-
     @GetMapping("/detail-ai")
     public ResponseEntity<?> getArticleByAi(@RequestParam String url) throws JsonProcessingException {
         String article = newsService.extractArticle(url);
