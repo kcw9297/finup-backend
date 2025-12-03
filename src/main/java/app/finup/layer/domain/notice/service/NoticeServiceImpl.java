@@ -39,7 +39,8 @@ public class NoticeServiceImpl implements NoticeService {
     private final NoticeMapper noticeMapper;
 
     @Override
-    public Long write(NoticeDto.Write rq) {
+    @Transactional
+    public NoticeDto.Detail write(NoticeDto.Write rq) {
         Long adminId = 1L; // 로그인 정보
         Member admin = memberRepository.findById(adminId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
@@ -49,7 +50,7 @@ public class NoticeServiceImpl implements NoticeService {
                 .admin(admin)
                 .build();
 
-        return noticeRepository.save(entity).getNoticeId();
+        return noticeRepository.save(entity);
     }
 
     @Override
