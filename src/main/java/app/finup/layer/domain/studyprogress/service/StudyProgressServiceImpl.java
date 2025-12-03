@@ -59,7 +59,6 @@ public class StudyProgressServiceImpl implements StudyProgressService {
         // [2] 만약 엔티티가 존재하지 않는 경우, 새롭게 생성 (단계 학습을 최초 열람한 경우)
         if (Objects.isNull(studyProgress))
             studyProgressRepository.save(createNewProgress(studyId, memberId, StudyStatus.IN_PROGRESS));
-
     }
 
 
