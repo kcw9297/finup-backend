@@ -91,7 +91,7 @@ public class NoticeServiceImpl implements NoticeService {
     @Transactional(readOnly = true)
     public Page<NoticeDto.Row> search(NoticeDto.Search rq) {
         List<NoticeDto.Row> list = noticeMapper.search(rq);
-        Long count = noticeMapper.searchCount(rq);
+        Long count = noticeMapper.countForSearch(rq);
         // count.intValue() 변환하여 전달
         return Page.of(list, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }
