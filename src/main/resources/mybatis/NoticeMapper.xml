@@ -39,16 +39,28 @@
                 </otherwise>
             </choose>
         </if>
-
         <!-- 정렬 -->
-        <choose>
-            <when test="order == 'oldest'">
-                ORDER BY n.cdate ASC
-            </when>
-            <otherwise>
-                ORDER BY n.cdate DESC
-            </otherwise>
-        </choose>
+        ORDER BY
+        <trim suffixOverrides=",">
+            <choose>
+                <when test="order != null and order != ''">
+                    <choose>
+                        <when test="order == 'latest'">
+                            n.cdate DESC,
+                        </when>
+                        <when test="order == 'oldest'">
+                            n.cdate ASC,
+                        </when>
+                        <otherwise>
+                            n.cdate DESC,
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    n.cdate DESC,
+                </otherwise>
+            </choose>
+        </trim>
 
         <!-- 페이징 -->
         LIMIT #{limit}
@@ -56,7 +68,7 @@
     </select>
 
     <!-- 총 개수 계산 -->
-    <select id="searchCount" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="long">
+    <select id="countForSearch" parameterType="app.finup.layer.domain.notice.dto.NoticeDto$Search" resultType="long">
         SELECT COUNT(*)
         FROM notice n
         WHERE 1 = 1

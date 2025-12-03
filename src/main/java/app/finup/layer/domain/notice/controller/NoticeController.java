@@ -43,6 +43,7 @@ public class NoticeController {
      * 공지사항 상세 조회 API
      * [GET] /admin/api/notices/{noticeId}
      */
+
     @GetMapping("/{noticeId}")
     public ResponseEntity<?> getDetail(@PathVariable Long noticeId) {
         // [1] 상세 조회 요청
@@ -76,5 +77,15 @@ public class NoticeController {
     public ResponseEntity<?> removeDetail(@PathVariable Long noticeId) {
         noticeService.remove(noticeId);
         return Api.ok();
+    }
+
+    /**
+     * 공지사항 추가
+     * [POST] /admin/api/notices/
+     */
+    @PostMapping
+    public ResponseEntity<?> addNotice(@RequestBody NoticeDto.Write rq) {
+        NoticeDto.Detail saved = noticeService.write(rq);
+        return Api.ok(saved);
     }
 }
