@@ -2,7 +2,6 @@ package app.finup.layer.domain.studyword.service;
 
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.common.manager.FileUrlProvider;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
