@@ -1,16 +1,19 @@
 package app.finup.layer.domain.studyword.service;
 
-import app.finup.common.constant.Const;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.manager.FileUrlProvider;
-import app.finup.infra.file.manager.FileManager;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
+import app.finup.layer.domain.uploadfile.entity.UploadFile;
+import app.finup.layer.domain.uploadfile.enums.FileOwner;
+import app.finup.layer.domain.uploadfile.enums.FileType;
+import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
+import app.finup.layer.domain.uploadfile.repository.UploadFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,8 +41,8 @@ public class StudyWordServiceImpl implements StudyWordService {
 
     private final StudyWordRepository studyWordRepository;
     private final StudyRepository studyRepository;
-    private final FileManager fileManager;
-    private final FileUrlProvider fileUrlProvider;
+    private final UploadFileRepository uploadFileRepository;
+    private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
 
     @Override
     @Transactional(readOnly = true)
@@ -48,7 +51,7 @@ public class StudyWordServiceImpl implements StudyWordService {
         return studyWordRepository
                 .findByStudyId(studyId)
                 .stream()
-                .map(studyWord -> StudyWordDtoMapper.toRow(studyWord, fileUrlProvider::getFullPath))
+                .map(studyWord -> StudyWordDtoMapper.toRow(studyWord, uploadFileManager::getFullUrl))
                 .toList();
     }
 
@@ -92,7 +95,25 @@ public class StudyWordServiceImpl implements StudyWordService {
     @Override
     public void uploadImage(Long studyWordId, MultipartFile file) {
 
+        // [1] 단어 정보 조회
+        StudyWord studyWord =
+                studyWordRepository
+                        .findWithImageById(studyWordId)
+                        .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
+        // [2] 새롭게 등록하는 파일 엔티티 생성
+        UploadFile newImageFile =
+                uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
+
+        // [3] 파일 엔티티 저장 후, 반영 전 현재 이미지파일 정보 추출
+        uploadFileRepository.save(newImageFile);
+        UploadFile oldImageFile = studyWord.getWordImageFile(); // 변경 전 원래 이미지
+
+        // [4] 새로운 이미지 파일을 단어 엔티티에 등록
+        studyWord.uploadImage(newImageFile);
+
+        // [5] 만약 이전 파일이 존재하는 경우, 물리적 파일 삭제 수행
+        if (Objects.nonNull(oldImageFile)) uploadFileManager.remove(oldImageFile);
     }
 
 
