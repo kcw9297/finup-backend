@@ -15,5 +15,5 @@ public interface StudyProgressService {
 
     void progress(Long studyId, Long memberId);
 
-    void complete(Long studyProgressId);
+    void complete(Long studyId, Long memberId);
 }

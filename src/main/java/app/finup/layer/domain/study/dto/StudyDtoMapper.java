@@ -4,6 +4,12 @@ import app.finup.layer.domain.study.entity.Study;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+/**
+ * 단계 학습 엔티티 클래스 -> DTO 매핑 지원 클래스
+ * @author kcw
+ * @since 2025-12-03
+ */
+
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class StudyDtoMapper {
 

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 학습 진도 엔티티 JPA 레포지토리 인터페이스
@@ -22,12 +23,21 @@ public interface StudyProgressRepository extends JpaRepository<StudyProgress, Lo
     List<StudyProgress> findByMemberId(Long memberId);
 
 
+    @Query("""
+        SELECT sp
+        FROM StudyProgress sp
+        WHERE sp.study.studyId = :studyId AND sp.member.memberId = :memberId
+    """)
+    Optional<StudyProgress> findByStudyIdAndMemberId(Long studyId, Long memberId);
+
+
     @Modifying
     @Query("""
         DELETE FROM StudyProgress sp
         WHERE sp.member.memberId = :memberId
     """)
     void deleteByMemberId(Long memberId);
+
 
     @Modifying
     @Query("""
