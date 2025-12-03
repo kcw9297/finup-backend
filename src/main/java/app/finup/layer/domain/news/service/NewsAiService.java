@@ -19,18 +19,43 @@ public class NewsAiService {
     public Map<String, Object> analyzeArticle(String article) throws JsonProcessingException {
 
         String prompt = """
-        당신은 초보 투자자에게 뉴스를 쉽게 설명하는 AI 분석가입니다.
-        아래 기사의 전문을 읽고 다음 4가지를 JSON 형식으로 출력하세요.
-
-        1) summary : 기사 핵심 내용을 초보자도 이해할 수 있게 4~6줄로 요약
-        2) keywords : 경제·주식·시장 관련 핵심 키워드 5개 (어려운 전문 용어 금지)
-        3) explanation : 초보자용 쉬운 해설 (뉴스가 의미하는 점을 한 문단으로)
-        4) analysis : 시장/산업/기업에 미칠 영향에 대한 중립적 분석
-
-        반드시 JSON만 출력하세요.
-
+        당신은 '초보자도 이해할 수 있게 뉴스를 설명하는' 금융 전문 AI 분석가입니다.
+        기사 전체를 읽고 아래 3가지 항목을 JSON으로만 출력하세요.
+        
+        ### 출력 형식
+        {
+          "summary": "...",
+          "keywords": ["...", "...", "..."],
+          "insight": "..."
+        }
+        
+        ### 지시사항
+        
+        1) summary
+        - 기사 핵심 내용을 5-8줄로 요약
+        - 내용은 쉽고 부드럽게, 경제 초보자도 이해 가능하도록 작성
+        - 불필요한 기업명/인명/날짜는 최소화
+        
+        2) keywords
+        - '경제·투자 개념·시장 구조' 중심의 개념적 키워드 5개와 뜻풀이 한문장
+        - 기업명/기관명/인명/브랜드명/지명 절대 포함하지 말 것
+        - 예시: 금리 인상, 물가 상승률, 재무 구조, 시장 변동성, 기술주, 유동성, 수요 둔화, 공급망, 인플레이션 등
+        - 키워드들은 모두 개념형 단어여야 함
+        
+        3) insight (해설 + 분석 통합)
+        - 초보자 기준으로 쉽게 풀어서 설명
+        - 해당 뉴스가 의미하는 경제적 맥락 + 시장/산업에 미칠 수 있는 영향까지
+        - 지나친 투자 조언, 매수/매도 표현 금지
+        - 한 문단(5~7줄)로 작성
+        
+        ### 규칙
+        - 반드시 JSON만 출력
+        - JSON 밖 텍스트 금지
+        - 문자열 내 줄바꿈 최소화
+        
         기사 전문:
         """ + article;
+
         ChatResponse response = openAiChatModel.call(
                 new Prompt(prompt)
         );
@@ -46,8 +71,7 @@ public class NewsAiService {
             return Map.of(
                     "summary", "AI 분석에 실패했습니다.",
                     "keywords", List.of(),
-                    "explanation", "본문이 너무 짧거나 형식이 올바르지 않을 수 있습니다.",
-                    "analysis", "다시 시도해주세요."
+                    "insight", "다시 시도해주세요."
             );
         }
     }
