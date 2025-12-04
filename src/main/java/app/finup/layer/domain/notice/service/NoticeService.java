@@ -15,7 +15,7 @@ public interface NoticeService {
      * @param rq 작성 요청 DTO
      * @return 생성된 게시글 번호
      */
-    NoticeDto.Detail write(NoticeDto.Write rq);
+    NoticeDto.Detail write(NoticeDto.Write rq, Long adminId);
 
     /**
      * 게시글 수정
@@ -41,7 +41,7 @@ public interface NoticeService {
      * 게시글 목록 일괄 조회
      * @return 조회된 게시글 DTO 페이지 리스트
      */
-    Page<NoticeDto.Row> getList(NoticeDto.Row rq);
+    Page<NoticeDto.Row> getList(NoticeDto.Search rq);
 
 
     /**

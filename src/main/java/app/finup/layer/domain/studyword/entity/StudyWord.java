@@ -67,7 +67,7 @@ public class StudyWord extends BaseEntity {
      * 단어 이미지 세팅
      * @param wordImageFile 이미지 파일 엔티티
      */
-    public void setImage(UploadFile wordImageFile) {
+    public void uploadImage(UploadFile wordImageFile) {
         this.wordImageFile = wordImageFile;
     }
 

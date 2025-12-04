@@ -61,13 +61,4 @@ public class UploadFile extends BaseEntity {
         this.filePath = filePath;
     }
 
-    /**
-     * JPA 연관관계 메소드 - 갱신 (파일 덮어쓰기)
-     * @param originalName 변경 대상 원래 파일명
-     * @param size 변경 대상 파일 사이즈 (Byte)
-     */
-    public void update(String originalName, Long size) {
-        this.originalName = originalName;
-        this.size = size;
-    }
 }

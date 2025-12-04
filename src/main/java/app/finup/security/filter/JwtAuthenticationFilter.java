@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import app.finup.common.manager.CookieManager;
 import app.finup.common.utils.LogUtils;
 import app.finup.infra.jwt.dto.JwtClaims;
-import app.finup.infra.jwt.manager.JwtManager;
+import app.finup.infra.jwt.manager.JwtProvider;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtManager jwtManager;
+    private final JwtProvider jwtProvider;
     private final CookieManager cookieManager;
 
     @Value("${jwt.cookie-name}")
@@ -109,7 +109,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             // [1] JWT 인증 후, 토큰 내 Claims 조회 시도
-            return jwtManager.getClaims(at);
+            return jwtProvider.getClaims(at);
 
             // 인증 예외 발생 시 처리
         } catch (JwtVerifyException e) {
@@ -128,13 +128,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             // [1] AT 재발급
-            String reissuedAt = jwtManager.reissue(at);
+            String reissuedAt = jwtProvider.reissue(at);
 
             // [2] 새 쿠키 생성
             cookieManager.createCookie(response, jwtCookieName, reissuedAt, jwtCookieExpiration);
 
             // [3] 재발급된 토큰에서 Claims 조회 및 반환
-            return jwtManager.getClaims(reissuedAt);
+            return jwtProvider.getClaims(reissuedAt);
 
             // 다시 실패한 경우엔 예외 던짐
         } catch (JwtVerifyException e) {

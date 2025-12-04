@@ -6,26 +6,23 @@ import app.finup.layer.domain.stocks.service.StocksService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@RequestMapping(Url.NEWS_PUBLIC)
+@RequestMapping(Url.STOCKS_PUBLIC)
 @RestController
 @RequiredArgsConstructor
 public class PublicStocksController {
 
-    //private final StocksService stocksService;
+    private final StocksService stocksService;
     /*
     @GetMapping("/market-cap-ranking")
     public ResponseEntity<?> getMarketCapRanking() {
         return Api.ok(stocksService.getMarketCapRanking());
-
     }*/
 
-    //@GetMapping("/stocks/{idx}")
-    //public ResponseEntity<?> getDetail() {
-    //    return Api.ok(stocksService.getDetail());
-    //}
+    @GetMapping("/detail/{code}")
+    public ResponseEntity<?> getDetail(@PathVariable String code) {
+        return Api.ok(stocksService.getDetail(code));
+    }
 }
