@@ -3,6 +3,8 @@ package app.finup.layer.domain.news.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,7 +15,11 @@ public final class NewsDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Row {
+    public static class Row implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         private String title;
         private String summary;
         private String thumbnail;
