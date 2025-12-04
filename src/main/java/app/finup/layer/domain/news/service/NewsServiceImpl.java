@@ -2,7 +2,6 @@ package app.finup.layer.domain.news.service;
 
 import app.finup.infra.ai.AiManager;
 import app.finup.infra.ai.PromptTemplates;
-import app.finup.infra.redis.manager.RedisCacheManager;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.dto.NewsDtoMapper;
 import app.finup.layer.domain.news.util.NewsScraper;
@@ -43,7 +42,7 @@ public class NewsServiceImpl implements NewsService {
     private final ObjectMapper objectMapper;
     private final NewsScraper newsScraper;
     private final AiManager aiManager;
-    private final RedisCacheManager  redisCacheManager;
+    //private final NewsRedisStorage newsRedisStorage;
 
     private static final long NEWS_TTL_MILLIS = 30 * 60 * 1000L; // 30분
     private static final int NEWS_LIMIT = 100;
@@ -55,7 +54,7 @@ public class NewsServiceImpl implements NewsService {
     public List<NewsDto.Row> getNews(String category) {
         String key = "NEWS:"+category;
         try{
-            String cachedJson = redisCacheManager.getNews(key);
+            String cachedJson = null; //newsRedisStorage.getNews(key);
             if(cachedJson != null){
                 log.debug("[NEWS] 캐시 HIT key={}", key);
                 return objectMapper.readValue(cachedJson, new TypeReference<List<NewsDto.Row>>() {});
@@ -68,7 +67,7 @@ public class NewsServiceImpl implements NewsService {
 
         try {
             String json = objectMapper.writeValueAsString(freshNews);
-            redisCacheManager.saveNews(key, json, NEWS_TTL_MILLIS);
+            //newsRedisStorage.saveNews(key, json, NEWS_TTL_MILLIS);
             log.debug("[NEWS] 캐시 저장 성공 key={}", key);
         } catch (Exception e) {
             log.warn("[NEWS] 캐시 저장 실패 key={}, err={}", key, e.getMessage());
@@ -86,7 +85,7 @@ public class NewsServiceImpl implements NewsService {
 
         try{
             String json = objectMapper.writeValueAsString(freshNews);
-            redisCacheManager.saveNews(key, json, NEWS_TTL_MILLIS);
+            //newsRedisStorage.saveNews(key, json, NEWS_TTL_MILLIS);
             log.info("[NEWS] 캐시 강제 갱신 완료 key={}", key);
         } catch (Exception e) {
             log.error("[NEWS] 캐시 강제 갱신 실패 key={}, err={}", key, e.getMessage());
