@@ -15,9 +15,9 @@ public class StocksDto {
      * 종목 시가총액 순위 리스트 담기 위해 사용
      */
     @Data
-    //@Builder
-    //@AllArgsConstructor
+    @AllArgsConstructor
     //@NoArgsConstructor
+    //@Builder
     public class MarketCapRow {
 
     }
@@ -26,9 +26,9 @@ public class StocksDto {
      * 종목 거래량 순위 리스트 담기 위해 사용
      */
     @Data
-    //@Builder
-    //@AllArgsConstructor
+    @AllArgsConstructor
     //@NoArgsConstructor
+    //@Builder
     public class VolumeRow {
 
     }
@@ -37,9 +37,9 @@ public class StocksDto {
      * 종목 상세페이지 종목 정보 담기 위해 사용 // 근데 종목 한글이름은 안넘겨줌...
      */
     @Data
-    //@Builder
     @AllArgsConstructor
     @NoArgsConstructor
+    //@Builder
     public class Detail {
         //private String iscdStatClsCode;           // 종목 상태 구분 코드
         //private String margRate;                  // 증거금 비율
