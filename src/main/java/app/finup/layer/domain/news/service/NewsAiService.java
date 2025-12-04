@@ -25,7 +25,11 @@ public class NewsAiService {
         ### 출력 형식
         {
           "summary": "...",
-          "keywords": ["...", "...", "..."],
+          "keywords": [
+            { "term": "...", "definition": "..." },
+            { "term": "...", "definition": "..." },
+            { "term": "...", "definition": "..." }
+          ],
           "insight": "..."
         }
         
@@ -41,6 +45,8 @@ public class NewsAiService {
         - 기업명/기관명/인명/브랜드명/지명 절대 포함하지 말 것
         - 예시: 금리 인상, 물가 상승률, 재무 구조, 시장 변동성, 기술주, 유동성, 수요 둔화, 공급망, 인플레이션 등
         - 키워드들은 모두 개념형 단어여야 함
+        - 반드시 다음 형식을 사용할 것:
+          { "term": "용어", "definition": "한 문장 뜻풀이" }
         
         3) insight (해설 + 분석 통합)
         - 초보자 기준으로 쉽게 풀어서 설명
@@ -52,6 +58,7 @@ public class NewsAiService {
         - 반드시 JSON만 출력
         - JSON 밖 텍스트 금지
         - 문자열 내 줄바꿈 최소화
+        - key 이름(term, definition)은 절대 변경 금지
         
         기사 전문:
         """ + article;
@@ -67,7 +74,7 @@ public class NewsAiService {
         try {
             return mapper.readValue(aiOutput, Map.class);
         } catch (Exception e) {
-            // 🟥 AI가 JSON을 깔끔하게 못 생성한 경우 대비
+            // AI가 JSON을 깔끔하게 못 생성한 경우 대비
             return Map.of(
                     "summary", "AI 분석에 실패했습니다.",
                     "keywords", List.of(),
