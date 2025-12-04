@@ -1,6 +1,7 @@
 package app.finup.layer.domain.studyword.entity;
 
 import app.finup.layer.base.entity.BaseEntity;
+import app.finup.layer.base.inter.Reorderable;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import jakarta.persistence.*;
@@ -23,7 +24,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudyWord extends BaseEntity {
+public class StudyWord extends BaseEntity implements Reorderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,7 +44,6 @@ public class StudyWord extends BaseEntity {
             cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
             orphanRemoval = true // null 설정 시 이미지 엔티티 자동 삭제 처리
     )
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "word_image_id")
     private UploadFile wordImageFile; // 단어 이미지
 
@@ -91,15 +91,11 @@ public class StudyWord extends BaseEntity {
     }
 
 
-    /**
-     * 순서 재정렬 (정렬순서 변경)
-     * @param displayOrder 정렬 순서 값
-     */
+    // 정렬 순서 변경
+    @Override
     public void reorder(Double displayOrder) {
         this.displayOrder = displayOrder;
     }
-
-
 }
 
 

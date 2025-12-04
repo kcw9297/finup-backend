@@ -31,6 +31,7 @@ public class Notice extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member admin;
 
+    // 생성자
     @Builder
     public Notice(String title, String content, Member admin) {
         this.title = title;
@@ -38,6 +39,12 @@ public class Notice extends BaseEntity {
         this.admin = admin;
     }
 
+    /** 
+     * 공지사항 업데이트
+     * @param title 제목
+     * @param content 내용
+     */
+    
     public void update(String title, String content) {
         this.title = title;
         this.content = content;

@@ -3,6 +3,7 @@ package app.finup.layer.domain.studyword.service;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.LogUtils;
+import app.finup.layer.base.utils.ReorderUtils;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
@@ -13,7 +14,6 @@ import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
 import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
-import app.finup.layer.domain.uploadfile.repository.UploadFileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * StudyWordService 구현 클래스
@@ -36,15 +35,9 @@ import java.util.Optional;
 @Transactional
 public class StudyWordServiceImpl implements StudyWordService {
 
-    // 사용 상수
-    private static final Double DEFAULT_DISPLAY_ORDER = 1000.0;
-    private static final Double DISPLAY_ORDER_INCREMENT = 1.0; // 삽입 시 증가량
-
     private final StudyWordRepository studyWordRepository;
     private final StudyRepository studyRepository;
-    private final UploadFileRepository uploadFileRepository;
     private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
-
 
     @Override
     @Transactional(readOnly = true)
@@ -68,7 +61,7 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [2] 정렬 순서 계산 (첫 항목: 1000.0, 이후: 이전 값 + 1.0)
         Double displayOrder = Objects.isNull(rq.getLastStudyWordId()) ?
-                DEFAULT_DISPLAY_ORDER :
+                ReorderUtils.DEFAULT_DISPLAY_ORDER :
                 calculateNextOrder(rq.getLastStudyWordId());
 
         // [3] 엔티티 생성
@@ -89,7 +82,7 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         return studyWordRepository
                 .findById(lastStudyWordId)
-                .map(word -> word.getDisplayOrder() + DISPLAY_ORDER_INCREMENT)
+                .map(word -> word.getDisplayOrder() + ReorderUtils.DISPLAY_ORDER_INCREMENT)
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
     }
 
@@ -106,19 +99,15 @@ public class StudyWordServiceImpl implements StudyWordService {
         // [2] 변경 전 원래 이미지 정보 추출
         UploadFile oldImageFile = studyWord.getWordImageFile();
 
-        // [3] 새롭게 등록하는 파일 엔티티 생성
-        UploadFile newImageFile =
-                uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
-
-        // [4] 파일 엔티티 저장 후, 엔티티에 등록
-        uploadFileRepository.save(newImageFile);
-        studyWord.uploadImage(newImageFile);
+        // [3] 새롭게 등록하는 파일 엔티티 생성 후, 삽입
+        UploadFile newImageFile = uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
+        studyWord.uploadImage(newImageFile); // cascade = CascadeType.ALL 옵션으로 인해 자동 저장됨
 
         // [5] 새롭게 추가된 파일 생성
         uploadFileManager.store(file, newImageFile);
 
         // [6] 만약 이전 파일이 존재하는 경우, 물리적 파일 삭제 수행
-        // 삭제 실패는 치명적이지 않으므로, 로그로 기록`
+        // 삭제 실패는 치명적이지 않으므로, 로그로 기록
         try {
             if (Objects.nonNull(oldImageFile)) uploadFileManager.remove(oldImageFile);
         } catch (Exception e) {
@@ -153,7 +142,7 @@ public class StudyWordServiceImpl implements StudyWordService {
         StudyWord nextWord = findWordIfExists(rq.getNextStudyWordId());
 
         // [3] 케이스에 따라 displayOrder 계산 후 갱신
-        Double displayOrder = calculateReorder(targetWord, prevWord, nextWord);
+        Double displayOrder = ReorderUtils.calculateReorder(targetWord, prevWord, nextWord);
         targetWord.reorder(displayOrder);
     }
 
@@ -169,20 +158,34 @@ public class StudyWordServiceImpl implements StudyWordService {
     }
 
 
-    // 목록 계산
-    private Double calculateReorder(StudyWord targetWord, StudyWord prevWord, StudyWord nextWord) {
-        return null;
-    }
-
-
     @Override
     public void remove(Long studyWordId) {
 
+        // [1] 삭제 전 엔티티 조회
+        StudyWord studyWord = studyWordRepository
+                .findWithImageById(studyWordId)
+                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+
+        // [2] 엔티티 삭제
+        studyWordRepository.deleteById(studyWordId); // cascade = CascadeType.ALL 옵션으로 파일 엔티티도 함께 삭제
+
+        // [3] 파일 물리적 삭제
+        uploadFileManager.remove(studyWord.getWordImageFile());
     }
 
 
     @Override
     public void removeImage(Long studyWordId) {
 
+        // [1] 엔티티 조회
+        StudyWord studyWord = studyWordRepository
+                .findWithImageById(studyWordId)
+                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+
+        // [2] 파일 제거
+        studyWord.removeImage();
+
+        // [3] 파일 물리적 삭제
+        uploadFileManager.remove(studyWord.getWordImageFile());
     }
 }

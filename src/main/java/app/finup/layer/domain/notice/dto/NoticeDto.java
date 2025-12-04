@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class NoticeDto {
+public final class NoticeDto {
 
     /**
      * 일반적인 단일(상세) 조회 결과로 사용
