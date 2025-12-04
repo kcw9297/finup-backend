@@ -40,8 +40,8 @@ public class NoticeServiceImpl implements NoticeService {
 
     @Override
     @Transactional
-    public NoticeDto.Detail write(NoticeDto.Write rq) {
-        Long adminId = 1L; // 로그인 정보
+    public NoticeDto.Detail write(NoticeDto.Write rq, Long adminId) {
+         // 로그인 정보
         Member admin = memberRepository.findById(adminId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
         Notice entity = Notice.builder()

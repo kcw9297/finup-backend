@@ -15,7 +15,7 @@ public interface NoticeService {
      * @param rq 작성 요청 DTO
      * @return 생성된 게시글 번호
      */
-    NoticeDto.Detail write(NoticeDto.Write rq);
+    NoticeDto.Detail write(NoticeDto.Write rq, Long adminId);
 
     /**
      * 게시글 수정
