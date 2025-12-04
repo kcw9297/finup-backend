@@ -16,7 +16,7 @@ public enum FileOwner {
     STUDY_WORD("study-word"),
     UNKNOWN("unknown");
 
-    private final String name;
+    private final String value;
 
-    FileOwner(String name) {this.name = name;}
+    FileOwner(String value) {this.value = value;}
 }

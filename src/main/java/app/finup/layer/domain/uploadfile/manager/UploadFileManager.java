@@ -33,10 +33,11 @@ public interface UploadFileManager {
 
     /**
      * 물리적 파일 저장
+     * @param file 업로드 파일
      * @param uploadFile 대상 파일 엔티티 클래스
      * @return 저장에 성공한 파일 fullUrl
      */
-    String store(UploadFile uploadFile);
+    String store(MultipartFile file, UploadFile uploadFile);
 
 
     /**

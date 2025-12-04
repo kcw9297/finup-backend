@@ -2,6 +2,7 @@ package app.finup.layer.domain.uploadfile.manager;
 
 import app.finup.common.utils.EnvUtils;
 import app.finup.common.utils.StrUtils;
+import app.finup.infra.file.FileProvider;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
@@ -22,16 +23,20 @@ import java.util.Objects;
 
 @Slf4j
 @Component
-    @RequiredArgsConstructor
-    public class UploadFileManagerImpl implements UploadFileManager {
+@RequiredArgsConstructor
+public class UploadFileManagerImpl implements UploadFileManager {
 
-        private final Environment env; // 프로필 상태 확인
+    private final Environment env; // 프로필 상태 확인
+    private final FileProvider fileProvider; // 물리적 파일 조작
 
-        @Value("${server.port}")
-        private Integer serverPort;
+    @Value("${server.port}")
+    private Integer serverPort;
 
-        @Value("${file.domain}")
-        private String fileDomain;
+    @Value("${file.domain}")
+    private String fileDomain;
+
+    @Value("${file.dir}")
+    private String fileDir;
 
     @Override
     public UploadFile setEntity(MultipartFile file, Long ownerId, FileOwner fileOwner, FileType fileType) {
@@ -40,7 +45,7 @@ import java.util.Objects;
         String originalName = file.getOriginalFilename();
         String ext = extractFileExt(originalName);
         String storeName = "%s.%s".formatted(StrUtils.createUUID(), ext);
-        String filePath = "/%s/%s".formatted(fileOwner.getName(), storeName);
+        String filePath = "%s/%s".formatted(fileOwner.getValue(), storeName);
 
         // 업로드 정보 DTO 생성 및 반환
         return UploadFile.builder()
@@ -55,6 +60,51 @@ import java.util.Objects;
     }
 
 
+    @Override
+    public String getFullUrl(String filePath) {
+
+        return EnvUtils.isProd(env) ?
+                "%s/%s".formatted(fileDomain, filePath) :
+                "http://localhost:%s/%s/%s".formatted(serverPort, fileDomain, filePath);
+    }
+
+
+    @Override
+    public String store(MultipartFile file, UploadFile uploadFile) {
+
+        // [1] 파일 업로드 경로 조합
+        String storePath = getStorePath(uploadFile);
+
+        // [2] 파일 업로드 수행
+        fileProvider.upload(file, storePath);
+
+        // [3] 저장된 file fullUrl 반환 (내부 메소드 사용)
+        return getFullUrl(uploadFile.getFilePath());
+    }
+
+
+    @Override
+    public byte[] download(UploadFile uploadFile) {
+
+        // [1] 파일 업로드 경로 조합
+        String storePath = getStorePath(uploadFile);
+
+        // [2] 파일 다운로드 처리를 위한 바이트 스트림 추출 및 반환
+        return fileProvider.download(storePath);
+    }
+
+
+    @Override
+    public void remove(UploadFile uploadFile) {
+
+        // [1] 파일 업로드 경로 조합
+        String storePath = getStorePath(uploadFile);
+
+        // [2] 파일 삭제
+        fileProvider.remove(storePath);
+    }
+
+
     // 파일 확장자 추출
     private static String extractFileExt(String originalFilename) {
         return Objects.isNull(originalFilename) || originalFilename.isBlank() ?
@@ -62,28 +112,16 @@ import java.util.Objects;
     }
 
 
-    @Override
-    public String getFullUrl(String filePath) {
+    // 파일 업로드 경로 조합
+    private String getStorePath(UploadFile uploadFile) {
 
+        // [1] 저장 파일 주소 추출
+        String filePath = uploadFile.getFilePath();
+
+        // [2] 배포/로컬 환경에 따라 업로드 주소 생성 및 반환
         return EnvUtils.isProd(env) ?
-                "%s%s".formatted(fileDomain, filePath) :
-                "http://localhost:%s%s%s".formatted(serverPort, fileDomain, filePath);
-    }
-
-
-    @Override
-    public String store(UploadFile uploadFile) {
-        return "";
-    }
-
-    @Override
-    public byte[] download(UploadFile uploadFile) {
-        return new byte[0];
-    }
-
-    @Override
-    public void remove(UploadFile uploadFile) {
-
+                filePath : // AWS S3는 상대 경로 그대로 사용
+                "%s/%s".formatted(fileDir, filePath);
     }
 
 }

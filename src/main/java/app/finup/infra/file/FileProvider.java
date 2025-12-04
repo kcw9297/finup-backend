@@ -11,35 +11,24 @@ public interface FileProvider {
 
     /**
      * 파일 업로드
-     * @param file       저장 대상 파일
-     * @param storeName  저장 파일명
-     * @param entityName 저장된 파일이 속하는 엔티티 타입명
-     * @return 저장된 파일 경로
+     * @param file      저장 대상 파일
+     * @param storePath 저장 주소
      */
-    String upload(MultipartFile file, String storeName, String entityName);
+    void upload(MultipartFile file, String storePath);
 
 
     /**
-     * 파일 다운로드
-     * @param storeName  저장 파일명
-     * @param entityName 저장된 파일이 속하는 엔티티 타입명
-     * @return 파일 바이트 문자열 반환
+     * 파일 다운로드 (바이트 문자열 추출)
+     * @param storePath 저장 주소
+     * @return 파일 바이트 문자열
      */
-    byte[] download(String storeName, String entityName);
+    byte[] download(String storePath);
 
 
     /**
      * 파일 삭제
-     * @param storeName  저장 파일명
-     * @param entityName 저장된 파일이 속하는 엔티티 타입명
+     * @param storePath 저장 파일 주소
      */
-    void remove(String storeName, String entityName);
-
-
-    /**
-     * 파일 삭제
-     * @param filePath 저장 파일 주소
-     */
-    void remove(String filePath);
+    void remove(String storePath);
 
 }
