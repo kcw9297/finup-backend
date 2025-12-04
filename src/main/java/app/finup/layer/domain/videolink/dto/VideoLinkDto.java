@@ -1,12 +1,8 @@
 package app.finup.layer.domain.videolink.dto;
 
-import app.finup.layer.domain.study.dto.StudyDto;
-import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
+import lombok.*;
 
 /**
  * 학습용 비디오 링크 DTO 클래스
@@ -27,7 +23,7 @@ public final class VideoLinkDto {
     public static class Row {
 
         private Long videoLinkId;
-        private Long videoId;
+        private String videoId;
         private String videoUrl;
         private String thumbnailUrl;
         private String title;
@@ -48,6 +44,7 @@ public final class VideoLinkDto {
         private Long ownerId; // 주인이 HOME인 경우 null
         private VideoLinkOwner videoLinkOwner;
         private String videoUrl;
+        private Long lastVideoLinkId; // 가장 마지막에 있던 영상링크 번호
 
         // 하단 정보는 유튜브 API에서 제공 받은 후 채우는 정보
         private String videoId;
@@ -65,6 +62,7 @@ public final class VideoLinkDto {
             this.thumbnailUrl = thumbnailUrl;
             this.title = title;
         }
+
     }
 
 

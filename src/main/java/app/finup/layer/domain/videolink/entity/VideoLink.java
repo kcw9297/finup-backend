@@ -1,6 +1,7 @@
 package app.finup.layer.domain.videolink.entity;
 
 import app.finup.layer.base.entity.BaseEntity;
+import app.finup.layer.base.inter.Reorderable;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.member.entity.Member;
 import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
@@ -24,7 +25,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoLink extends BaseEntity {
+public class VideoLink extends BaseEntity implements Reorderable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,14 +67,6 @@ public class VideoLink extends BaseEntity {
     /* 엔티티 메소드 */
 
     /**
-     * 재정렬 로직
-     * @param displayOrder 정렬 순서
-     */
-    public void reorder(Double displayOrder) {
-        this.displayOrder = displayOrder;
-    }
-
-    /**
      * 비디오 링크정보 갱신
      * @param videoUrl 비디오 Full URL
      * @param videoId 비디오 아이디 (API 에서 얻어온 번호)
@@ -85,6 +78,12 @@ public class VideoLink extends BaseEntity {
         this.videoId = videoId;
         this.thumbnailUrl = thumbnailUrl;
         this.title = title;
+    }
+
+    // 정렬 순서 변경
+    @Override
+    public void reorder(Double displayOrder) {
+        this.displayOrder = displayOrder;
     }
 }
 

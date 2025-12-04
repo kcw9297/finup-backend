@@ -1,4 +1,4 @@
-package app.finup.layer.domain.admin.controller;
+package app.finup.layer.domain.member.controller;
 
 import app.finup.common.constant.Url;
 import lombok.RequiredArgsConstructor;
@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 관리자 컨트롤러 클래스
+ * 회원 컨트롤러 클래스
  * @author khj
  * @since 2025-12-04
  */
 
 @Slf4j
 @RestController
-@RequestMapping(Url.ADMIN_API)
+@RequestMapping(Url.MEMBER)
 @RequiredArgsConstructor
-public class AdminController {
+public class MemberController {
 
 }
