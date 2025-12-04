@@ -45,6 +45,9 @@ public class Url {
     public static final String STOCKS = API + "/stocks";
     public static final String STOCKS_PUBLIC = PUBLIC + STOCKS;
 
+    /* admin */
+    public static final String ADMIN_API = API + ADMIN;
+
     /* notice */
     public static final String NOTICE = API + "/notices";
     public static final String NOTICE_ADMIN_API = ADMIN + NOTICE;
