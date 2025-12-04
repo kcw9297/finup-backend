@@ -21,7 +21,7 @@ public class PublicStocksController {
         return Api.ok(stocksService.getMarketCapRanking());
     }*/
 
-    @GetMapping("/detail/{code}")
+    @GetMapping("/detail/{code:[0-9]+}")
     public ResponseEntity<?> getDetail(@PathVariable String code) {
         return Api.ok(stocksService.getDetail(code));
     }
