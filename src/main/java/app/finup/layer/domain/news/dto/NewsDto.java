@@ -19,7 +19,7 @@ public final class NewsDto {
         private String thumbnail;
         private String publisher;
         private String link;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime publishedAt;
     }
 

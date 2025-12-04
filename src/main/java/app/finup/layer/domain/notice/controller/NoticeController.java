@@ -84,8 +84,8 @@ public class NoticeController {
      * [POST] /admin/api/notices/
      */
     @PostMapping
-    public ResponseEntity<?> addNotice(@RequestBody NoticeDto.Write rq) {
-        NoticeDto.Detail saved = noticeService.write(rq);
+    public ResponseEntity<?> addNotice(@RequestBody NoticeDto.Write rq, Long adminId) {
+        NoticeDto.Detail saved = noticeService.write(rq, adminId);
         return Api.ok(saved);
     }
 }

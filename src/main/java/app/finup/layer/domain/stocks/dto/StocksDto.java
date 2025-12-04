@@ -1,5 +1,6 @@
 package app.finup.layer.domain.stocks.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
 import lombok.*;
 
@@ -15,10 +16,10 @@ public class StocksDto {
      * 종목 시가총액 순위 리스트 담기 위해 사용
      */
     @Data
-    //@Builder
-    //@AllArgsConstructor
+    @AllArgsConstructor
     //@NoArgsConstructor
-    public class MarketCapRow {
+    //@Builder
+    public static class MarketCapRow {
 
     }
 
@@ -26,10 +27,10 @@ public class StocksDto {
      * 종목 거래량 순위 리스트 담기 위해 사용
      */
     @Data
-    //@Builder
-    //@AllArgsConstructor
+    @AllArgsConstructor
     //@NoArgsConstructor
-    public class VolumeRow {
+    //@Builder
+    public static class VolumeRow {
 
     }
 
@@ -37,10 +38,46 @@ public class StocksDto {
      * 종목 상세페이지 종목 정보 담기 위해 사용 // 근데 종목 한글이름은 안넘겨줌...
      */
     @Data
-    //@Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Detail {
+    @Builder
+    public static class Detail {
+
+        //종목 기본 정보
+        private String stckShrnIscd;              // 주식 단축 종목코드 //005930
+        private String stckPrpr;                  // 주식 현재가 //104900
+        private String rprsMrktKorName;           // 대표 시장 한글 명 //KOSPI200
+        private String bstpKorIsnm;               // 업종 한글 종목명 //전기·전자
+        private String stckFcam;                  // 주식 액면가 //100
+        private String htsAvls;                   // HTS 시가총액 //6209700
+        private String lstnStcn;                  // 상장 주수 //5919637922
+
+        //투자지표
+        //[1] 가격
+        private String w52Hgpr;                    // 52주일 최고가 //112400
+        private String w52Lwpr;                    // 52주일 최저가 //50800
+        private String d250Hgpr;                   // 250일 최고가 //112400
+        private String d250Lwpr;                   // 250일 최저가 //50800
+
+        //[2] 가치평가
+        private String per;                        // PER //21.19
+        private String pbr;                        // PBR //1.81
+        private String eps;                        // EPS //4950.00
+        private String bps;                        // BPS //57930.00
+
+        //[3] 수급 거래
+        private String frgnNtbyQty;                 // 외국인 순매수 수량 //0
+        private String pgtrNtbyQty;                 // 프로그램매매 순매수 수량 //-48796
+        private String htsFrgnEhrt;                 // HTS 외국인 소진율 //52.22
+        private String volTnrt;                     // 거래량 회전율 //0.20
+
+        //[4] 리스크 상태
+        private String tempStopYn;                   // 임시 정지 여부  //N
+        private String invtCafulYn;                  // 투자유의여부 //N
+        private String shortOverYn;                  // 단기과열여부 //N
+        private String mangIssuClsCode;              // 관리종목여부 //N
+
+        /* api로 가져올 수 있는 전체 데이터
         //private String iscdStatClsCode;           // 종목 상태 구분 코드
         //private String margRate;                  // 증거금 비율
         private String rprsMrktKorName;           // 대표 시장 한글 명 //KOSPI200
@@ -123,6 +160,7 @@ public class StocksDto {
         private String shortOverYn;                  // 단기과열여부 //N
         //private String sltrYn;                       // 정리매매여부
         private String mangIssuClsCode;              // 관리종목여부 //N
+         */
     }
 
     /**
