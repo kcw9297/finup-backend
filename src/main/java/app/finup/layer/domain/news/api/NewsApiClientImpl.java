@@ -38,13 +38,13 @@ public class NewsApiClientImpl implements NewsApiClient {
     private final NewsScraper newsScraper;
 
     @Override
-    public List<NewsDto.Row> fetchNews(String category) {
+    public List<NewsDto.Row> fetchNews(String query,String sort, int display) {
 
-        String json = callNaverApi(category);
+        String json = callNaverApi(query,sort,display);
         return parseNaverJson(json);
     }
     //webclient 호출 담당
-    private String callNaverApi(String category){
+    private String callNaverApi(String query,String sort, int display){
         WebClient client = WebClient.builder()
                 .baseUrl("https://openapi.naver.com")
                 .defaultHeader("X-Naver-Client-Id", clientId)
@@ -55,9 +55,9 @@ public class NewsApiClientImpl implements NewsApiClient {
         return client.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
-                        .queryParam("query", "국내+주식")
-                        .queryParam("display", 100)
-                        .queryParam("sort", category)
+                        .queryParam("query", query)
+                        .queryParam("display", display)
+                        .queryParam("sort", sort)
                         .build()
                 )
                 .retrieve()

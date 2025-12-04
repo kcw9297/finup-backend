@@ -1,26 +1,15 @@
 package app.finup.layer.domain.news.service;
 
-import app.finup.infra.ai.AiManager;
 import app.finup.layer.domain.news.api.NewsApiClient;
 import app.finup.layer.domain.news.dto.NewsDto;
-import app.finup.layer.domain.news.dto.NewsDtoMapper;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
-import app.finup.layer.domain.news.util.NewsScraper;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 /**
  * NewsService 구현 클래스
@@ -83,7 +72,7 @@ public class NewsServiceImpl implements NewsService {
 
     private List<NewsDto.Row> fetchFromExternal(String category) {
         log.info("[NEWS] 외부 뉴스 API 호출 category={}, limit={}", category, NEWS_LIMIT);
-        List<NewsDto.Row> parseList = newsApiClient.fetchNews(category);
+        List<NewsDto.Row> parseList = newsApiClient.fetchNews("국내+주식",category,100);
         List<NewsDto.Row> distinct = distinctByUrl(parseList);
 
         return distinct;
