@@ -1,6 +1,8 @@
 package app.finup.layer.domain.stocks.service;
 
 import app.finup.layer.domain.stocks.dto.StocksDto;
+import app.finup.layer.domain.stocks.dto.StocksDtoMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * StocksService 구현 클래스
@@ -29,24 +32,33 @@ public class StocksServiceImpl implements StocksService {
     @Value("${API_KIS_LOCAL_ACCESS_TOKEN}")
     private String ACCESS_TOKEN;
 
+    private final ObjectMapper objectMapper;
+
     /*api URL*/
-    String detail = "/uapi/domestic-stock/v1/quotations/inquire-price";
+    //종목 상세 페이지 데이터
+    public static final String DETAIL = "/uapi/domestic-stock/v1/quotations/inquire-price";
+
+    //종목 리스트 시가총액 순위
+    public static final String MARKET_CAP = "/uapi/domestic-stock/v1/ranking/market-cap";
+
 
     // 종목 상세 페이지 데이터 가져오기
     @Override
-    public List<StocksDto.Detail> getDetail(String code) {
+    public StocksDto.Detail getDetail(String code) {
+        System.out.println("요청 종목코드: [" + code + "]");
 
         //[1] 종목코드(String code)로 json 데이터 가져오기
         String json = fetchDetailJson(code);
-        if(json == null) return List.of();
+        if(json == null) return null;
 
-        System.out.println(json);
-        log.info(json);
+        //System.out.println(json);
+        //log.info(json);
 
-        //List<StocksDto.Detail> list = parseDetailJson(json);
+        //[2] json데이터 dto로 parsing하기
+        StocksDto.Detail detail = parseDetailJson(json);
+        System.out.println(detail);
 
-        //return list;
-        return null;
+        return detail;
     }
 
     private String fetchDetailJson(String code) {
@@ -56,7 +68,7 @@ public class StocksServiceImpl implements StocksService {
 
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path(detail)
+                        .path(DETAIL)
                         .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                         .queryParam("FID_INPUT_ISCD", code)
                         .build()
@@ -70,21 +82,16 @@ public class StocksServiceImpl implements StocksService {
                 .bodyToMono(String.class)
                 .block();
     }
-}
 
-/*
-content-type: str    #컨텐츠타입
-authorization: str    #접근토큰
-appkey: str    #앱키
-appsecret: str    #앱시크릿키
-personalseckey: Optional[str] = None    #고객식별키
-tr_id: str    #거래ID
-tr_cont: Optional[str] = None    #연속 거래 여부
-custtype: str    #고객 타입
-seq_no: Optional[str] = None    #일련번호
-mac_address: Optional[str] = None    #맥주소
-phone_number: Optional[str] = None    #핸드폰번호
-ip_addr: Optional[str] = None    #접속 단말 공인 IP
-gt_uid: Optional[str] = None    #Global UID
-*/
+    private StocksDto.Detail parseDetailJson(String json) {
+        try {
+            JsonNode root = objectMapper.readTree(json);
+            JsonNode output = root.path("output");
+            return StocksDtoMapper.toDetail(output);
+        } catch (Exception e) {
+            log.error("상세 정보 파싱 실패: {}", e.getMessage());
+            return null;
+        }
+    }
+}
 

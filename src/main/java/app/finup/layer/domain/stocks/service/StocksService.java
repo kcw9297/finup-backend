@@ -6,5 +6,5 @@ import java.util.List;
 public interface StocksService {
     //List<StocksDto.Row> getMarketCapRanking();
     //List<StocksDto> getStocks();
-    List<StocksDto.Detail> getDetail(String code);
+    StocksDto.Detail getDetail(String code);
 }
