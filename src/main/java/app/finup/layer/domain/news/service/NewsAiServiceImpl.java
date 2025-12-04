@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +43,13 @@ public class NewsAiServiceImpl implements NewsAiService {
         String article = extractArticle(url);
         String prompt = PromptTemplates.NEWS_ANALYSIS.replace("{ARTICLE}", article);
         Map<String, Object> freshAi= aiManager.runJsonPrompt(prompt);
+
+        //키워드 정렬
+        List<Map<String, String>> keywords = (List<Map<String, String>>) freshAi.get("keywords");
+        if(keywords != null){
+            keywords.sort(Comparator.comparing(k -> k.get("term")));
+            freshAi.put("keywords", keywords);
+        }
         newsRedisStorage.saveNews(key, freshAi, DURATION_AI);
 
         return freshAi;
@@ -68,54 +76,8 @@ public class NewsAiServiceImpl implements NewsAiService {
     }
 
     private String tryExtractContent(Document doc) {
-
-        // 연합뉴스
-        Element yna = doc.selectFirst("article#articleWrap");
-        if (yna != null) return yna.text();
-
-        // 한국경제
-        Element hk = doc.selectFirst("div#articletxt, div.article-body");
-        if (hk != null) return hk.text();
-
-        // 조선비즈
-        Element cbiz = doc.selectFirst("div#news_body_id, div.article-body");
-        if (cbiz != null) return cbiz.text();
-
-        // 매일경제
-        Element mk = doc.selectFirst("div#article_body, div#article_body_id, section.article");
-        if (mk != null) return mk.text();
-
-        // 머니투데이
-        Element mt = doc.selectFirst("div#article, div#textBody");
-        if (mt != null) return mt.text();
-
-        // 아시아경제
-        Element asiae = doc.selectFirst("div#articleBody, div#txt_content");
-        if (asiae != null) return asiae.text();
-
-        // 뉴시스
-        Element newsis = doc.selectFirst("div#content, div.viewBox");
-        if (newsis != null) return newsis.text();
-
-        // 파이낸셜뉴스
-        Element fn = doc.selectFirst("div#article_content, div#article_body");
-        if (fn != null) return fn.text();
-
-        // 디지털타임스
-        Element dt = doc.selectFirst("div#articleBody, div.article_txt");
-        if (dt != null) return dt.text();
-
-        // 전자신문
-        Element et = doc.selectFirst("div#articleBody, div#articleTxt");
-        if (et != null) return et.text();
-
-        // 헤럴드경제
-        Element herald = doc.selectFirst("div#articleText, div.article-text");
-        if (herald != null) return herald.text();
-
-        // 그 외 기본적인 기사 body 후보들
-        Element generic = doc.selectFirst("article, div.article, div#content, div.story-body, section");
-        if (generic != null) return generic.text();
+        Element content = doc.selectFirst("dic_area");
+        if(content != null) return content.text();
 
         return "";
     }

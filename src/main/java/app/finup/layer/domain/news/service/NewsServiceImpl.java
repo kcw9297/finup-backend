@@ -1,6 +1,7 @@
 package app.finup.layer.domain.news.service;
 
 import app.finup.infra.ai.AiManager;
+import app.finup.layer.domain.news.api.NewsApiClient;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.dto.NewsDtoMapper;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
@@ -32,16 +33,8 @@ import java.util.*;
 @RequiredArgsConstructor
 public class NewsServiceImpl implements NewsService {
 
-    private final ObjectMapper objectMapper;
-    @Value("${api.naver-news.client.id}")
-    private String clientId;
-
-    @Value("${api.naver-news.client.secret}")
-    private String clientSecret;
-
-    private final NewsScraper newsScraper;
+    private final NewsApiClient newsApiClient;
     private final NewsRedisStorage newsRedisStorage;
-
     private static final Duration DURATION_NEWS = Duration.ofMinutes(30); // 30분
     private static final int NEWS_LIMIT = 100;
     /**
@@ -90,77 +83,10 @@ public class NewsServiceImpl implements NewsService {
 
     private List<NewsDto.Row> fetchFromExternal(String category) {
         log.info("[NEWS] 외부 뉴스 API 호출 category={}, limit={}", category, NEWS_LIMIT);
-        String json = fetchNewsJson(category);
-        List<NewsDto.Row> parseList = parseNewsJson(json);
-        List<NewsDto.Row> filteredPress = filterAllowedPress(parseList);
-        List<NewsDto.Row> distinct = distinctByUrl(filteredPress);
+        List<NewsDto.Row> parseList = newsApiClient.fetchNews(category);
+        List<NewsDto.Row> distinct = distinctByUrl(parseList);
 
         return distinct;
-    }
-
-    private String fetchNewsJson(String category) {
-        WebClient client = WebClient.builder()
-                .baseUrl("https://openapi.naver.com")
-                .defaultHeader("X-Naver-Client-Id", clientId)
-                .defaultHeader("X-Naver-Client-Secret", clientSecret)
-                .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0")
-                .build();
-
-        return client.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/v1/search/news.json")
-                        .queryParam("query", "국내+주식")
-                        .queryParam("display", 100)
-                        .queryParam("sort", category)
-                        .build()
-                )
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-    }
-
-    private List<NewsDto.Row> parseNewsJson(String json) {
-        List<NewsDto.Row> result = new ArrayList<>();
-
-        try {
-            JsonNode root = objectMapper.readTree(json);
-            JsonNode items = root.path("items");
-
-            for (JsonNode item : items) {
-                String title = Jsoup.parse(item.path("title").asText()).text();
-                String summary = Jsoup.parse(item.path("description").asText()).text();
-                String link = item.path("link").asText();
-
-                String thumbnail = newsScraper.extractThumbnail(link);
-                String publisher = newsScraper.extractPublisher(link);
-
-                ZonedDateTime zdt = ZonedDateTime.parse(
-                        item.path("pubDate").asText(),
-                        DateTimeFormatter.RFC_1123_DATE_TIME
-                );
-
-                NewsDto.Row dto = NewsDtoMapper.toRow(
-                        title,
-                        summary,
-                        thumbnail,
-                        publisher,
-                        zdt.toLocalDateTime(),
-                        link
-                );
-
-                result.add(dto);
-            }
-
-        } catch (Exception e) {
-            log.error("뉴스 파싱 에러: {}", e.getMessage());
-        }
-
-        return result;
-    }
-    private List<NewsDto.Row> filterAllowedPress(List<NewsDto.Row> list) {
-        return list.stream()
-                .filter(item -> NewsDto.ALLOWED_PRESS.contains(item.getPublisher()))
-                .toList();
     }
 
     private List<NewsDto.Row> distinctByUrl(List<NewsDto.Row> list) {

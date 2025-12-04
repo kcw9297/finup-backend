@@ -28,20 +28,4 @@ public final class NewsDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime publishedAt;
     }
-
-    public static final List<String> ALLOWED_PRESS = List.of(
-            "한국경제",
-            "매일경제",
-            "연합뉴스",
-            "조선비즈",
-            "서울경제",
-            "머니투데이",
-            "아시아경제",
-            "뉴시스",
-            "파이낸셜뉴스",
-            "디지털타임스",
-            "전자신문",
-            "헤럴드경제"
-    );
-
 }
