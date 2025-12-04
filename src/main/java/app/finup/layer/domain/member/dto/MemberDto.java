@@ -10,7 +10,6 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberDto {
 
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
