@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -20,4 +21,13 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
         WHERE sw.study.studyId = :studyId
     """)
     List<StudyWord> findByStudyId(Long studyId);
+
+
+    @Query("""
+        SELECT sw
+        FROM StudyWord sw
+        LEFT JOIN FETCH sw.wordImageFile
+        WHERE sw.studyWordId = :studyWordId
+    """)
+    Optional<StudyWord> findWithImageById(Long studyWordId);
 }

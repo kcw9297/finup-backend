@@ -1,11 +1,11 @@
-package app.finup.infra.redis.manager;
+package app.finup.infra.jwt.redis;
 
 /**
- * Redis ↔ Jwt 간 생명 주기를 관리하는 Manager 클래스
+ * Redis 내 JWT 토큰 저장을 로직을 제공하는 인터페이스
  * @author kcw
  * @since 2025-11-26
  */
-public interface RedisJwtManager {
+public interface RedisJwtStorage {
 
     void save(String jti, String refreshToken);
 

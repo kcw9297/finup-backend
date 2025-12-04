@@ -3,7 +3,6 @@ package app.finup.layer.domain.uploadfile.controller;
 import app.finup.common.utils.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/upload-files")
 @RequiredArgsConstructor
-public class FileRestController {
+public class FileController {
 
     @GetMapping("/{fileId}/download")
     public ResponseEntity<?> download(@PathVariable Long fileId) {
