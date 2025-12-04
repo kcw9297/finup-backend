@@ -20,10 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
 /**
  * NoticeService 구현 클래스
- * ReboardServiceImpl 패턴에 완전히 맞춘 구조
  * @author khj
  * @since 2025-12-01
  */
@@ -53,6 +51,7 @@ public class NoticeServiceImpl implements NoticeService {
         Notice saved = noticeRepository.save(entity);
         return NoticeDtoMapper.toDetailDto(saved);
     }
+
 
     @Override
     @Transactional
