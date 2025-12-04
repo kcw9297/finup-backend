@@ -1,8 +1,12 @@
 package app.finup.layer.domain.news.service;
 
+import app.finup.infra.ai.AiManager;
+import app.finup.infra.ai.PromptTemplates;
+import app.finup.infra.redis.manager.RedisCacheManager;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.dto.NewsDtoMapper;
 import app.finup.layer.domain.news.util.NewsScraper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +23,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-
+/**
+ * NewsService 구현 클래스
+ * @author oyh
+ * @since 2025-12-01
+ */
 @Slf4j
 @Service
 @Transactional
@@ -34,21 +42,82 @@ public class NewsServiceImpl implements NewsService {
 
     private final ObjectMapper objectMapper;
     private final NewsScraper newsScraper;
+    private final AiManager aiManager;
+    private final RedisCacheManager  redisCacheManager;
 
+    private static final long NEWS_TTL_MILLIS = 30 * 60 * 1000L; // 30분
+    private static final int NEWS_LIMIT = 100;
+    /**
+     * 프론트에서 호출하는 메인 메서드
+     * GET /news/list?category=date
+     */
     @Override
-    public List<NewsDto.Row> getNews(int page, String keyword, String category) {
-        keyword = "국내주식";
+    public List<NewsDto.Row> getNews(String category) {
+        String key = "NEWS:"+category;
+        try{
+            String cachedJson = redisCacheManager.getNews(key);
+            if(cachedJson != null){
+                log.debug("[NEWS] 캐시 HIT key={}", key);
+                return objectMapper.readValue(cachedJson, new TypeReference<List<NewsDto.Row>>() {});
+            }
+        }catch (Exception e){
+            log.warn("[NEWS] 캐시 조회/파싱 실패 → 외부 API로 fallback. key={}, err={}", key, e.getMessage());
+        }
 
-        String json = fetchNewsJson(page, keyword, category);
-        if(json == null) return List.of();
-        List<NewsDto.Row> list = parseNewsJson(json);
-        //언론사 필터링
-        list = filterAllowedPress(list);
-        //url 기준 중복 삭제
-        list = distinctByUrl(list);
+        List<NewsDto.Row> freshNews = fetchFromExternal(category);
 
-        return list;
+        try {
+            String json = objectMapper.writeValueAsString(freshNews);
+            redisCacheManager.saveNews(key, json, NEWS_TTL_MILLIS);
+            log.debug("[NEWS] 캐시 저장 성공 key={}", key);
+        } catch (Exception e) {
+            log.warn("[NEWS] 캐시 저장 실패 key={}, err={}", key, e.getMessage());
+        }
+        return freshNews;
     }
+    /**
+     * 스케줄러에서 강제 리프레시할 때 호출
+     * - 30분마다 date/sim 각각 새로 가져와 덮어쓰기
+     */
+    @Override
+    public void refreshCategory(String category) {
+        String key = "NEWS:"+category;
+        List<NewsDto.Row> freshNews = fetchFromExternal(category);
+
+        try{
+            String json = objectMapper.writeValueAsString(freshNews);
+            redisCacheManager.saveNews(key, json, NEWS_TTL_MILLIS);
+            log.info("[NEWS] 캐시 강제 갱신 완료 key={}", key);
+        } catch (Exception e) {
+            log.error("[NEWS] 캐시 강제 갱신 실패 key={}, err={}", key, e.getMessage());
+        }
+    }
+    /**
+     * 모든 카테고리 캐시 갱신 (스케줄러에서 1번만 호출)
+     */
+    @Override
+    public void refreshAllCategories() {
+        refreshCategory("date");
+        refreshCategory("sim");
+    }
+
+    private List<NewsDto.Row> fetchFromExternal(String category) {
+        log.info("[NEWS] 외부 뉴스 API 호출 category={}, limit={}", category, NEWS_LIMIT);
+        String json = fetchNewsJson(category);
+        List<NewsDto.Row> parseList = parseNewsJson(json);
+        List<NewsDto.Row> filteredPress = filterAllowedPress(parseList);
+        List<NewsDto.Row> distinct = distinctByUrl(filteredPress);
+
+        return distinct.stream()
+                .limit(NEWS_LIMIT)
+                .toList();
+    }
+    @Override
+    public Map<String, Object> analyzeNews(String article) {
+        String prompt = PromptTemplates.NEWS_ANALYSIS.replace("{ARTICLE}", article);
+        return aiManager.runJsonPrompt(prompt);
+    }
+
 
     @Override
     public String extractArticle(String url) {
@@ -70,10 +139,7 @@ public class NewsServiceImpl implements NewsService {
         }
     }
 
-    private String fetchNewsJson(int page, String keyword, String category) {
-        int display = 20;
-        int start = (page-1) * display + 1;
-
+    private String fetchNewsJson(String category) {
         WebClient client = WebClient.builder()
                 .baseUrl("https://openapi.naver.com")
                 .defaultHeader("X-Naver-Client-Id", clientId)
@@ -84,10 +150,9 @@ public class NewsServiceImpl implements NewsService {
         return client.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
-                        .queryParam("query", keyword)
-                        .queryParam("display", display)
+                        .queryParam("query", "국내 주식")
+                        .queryParam("display", 100)
                         .queryParam("sort", category)
-                        .queryParam("start", start)
                         .build()
                 )
                 .retrieve()
