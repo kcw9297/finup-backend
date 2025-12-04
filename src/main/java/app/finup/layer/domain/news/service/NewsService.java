@@ -11,8 +11,8 @@ import java.util.Map;
  * @since 2025-12-01
  */
 public interface NewsService {
-    String extractArticle(String url);
-    Map<String, Object> analyzeNews(String article);
+
+
     List<NewsDto.Row> getNews(String category);
     void refreshCategory(String category);
     void refreshAllCategories();

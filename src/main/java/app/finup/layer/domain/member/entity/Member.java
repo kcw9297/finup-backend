@@ -57,7 +57,6 @@ public class Member extends BaseEntity {
             cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
             orphanRemoval = true // null 설정 시 이미지 엔티티 자동 삭제 처리
     )
-    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "profile_image_id")
     private UploadFile profileImage;
 

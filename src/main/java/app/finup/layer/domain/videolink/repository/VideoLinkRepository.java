@@ -15,6 +15,14 @@ import java.util.List;
  */
 public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
 
+    @Query("""
+        SELECT vl
+        FROM VideoLink vl
+        WHERE vl.videoLinkOwner = :videoLinkOwner
+        ORDER BY vl.displayOrder
+    """)
+    List<VideoLink> findByVideoLinkOwner(VideoLinkOwner videoLinkOwner);
+
 
     @Query("""
         SELECT vl
@@ -31,4 +39,5 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
         WHERE vl.ownerId = :ownerId
     """)
     void deleteByOwnerId(Long ownerId);
+
 }
