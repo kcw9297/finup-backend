@@ -29,8 +29,6 @@ public class MemberServiceImpl implements MemberService {
         List<MemberDto.Row> rp = memberMapper.search(rq);
         Long count = memberMapper.countForSearch(rq);
 
-
-
         return Page.of(rp, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }
 }

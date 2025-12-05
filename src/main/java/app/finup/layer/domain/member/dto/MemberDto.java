@@ -19,9 +19,16 @@ public final class MemberDto {
         private String email;
         private String nickname;
         private Boolean isActive;
-        private String memberRole;
-        private String socialType;
+        private MemberRole memberRole;
+        private MemberSocial socialType;
         private String socialId;
+
+        public String getMemberRoleValue() {
+            return memberRole != null ? memberRole.getValue() : null;
+        }
+        public String getSocialTypeValue() {
+            return socialType != null ? socialType.getValue() : null;
+        }
     }
 
     /**
