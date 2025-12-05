@@ -19,8 +19,8 @@ public final class MemberDto {
         private String email;
         private String nickname;
         private Boolean isActive;
-        private MemberRole role;
-        private MemberSocial memberSocial;
+        private String memberRole;
+        private String socialType;
         private String socialId;
     }
 

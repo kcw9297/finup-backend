@@ -19,8 +19,8 @@ public class MemberDtoMapper {
                 .email(entity.getEmail())
                 .nickname(entity.getNickname())
                 .isActive(entity.getIsActive())
-                .role(entity.getRole())
-                .memberSocial(entity.getSocial())
+                .memberRole(entity.getRole().getValue())
+                .socialType(entity.getSocial().getValue())
                 .socialId(entity.getSocialId())
                 .build();
     }
