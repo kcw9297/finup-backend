@@ -25,7 +25,7 @@ public class UploadFileServiceImpl implements UploadFileService {
         return uploadFileRepository
                 .findById(uploadFileId)
                 .map(UploadFileDtoMapper::toDetail)
-                .orElseThrow(() -> new BusinessException(AppStatus.FILE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(AppStatus.UPLOAD_FILE_NOT_FOUND));
     }
 
 }

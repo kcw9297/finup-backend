@@ -1,5 +1,6 @@
 package app.finup.infra.file;
 
+import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -32,26 +33,31 @@ public class LocalFileProvider implements FileProvider {
 
         try {
 
-            // [1] 저장 파일 디렉토리 확인 (없을 시 생성)
+            // [1] 파일 검증
+            if (Objects.isNull(file)) {
+                LogUtils.showError(this.getClass(), "파일이 서버에 전달되지 않아 업로드 실패!");
+                throw new ProviderException(AppStatus.FILE_NOT_EXIST); // 파일이 존재하지 않을 시
+            }
+
+            if (file.isEmpty()) {
+                LogUtils.showError(this.getClass(), "비어 있는 파일 업로드 시도로 인한 실패!");
+                throw new ProviderException(AppStatus.FILE_EMPTY); // 비어 있는 파일 업로드 시
+            }
+
+            // [2] 저장 파일 디렉토리 확인 (없을 시 생성)
             String uploadDir = "%s/".formatted(Paths.get(storePath).getParent().toString());
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 
-            // [2] 파일 검증
-            if (Objects.isNull(file) || file.isEmpty()) {
-                LogUtils.showError(this.getClass(), "파일이 존재하지 않아 업로드 실패!");
-                throw new ManagerException(AppStatus.FILE_NOT_FOUND); // 파일이 존재하지 않으면 예외 발생
-            }
-
             // [3] 파일 업로드
             file.transferTo(new File(storePath)); // 파일 업로드
 
-        } catch (ManagerException e) {
+        } catch (ProviderException e) {
             throw e;
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());
-            throw new ManagerException(AppStatus.UTILS_LOGIC_FAILED, e);
+            throw new ProviderException(AppStatus.UTILS_LOGIC_FAILED, e);
         }
     }
 
@@ -68,7 +74,7 @@ public class LocalFileProvider implements FileProvider {
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());
-            throw new ManagerException(AppStatus.UTILS_LOGIC_FAILED, e);
+            throw new ProviderException(AppStatus.UTILS_LOGIC_FAILED, e);
         }
     }
 
@@ -85,7 +91,7 @@ public class LocalFileProvider implements FileProvider {
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());
-            throw new ManagerException(AppStatus.UTILS_LOGIC_FAILED, e);
+            throw new ProviderException(AppStatus.UTILS_LOGIC_FAILED, e);
         }
     }
 

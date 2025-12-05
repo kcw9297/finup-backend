@@ -138,11 +138,6 @@ public final class StrUtils {
         return UUID.randomUUID().toString().replace("-", "");
     }
 
-    public static String formatKoreaNumber(long value) {
-        NumberFormat fmt = NumberFormat.getNumberInstance(Locale.KOREA);
-        return fmt.format(value);
-    }
-
     public static String createVersionUrl(String fileUrl) {
         return "%s?v=%d".formatted(fileUrl, System.currentTimeMillis());
     }
