@@ -51,7 +51,12 @@ api:
       access-token: ${API_KIS_LOCAL_ACCESS_TOKEN:}  # 로컬에서 사용할 임시 토큰 (23시간마다 만료됨)
 
   naver-news:
+    endpoint: ${API_NAVER_ENDPOINT}
     client:
       id: ${API_NAVER_NEWS_CLIENT_ID}
       secret: ${API_NAVER_NEWS_CLIENT_SECRET}
 
+
+  youtube:
+    endpoint: ${API_YOUTUBE_ENDPOINT}
+    key: ${API_YOUTUBE_KEY}

@@ -1,8 +1,8 @@
 package app.finup.layer.base.validation.validator;
 
+import app.finup.common.utils.FormatUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import app.finup.common.utils.StrUtils;
 import app.finup.layer.base.validation.annotation.IntRange;
 
 import java.util.Objects;
@@ -30,8 +30,8 @@ public class IntRangeValidator implements ConstraintValidator<IntRange, Integer>
         this.nullable = annotation.nullable();
 
         // 숫자 포메팅
-        String minStr = StrUtils.formatKoreaNumber(min);
-        String maxStr = StrUtils.formatKoreaNumber(max);
+        String minStr = FormatUtils.formatKoreaNumber(min);
+        String maxStr = FormatUtils.formatKoreaNumber(max);
 
         // 사용자 입력 오류 메세지
         this.message = annotation.message();

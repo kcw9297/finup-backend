@@ -1,4 +1,4 @@
-package app.finup.infra.jwt.manager;
+package app.finup.infra.jwt.provider;
 
 import app.finup.common.constant.Const;
 import app.finup.common.enums.AppStatus;

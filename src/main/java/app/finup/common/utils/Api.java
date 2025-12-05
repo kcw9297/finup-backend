@@ -24,7 +24,7 @@ import java.util.Objects;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Api {
+public final class Api {
 
     /**
      * 직접 JSON 성공 응답을 전송하는 경우 (주로 Spring Security Filter 내 사용)

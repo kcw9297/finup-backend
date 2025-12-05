@@ -1,4 +1,4 @@
-package app.finup.infra.jwt.manager;
+package app.finup.infra.jwt.provider;
 
 import app.finup.infra.jwt.dto.JwtClaims;
 import app.finup.security.dto.CustomUserDetails;
