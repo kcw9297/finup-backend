@@ -1,46 +1,42 @@
-package app.finup.layer.domain.news.service;
+package app.finup.layer.domain.stockNews.service;
 
 import app.finup.layer.domain.news.api.NewsApiClient;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
+import app.finup.layer.domain.news.service.NewsRemoveDuplicateService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.List;
+
 /**
- * NewsService 구현 클래스
+ * StockNewsService 구현 클래스
  * @author oyh
- * @since 2025-12-01
+ * @since 2025-12-05
  */
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
-public class NewsServiceImpl implements NewsService {
-
+public class StockNewsServiceImpl implements StockNewsService {
     private final NewsApiClient newsApiClient;
-    private final NewsRedisStorage newsRedisStorage;
     private final NewsRemoveDuplicateService duplicateService;
-    private static final Duration DURATION_NEWS = Duration.ofMinutes(10); // 30분
-    private static final int NEWS_LIMIT = 100;
-    /**
-     * 프론트에서 호출하는 메인 메서드
-     * GET /news/list?category=date
-     */
-    @Override
-    public List<NewsDto.Row> getNews(String category) {
-        String key = "NEWS:"+category;
+    private final NewsRedisStorage newsRedisStorage;
 
+    private static final Duration DURATION_NEWS = Duration.ofMinutes(10); // 30분
+    private static final int NEWS_LIMIT = 50;
+
+    @Override
+    public List<NewsDto.Row> getNews(String category, String stockName) {
+        String key = "STOCK_NEWS:"+category+":"+stockName;
         //redis 캐시 조회
         List<NewsDto.Row> cashNews = newsRedisStorage.getNews(key, new TypeReference<List<NewsDto.Row>>() {});
         if(cashNews != null) return cashNews;
 
         //외부 api 호출
-        List<NewsDto.Row> freshNews = fetchFromExternal(category);
+        List<NewsDto.Row> freshNews = fetchFromExternal(category, stockName);
         List<NewsDto.Row> limitedNews = freshNews.stream().limit(NEWS_LIMIT).toList();
 
         //redis 캐싱
@@ -55,30 +51,26 @@ public class NewsServiceImpl implements NewsService {
      * - 30분마다 date/sim 각각 새로 가져와 덮어쓰기
      */
     @Override
-    public void refreshCategory(String category) {
-        String key = "NEWS:"+category;
-        List<NewsDto.Row> freshNews = fetchFromExternal(category);
+    public void refreshCategory(String category, String stockName) {
+        String key = "STOCK_NEWS:"+category+":"+stockName;
+        List<NewsDto.Row> freshNews = fetchFromExternal(category, stockName);
         List<NewsDto.Row> limited = freshNews.stream().limit(NEWS_LIMIT).toList();
         newsRedisStorage.saveNews(key, limited, DURATION_NEWS);
-        log.info("[NEWS] 스케줄러 캐시 강제 갱신 category={}, key={}", category, key);
+        log.info("[NEWS] 스케줄러 캐시 강제 갱신 key={}", key);
     }
     /**
      * 모든 카테고리 캐시 갱신 (스케줄러에서 1번만 호출)
      */
     @Override
-    public void refreshAllCategories() {
-        refreshCategory("date");
-        refreshCategory("sim");
+    public void refreshAllCategories(String stockName) {
+        refreshCategory("date", stockName);
+        refreshCategory("sim", stockName);
     }
 
-    private List<NewsDto.Row> fetchFromExternal(String category) {
-        log.info("[NEWS] 외부 뉴스 API 호출 category={}, limit={}", category, NEWS_LIMIT);
-        List<NewsDto.Row> parseList = newsApiClient.fetchNews("국내+주식",category,100);
+    private List<NewsDto.Row> fetchFromExternal(String category, String stockName){
+        List<NewsDto.Row> parseList = newsApiClient.fetchNews(stockName, category, 50);
         List<NewsDto.Row> duplicateList = duplicateService.removeDuplicate(parseList);
 
         return duplicateList;
     }
-
-
-
 }
