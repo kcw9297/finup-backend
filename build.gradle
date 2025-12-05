@@ -78,6 +78,10 @@ dependencies {
 
     // spring ai
     implementation "org.springframework.ai:spring-ai-starter-model-openai"
+
+    // Apache POI - 스프링이 엑셀 파일을 읽고 DB에 저장하려면 필요(Stocks 종목코드 종목명 DB 저장위해) by lky
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.poi:poi:5.2.3'
 }
 dependencyManagement {
     imports {

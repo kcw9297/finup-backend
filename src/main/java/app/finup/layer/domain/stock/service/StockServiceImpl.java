@@ -1,15 +1,21 @@
-package app.finup.layer.domain.stocks.service;
+package app.finup.layer.domain.stock.service;
 
-import app.finup.layer.domain.stocks.dto.StocksDto;
-import app.finup.layer.domain.stocks.dto.StocksDtoMapper;
+import app.finup.layer.domain.stock.dto.StocksDto;
+import app.finup.layer.domain.stock.dto.StocksDtoMapper;
+import app.finup.layer.domain.stock.entity.Stock;
+import app.finup.layer.domain.stock.repository.StockRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import java.util.List;
+
+import java.io.FileInputStream;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -21,7 +27,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class StocksServiceImpl implements StocksService {
+public class StockServiceImpl implements StockService {
+
+    private final StockRepository stockRepository;
 
     @Value("${API_KIS_CLIENT_ID}")
     private String APPKEY;
@@ -42,21 +50,57 @@ public class StocksServiceImpl implements StocksService {
     public static final String MARKET_CAP = "/uapi/domestic-stock/v1/ranking/market-cap";
 
 
+    // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
+    @Override
+    public void importKospi() throws Exception {
+
+        String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
+
+        FileInputStream fis = new FileInputStream(path);
+        Workbook workbook = new XSSFWorkbook(fis);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) continue; // 헤더 스킵
+
+            String mkscShrnIscd = row.getCell(0).getStringCellValue();
+            String htsKorIsnm = row.getCell(2).getStringCellValue();
+
+            Stock stock = Stock.builder()
+                    .mkscShrnIscd(mkscShrnIscd)
+                    .htsKorIsnm(htsKorIsnm)
+                    .build();
+
+            stockRepository.save(stock);
+        }
+        workbook.close();
+    }
+
     // 종목 상세 페이지 데이터 가져오기
     @Override
     public StocksDto.Detail getDetail(String code) {
-        System.out.println("요청 종목코드: [" + code + "]");
+        //System.out.println("요청 종목코드: [" + code + "]");
 
-        //[1] 종목코드(String code)로 json 데이터 가져오기
+        //[1] 종목코드(String code)로 DB에서 한글 종목명 가져오기
+        Stock stock = stockRepository.findByMkscShrnIscd(code)
+                .orElseThrow(() -> new RuntimeException("종목 없음!"));
+        String htsKorIsnm = stock.getHtsKorIsnm();
+        //System.out.println("종목이름: " + htsKorIsnm);
+
+        //[2] 종목코드(String code)로 api json 데이터 가져오기
         String json = fetchDetailJson(code);
         if(json == null) return null;
 
         //System.out.println(json);
         //log.info(json);
 
-        //[2] json데이터 dto로 parsing하기
-        StocksDto.Detail detail = parseDetailJson(json);
-        System.out.println(detail);
+        //[3] json데이터 dto로 parsing하기
+        JsonNode jsonNode = parseDetailJson(json);
+        //StocksDto.Detail detail = parseDetailJson(json);
+        //System.out.println(detail);
+
+        //[4] dto 매핑하기
+        StocksDto.Detail detail = StocksDtoMapper.toDetail(htsKorIsnm, jsonNode);
 
         return detail;
     }
@@ -83,11 +127,11 @@ public class StocksServiceImpl implements StocksService {
                 .block();
     }
 
-    private StocksDto.Detail parseDetailJson(String json) {
+    private JsonNode parseDetailJson(String json) {
         try {
             JsonNode root = objectMapper.readTree(json);
-            JsonNode output = root.path("output");
-            return StocksDtoMapper.toDetail(output);
+            return root.path("output");
+            //return StocksDtoMapper.toDetail(output);
         } catch (Exception e) {
             log.error("상세 정보 파싱 실패: {}", e.getMessage());
             return null;
