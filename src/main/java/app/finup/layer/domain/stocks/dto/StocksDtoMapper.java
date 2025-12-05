@@ -14,15 +14,19 @@ public class StocksDtoMapper {
 
     public static StocksDto.Detail toDetail(JsonNode output){
         return StocksDto.Detail.builder()
-                // 종목 기본 정보
+                /* 종목 기본 정보 */
+                // 종목명 헤더
                 .stckShrnIscd(output.path("stck_shrn_iscd").asText())
                 .stckPrpr(output.path("stck_prpr").asText())
                 .rprsMrktKorName(output.path("rprs_mrkt_kor_name").asText())
+
+                // 종목 카드
                 .bstpKorIsnm(output.path("bstp_kor_isnm").asText())
                 .stckFcam(output.path("stck_fcam").asText())
                 .htsAvls(output.path("hts_avls").asText())
                 .lstnStcn(output.path("lstn_stcn").asText())
 
+                /* 투자 지표 */
                 // 가격
                 .w52Hgpr(output.path("w52_hgpr").asText())
                 .w52Lwpr(output.path("w52_lwpr").asText())

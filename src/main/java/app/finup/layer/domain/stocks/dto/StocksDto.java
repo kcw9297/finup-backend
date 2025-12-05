@@ -44,9 +44,12 @@ public class StocksDto {
     public static class Detail {
 
         //종목 기본 정보
+        //[1] 종목명 헤더
         private String stckShrnIscd;              // 주식 단축 종목코드 //005930
         private String stckPrpr;                  // 주식 현재가 //104900
         private String rprsMrktKorName;           // 대표 시장 한글 명 //KOSPI200
+
+        //[2] 종목 카드
         private String bstpKorIsnm;               // 업종 한글 종목명 //전기·전자
         private String stckFcam;                  // 주식 액면가 //100
         private String htsAvls;                   // HTS 시가총액 //6209700
