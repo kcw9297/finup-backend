@@ -12,7 +12,7 @@ import java.util.Objects;
  * @since 2025-11-26
  */
 
-public class EnvUtils {
+public final class EnvUtils {
 
     public static boolean hasProfile(Environment env, String profile) {
         return Arrays.asList(env.getActiveProfiles()).contains(profile);

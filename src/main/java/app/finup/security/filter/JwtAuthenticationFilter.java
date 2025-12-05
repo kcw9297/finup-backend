@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import app.finup.common.manager.CookieManager;
 import app.finup.common.utils.LogUtils;
 import app.finup.infra.jwt.dto.JwtClaims;
-import app.finup.infra.jwt.manager.JwtProvider;
+import app.finup.infra.jwt.provider.JwtProvider;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;

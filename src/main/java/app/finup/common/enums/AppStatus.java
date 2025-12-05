@@ -30,11 +30,19 @@ public enum AppStatus {
     TOKEN_EXPIRED(403, "로그인이 만료되었습니다. 다시 로그인해 주세요.", "TOKEN_EXPIRED"),
     TOKEN_REISSUE_FAILED(403, "잘못된 요청입니다. 다시 로그인해 주세요.", "TOKEN_REISSUE_FAILED"),
 
-    /* 파일(Entity) 상태 */
-    FILE_NOT_FOUND(500, "파일이 존재하지 않습니다.", "FILE_NOT_FOUND"),
-
-    /* 유틸 클래스 상태 (아직 구제적으로 케이스를 나누진 않음) */
+    /* 범용 유틸 클래스 상태 */
     UTILS_LOGIC_FAILED(500, "처리 중 오류가 발생했습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_LOGIC_FAILED"),
+
+    /* Infra - File */
+    FILE_NOT_EXIST(500, "파일이 업로드되지 않았습니다. 잠시 후에 다시 시도해 주세요.", "FILE_NOT_EXIST"),
+    FILE_EMPTY(500, "잘못된 업로드 요청입니다. 올바른 파일로 다시 시도해 주세요.", "FILE_EMPTY"),
+
+    /* Infra - YouTube */
+    YOUTUBE_URL_NOT_VALID(400, "유효하지 않은 YouTube URL 입니다. 다시 시도해 주세요.", "YOUTUBE_URL_NOT_VALID"),
+    YOUTUBE_ID_NOT_VALID(400, "유효하지 않은 YouTube 번호 입니다. 다시 시도해 주세요.", "YOUTUBE_ID_NOT_VALID"),
+    YOUTUBE_VIDEO_NOT_FOUND(500, "삭제되었거나 숨김 처리 된 영상입니다.", "YOUTUBE_ID_NOT_VALID"),
+    YOUTUBE_REQUEST_FAILED(500, "유튜브 영상 조회에 실패했습니다.", "YOUTUBE_REQUEST_FAILED"),
+
 
     /* ======================================== 작성 영역 (외에는 건들이지 말 것) ====================================== */
 
@@ -42,6 +50,9 @@ public enum AppStatus {
     REBOARD_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 게시글입니다.", "REBOARD_NOT_FOUND"),
     REBOARD_OK_WRITE(200, "게시글을 작성했습니다.", "REBOARD_OK_WRITE"),
     REBOARD_OK_EDIT(200, "게시글을 수정했습니다.", "REBOARD_OK_EDIT"),
+
+    /* 파일 UploadFile */
+    UPLOAD_FILE_NOT_FOUND(500, "파일이 존재하지 않습니다.", "UPLOAD_FILE_NOT_FOUND"),
 
     /* 회원 Member */
     MEMBER_NOT_FOUND(400, "회원 정보가 존재하지 않습니다.", "MEMBER_NOT_FOUND"),
@@ -53,7 +64,6 @@ public enum AppStatus {
     STUDY_WORD_NOT_FOUND(400, "단어 목록이 갱신되었습니다. 새로고침 후 다시 시도해주세요.", "STUDY_WORD_NOT_FOUND"),
 
     /* 단계 학습 진도 StudyProgress */
-
 
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),

@@ -15,9 +15,10 @@ public class Const {
     public static final String ROLE = "role";
     public static final String SOCIAL = "social";
     public static final String XSRF_TOKEN = "XSRF-TOKEN";
-
+    public static final String ISO8601 = "ISO8601";
 
     /* 접두사 상수 */
     public static final String PREFIX_KEY_JWT = "RT:";
     public static final String PREFIX_KEY_NEWS = "News:";
+    public static final String PREFIX_KEY_YOUTUBE_DETAIL = "YT:";
 }
