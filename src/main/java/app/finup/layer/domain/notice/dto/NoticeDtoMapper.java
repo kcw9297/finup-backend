@@ -26,6 +26,10 @@ public final class NoticeDtoMapper {
                 .build();
     }
 
+    /**
+     * 여러 건 조회: Notice -> Detail DTO
+     */
+
     public static NoticeDto.Row toListDto(Notice entity) {
         return NoticeDto.Row.builder()
                 .noticeId(entity.getNoticeId())

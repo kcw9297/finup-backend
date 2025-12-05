@@ -10,7 +10,6 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberDto {
 
-
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -20,8 +19,8 @@ public final class MemberDto {
         private String email;
         private String nickname;
         private Boolean isActive;
-        private MemberRole role;
-        private MemberSocial memberSocial;
+        private String memberRole;
+        private String socialType;
         private String socialId;
     }
 
