@@ -39,9 +39,9 @@ public class PublicStocksController {
     /**
      * 종목 상세페이지 조회 API
      * [GET] stocks/detail/{code}
-     * @param code 종목코드
+     * @param code 종목코드 // 문자열도 있음
      */
-    @GetMapping("/detail/{code:[0-9]+}")
+    @GetMapping("/detail/{code}")
     public ResponseEntity<?> getDetail(@PathVariable String code) {
         return Api.ok(stockService.getDetail(code));
     }

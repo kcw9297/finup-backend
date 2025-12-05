@@ -5,7 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
-@Table(name = "stocks")
+@Table(name = "stock")
 @DynamicUpdate
 @Getter
 @ToString
