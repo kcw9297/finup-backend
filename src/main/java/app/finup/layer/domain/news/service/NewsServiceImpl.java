@@ -24,7 +24,8 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsApiClient newsApiClient;
     private final NewsRedisStorage newsRedisStorage;
-    private static final Duration DURATION_NEWS = Duration.ofMinutes(30); // 30분
+    private final NewsRemoveDuplicateService duplicateService;
+    private static final Duration DURATION_NEWS = Duration.ofMinutes(10); // 30분
     private static final int NEWS_LIMIT = 100;
     /**
      * 프론트에서 호출하는 메인 메서드
@@ -46,7 +47,7 @@ public class NewsServiceImpl implements NewsService {
         newsRedisStorage.saveNews(key, limitedNews, DURATION_NEWS);
         log.info("[NEWS] 캐시 저장 성공 key={}", key);
 
-        return freshNews;
+        return limitedNews;
     }
 
     /**
@@ -73,16 +74,11 @@ public class NewsServiceImpl implements NewsService {
     private List<NewsDto.Row> fetchFromExternal(String category) {
         log.info("[NEWS] 외부 뉴스 API 호출 category={}, limit={}", category, NEWS_LIMIT);
         List<NewsDto.Row> parseList = newsApiClient.fetchNews("국내+주식",category,100);
-        List<NewsDto.Row> distinct = distinctByUrl(parseList);
+        List<NewsDto.Row> duplicateList = duplicateService.removeDuplicate(parseList);
 
-        return distinct;
+        return duplicateList;
     }
 
-    private List<NewsDto.Row> distinctByUrl(List<NewsDto.Row> list) {
-        Set<String> seen = new HashSet<>();
-        return list.stream()
-                .filter(item -> seen.add(item.getLink()))
-                .toList();
-    }
+
 
 }

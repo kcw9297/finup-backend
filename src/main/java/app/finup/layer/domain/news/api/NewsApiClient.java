@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface NewsApiClient {
 
-    List<NewsDto.Row> fetchNews(String query,String sort, int display);
+    List<NewsDto.Row> fetchNews(String query, String sort, int display);
 
 }

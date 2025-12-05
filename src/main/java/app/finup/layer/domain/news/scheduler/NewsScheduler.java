@@ -1,6 +1,5 @@
 package app.finup.layer.domain.news.scheduler;
 
-import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
