@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.finup.layer.domain.member.mapper.MemberMapper">
+    <!-- 공통 SELECT 절 -->
+    <sql id="memberColumns">
+        m.member_id     AS memberId,
+        m.email         AS email,
+        m.nickname      AS nickname,
+        CASE m.role
+            WHEN 'ADMIN' THEN '관리자'
+            WHEN 'NORMAL' THEN '일반'
+        END AS memberRole,
+        m.is_active     AS isActive
+    </sql>
+    
+    <!-- 목록 조회 -->
+    <select id="search" resultType="MemberRow">
+        SELECT 
+        <include refid="memberColumns"/>
+        FROM `member` m
+        WHERE 1 = 1
+
+        <!-- 필터 & 키워드 -->
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="filter == 'email'">
+                    AND m.email LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter == 'nickname'">
+                    AND m.nickname LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <otherwise>
+                    AND (m.email LIKE CONCAT('%', #{keyword}, '%')
+                    OR m.nickname LIKE CONCAT('%', #{keyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+        <!-- 정렬 -->
+        ORDER BY
+        <trim suffixOverrides=",">
+            <choose>
+                <when test="order != null and order != ''">
+                    <choose>
+                        <when test="order == 'latest'">
+                            m.cdate DESC,
+                        </when>
+                        <when test="order == 'oldest'">
+                            m.cdate ASC,
+                        </when>
+                        <otherwise>
+                            m.cdate DESC,
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    m.cdate DESC,
+                </otherwise>
+            </choose>
+        </trim>
+
+        <!-- 페이징 -->
+        LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
+
+    <!-- 총 개수 계산 -->
+    <select id="countForSearch" parameterType="app.finup.layer.domain.member.dto.MemberDto$Search" resultType="long">
+        SELECT COUNT(*)
+        FROM `member` m
+        WHERE 1 = 1
+
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="filter == 'email'">
+                    AND m.email LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter == 'nickname'">
+                    AND m.nickname LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <otherwise>
+                    AND (m.email LIKE CONCAT('%', #{keyword}, '%')
+                    OR m.nickname LIKE CONCAT('%', #{keyword}, '%'))
+                </otherwise>
+            </choose>
+        </if>
+    </select>
+</mapper>

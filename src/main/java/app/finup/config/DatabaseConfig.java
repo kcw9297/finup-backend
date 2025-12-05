@@ -1,5 +1,6 @@
 package app.finup.config;
 
+import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.notice.dto.NoticeDto;
 import app.finup.layer.domain.reboard.dto.ReboardDto;
 import app.finup.layer.domain.study.dto.StudyDto;
@@ -54,6 +55,7 @@ public class DatabaseConfig {
         registry.registerAlias("ReboardRow", ReboardDto.Row.class);
         registry.registerAlias("NoticeRow", NoticeDto.Row.class);
         registry.registerAlias("StudyRow", StudyDto.Row.class);
+        registry.registerAlias("MemberRow", MemberDto.Row.class);
     }
 
 }
