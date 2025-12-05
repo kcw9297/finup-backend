@@ -1,7 +1,5 @@
-package app.finup.layer.domain.stocks.dto;
+package app.finup.layer.domain.stock.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.annotation.Nullable;
 import lombok.*;
 
 /**
@@ -45,6 +43,7 @@ public class StocksDto {
 
         //종목 기본 정보
         //[1] 종목명 헤더
+        private String htsKorIsnm;                // 한글 종목명
         private String stckShrnIscd;              // 주식 단축 종목코드 //005930
         private String stckPrpr;                  // 주식 현재가 //104900
         private String rprsMrktKorName;           // 대표 시장 한글 명 //KOSPI200

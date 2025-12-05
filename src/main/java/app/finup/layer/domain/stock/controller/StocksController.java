@@ -1,7 +1,6 @@
-package app.finup.layer.domain.stocks.controller;
+package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
-import app.finup.layer.domain.stocks.service.StocksService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
