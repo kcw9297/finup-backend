@@ -3,7 +3,7 @@ package app.finup.infra.file;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 파일의 저장, 삭제, 다운로드 메소드 처리
+ * 파일의 물리적 조작을 처리하는 인터페이스
  * @author kcw
  * @since 2025-11-26
  */
