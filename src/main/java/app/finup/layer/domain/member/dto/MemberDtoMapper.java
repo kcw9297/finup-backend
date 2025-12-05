@@ -10,7 +10,7 @@ import app.finup.layer.domain.member.entity.Member;
  */
 public class MemberDtoMapper {
     /**
-     * 여러 건 조회: Notice -> Detail DTO
+     * 여러 건 조회: member -> Detail DTO
      */
 
     public static MemberDto.Row toRow(Member entity) {
@@ -24,4 +24,5 @@ public class MemberDtoMapper {
                 .socialId(entity.getSocialId())
                 .build();
     }
+
 }

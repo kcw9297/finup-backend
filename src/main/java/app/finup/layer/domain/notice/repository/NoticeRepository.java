@@ -7,6 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
+/**
+ * 공지사항 게시판 레포지토리 인터페이스
+ * @author khj
+ * @since 2025-12-01
+ */
+
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
 }
