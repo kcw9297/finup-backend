@@ -3,6 +3,7 @@ package app.finup.infra.youtube.dto;
 import app.finup.infra.youtube.utils.YouTubeUtils;
 import lombok.*;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -38,9 +39,9 @@ public final class YouTubeDtoMapper {
                 .title(snippet.getTitle())
                 .channelTitle(snippet.getChannelTitle())
                 .thumbnailUrl(standard.getUrl())
-                .duration(contentDetails.getDuration())
-                .viewCount(statistics.getViewCount())
-                .likeCount(statistics.getLikeCount())
+                .duration(Duration.parse(contentDetails.getDuration()))
+                .viewCount(Long.valueOf(statistics.getViewCount()))
+                .likeCount(Long.valueOf(statistics.getLikeCount()))
                 .build();
     }
 
@@ -60,7 +61,6 @@ public final class YouTubeDtoMapper {
     private static YouTube.Row mapToRow(YouTube.SearchRp.Item item) {
 
         // [1] item 내 상세 정보 추출
-        // id
         YouTube.SearchRp.Item.Id id = item.getId();
 
         // snippet
@@ -68,10 +68,10 @@ public final class YouTubeDtoMapper {
         YouTube.SearchRp.Item.Snippet.Thumbnails thumbnails = snippet.getThumbnails();
         YouTube.SearchRp.Item.Snippet.Thumbnails.Thumbnail high = thumbnails.getHigh();
 
-
+        // [2] DTO 변환 및 반환
         return YouTube.Row.builder()
                 .videoId(id.getVideoId())
-                .videoUrl(YouTubeUtils.getVideoUrl(id.getVideoId()))
+                .videoUrl(YouTubeUtils.toVideoUrl(id.getVideoId()))
                 .thumbnailUrl(high.getUrl())
                 .title(snippet.getTitle())
                 .build();

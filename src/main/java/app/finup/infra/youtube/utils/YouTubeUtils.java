@@ -5,6 +5,9 @@ import app.finup.common.exception.UtilsException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,12 +58,25 @@ public final class YouTubeUtils {
 
 
     /**
-     * YouTube 영상 URL 생성
+     * YouTube 영상 URL 으로 변경 (videoId 기반)
      * @param videoId 유튜브 영상 비디오 고유번호
      * @return 영상 URL
      */
-    public static String getVideoUrl(String videoId) {
+    public static String toVideoUrl(String videoId) {
         return "https://www.youtube.com/watch?v=%s".formatted(videoId);
+    }
+
+
+    /**
+     * YouTube API용 날짜 형식 변환
+     * @param dateTime 변환할 날짜시간
+     * @return RFC 3339 형식 문자열 (예: "2024-12-06T00:00:00Z")
+     */
+    public static String toYouTubeDateTime(LocalDateTime dateTime) {
+
+        return dateTime
+                .atZone(ZoneId.of("UTC"))
+                .format(DateTimeFormatter.ISO_INSTANT);
     }
 
 }

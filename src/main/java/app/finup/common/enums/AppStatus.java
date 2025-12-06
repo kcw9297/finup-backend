@@ -65,6 +65,10 @@ public enum AppStatus {
 
     /* 단계 학습 진도 StudyProgress */
 
+    /* 영상 정보 VideoLink */
+    VIDEO_LINK_NOT_FOUND(500, "영상 목록이 갱신되었습니다. 새로고침 후 다시 시도해 주세요.", "VIDEO_LINK_NOT_FOUND"),
+    VIDEO_LINK_ALREADY_EXISTS(400, "이미 존재하는 영상입니다.", "VIDEO_LINK_ALREADY_EXISTS"),
+
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),
 
