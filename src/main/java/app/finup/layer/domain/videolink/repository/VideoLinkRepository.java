@@ -24,6 +24,9 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
     List<VideoLink> findByVideoLinkOwner(VideoLinkOwner videoLinkOwner);
 
 
+    Boolean existsByVideoId(String videoId);
+
+
     @Query("""
         SELECT vl
         FROM VideoLink vl
