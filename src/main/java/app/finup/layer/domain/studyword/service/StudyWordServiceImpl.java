@@ -21,7 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * StudyWordService 구현 클래스
@@ -133,21 +136,21 @@ public class StudyWordServiceImpl implements StudyWordService {
     public void reorder(StudyWordDto.Reorder rq) {
 
         // [1] 정렬 대상 조회
-        StudyWord targetWord = studyWordRepository
-                .findById(rq.getStudyWordId())
-                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+        StudyWord targetWord =
+                studyWordRepository
+                        .findById(rq.getStudyWordId())
+                        .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
         // [2] 대상 양 옆의 단어 조회. 받아온 id가 null 인 경우, 조회하지 않음
         StudyWord prevWord = findWordIfExists(rq.getPrevStudyWordId());
         StudyWord nextWord = findWordIfExists(rq.getNextStudyWordId());
 
         // [3] 케이스에 따라 displayOrder 계산 후 갱신
-        Double displayOrder = ReorderUtils.calculateReorder(targetWord, prevWord, nextWord);
-        targetWord.reorder(displayOrder);
+        targetWord.reorder(calculateNextOrder(rq, targetWord, prevWord, nextWord));
     }
 
 
-    // 단어 목록 조회
+    // 있는 단어 조회
     private StudyWord findWordIfExists(Long studyWordId) {
 
         return Objects.isNull(studyWordId) ?
@@ -155,6 +158,40 @@ public class StudyWordServiceImpl implements StudyWordService {
                 studyWordRepository
                         .findById(studyWordId)
                         .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+    }
+
+    // 정렬 값 계산
+    private Double calculateNextOrder(StudyWordDto.Reorder rq,
+                                      StudyWord targetWord, StudyWord prevWord, StudyWord nextWord) {
+
+        // [1] 재정렬 수행
+        Double displayOrder = ReorderUtils.calculateReorder(targetWord, prevWord, nextWord);
+
+        // [2] 정렬 수행 후, 전체 재정렬이 필요한 경우 수행 (결과가 null이면 전체 재정렬 필요)
+        return Objects.isNull(displayOrder) ? rebalanceAndReCalculate(rq) : displayOrder;
+    }
+
+    // 전체 재정렬 (rebalance) 수행 후, 다시 계산
+    private Double rebalanceAndReCalculate(StudyWordDto.Reorder rq) {
+
+        // [1] 현재 학습에 속한 전체 단어 조회
+        List<StudyWord> studyWords =
+                studyWordRepository.findByStudyId(rq.getStudyId());
+
+        // [2] 재정렬 수행
+        ReorderUtils.rebalance(studyWords); // 재정렬 수행
+
+        // [3] 재정렬한 결과들을 Map으로 변환 (PK - Entity 자신 쌍)
+        Map<Long, StudyWord> linkMap = studyWords.stream()
+                .collect(Collectors.toConcurrentMap(StudyWord::getStudyWordId, Function.identity()));
+
+        // [4] 재정렬 후 엔티티 조회 (이전, 이후 엔티티가 없다면 null)
+        StudyWord newTargetOrder = linkMap.get(rq.getStudyWordId()); // 현재 링크 정보 (재정렬 후)
+        StudyWord newPrevOrder = Objects.isNull(rq.getPrevStudyWordId()) ? null : linkMap.get(rq.getPrevStudyWordId());
+        StudyWord newNextOrder = Objects.isNull(rq.getNextStudyWordId()) ? null : linkMap.get(rq.getNextStudyWordId());
+
+        // [5] 다시 계산 후 반환
+        return ReorderUtils.calculateReorder(newTargetOrder, newPrevOrder, newNextOrder);
     }
 
 
