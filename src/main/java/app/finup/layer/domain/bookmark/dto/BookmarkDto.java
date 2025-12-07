@@ -67,15 +67,17 @@ public final class BookmarkDto {
 
 
     /**
-     * 북마크 요청
+     * 북마크 추가
      */
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Bookmark {
+    public static class Add {
 
         private Long memberId;
+        private Long targetId;
         private BookmarkTarget bookmarkTarget;
     }
+
 }

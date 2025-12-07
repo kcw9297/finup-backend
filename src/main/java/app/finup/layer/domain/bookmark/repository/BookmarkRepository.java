@@ -1,11 +1,13 @@
 package app.finup.layer.domain.bookmark.repository;
 
 import app.finup.layer.domain.bookmark.entity.Bookmark;
+import app.finup.layer.domain.bookmark.enums.BookmarkTarget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 북마크 JPA 레포지토리 인터페이스
@@ -21,10 +23,19 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     """)
     List<Bookmark> findByMemberId(Long memberId);
 
-    @Modifying // 변경 로직
+
+    @Modifying
     @Query("""
         DELETE FROM Bookmark b
         WHERE b.member.memberId = :memberId
     """)
     void deleteByMemberId(Long memberId);
+
+
+    @Modifying
+    @Query("""
+        DELETE FROM Bookmark b
+        WHERE b.targetId = :targetId AND b.bookmarkTarget = :bookmarkTarget
+    """)
+    void deleteByTargetIdAndBookmarkTarget(Long targetId, BookmarkTarget bookmarkTarget);
 }
