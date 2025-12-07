@@ -32,6 +32,7 @@ public enum AppStatus {
 
     /* 범용 유틸 클래스 상태 */
     UTILS_LOGIC_FAILED(500, "처리 중 오류가 발생했습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_LOGIC_FAILED"),
+    UTILS_REORDER_FAILED(500, "위치를 변경할 수 없습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_REORDER_FAILED"),
 
     /* Infra - File */
     FILE_NOT_EXIST(500, "파일이 업로드되지 않았습니다. 잠시 후에 다시 시도해 주세요.", "FILE_NOT_EXIST"),
@@ -59,15 +60,27 @@ public enum AppStatus {
 
     /* 단계 학습 Study */
     STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),
+    STUDY_OK_ADD(200, "단계학습 정보를 추가했습니다.", "STUDY_OK_ADD"),
+    STUDY_OK_EDIT(200, "단계학습 정보를 수정했습니다.", "STUDY_OK_EDIT"),
+    STUDY_OK_REMOVE(200, "단계학습 정보를 삭제했습니다.", "STUDY_OK_REMOVE"),
 
     /* 학습 단어 StudyWord */
     STUDY_WORD_NOT_FOUND(400, "단어 목록이 갱신되었습니다. 새로고침 후 다시 시도해주세요.", "STUDY_WORD_NOT_FOUND"),
+    STUDY_WORD_OK_ADD(200, "학습 단어를 추가했습니다.", "STUDY_WORD_OK_ADD"),
+    STUDY_WORD_OK_UPLOAD_IMAGE(200, "학습 단어 이미지를 등록했습니다.", "STUDY_WORD_OK_UPLOAD_IMAGE"),
+    STUDY_WORD_OK_EDIT(200, "학습 단어를 수정했습니다.", "STUDY_WORD_OK_EDIT"),
+    STUDY_WORD_OK_REMOVE(200, "학습 단어를 삭제했습니다.", "STUDY_WORD_OK_REMOVE"),
+    STUDY_WORD_OK_REMOVE_IMAGE(200, "학습 단어를 이미지를 삭제했습니다.", "STUDY_WORD_OK_REMOVE_IMAGE"),
 
-    /* 단계 학습 진도 StudyProgress */
+
 
     /* 영상 정보 VideoLink */
     VIDEO_LINK_NOT_FOUND(500, "영상 목록이 갱신되었습니다. 새로고침 후 다시 시도해 주세요.", "VIDEO_LINK_NOT_FOUND"),
     VIDEO_LINK_ALREADY_EXISTS(400, "이미 존재하는 영상입니다.", "VIDEO_LINK_ALREADY_EXISTS"),
+    VIDEO_LINK_OK_ADD(200, "학습 영상을 추가했습니다.", "VIDEO_LINK_OK_ADD"),
+    VIDEO_LINK_OK_EDIT(200, "학습 영상 링크를 수정했습니다.", "VIDEO_LINK_OK_EDIT"),
+    VIDEO_LINK_OK_REMOVE(200, "학습 영상을 삭제했습니다.", "VIDEO_LINK_OK_REMOVE"),
+
 
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),
