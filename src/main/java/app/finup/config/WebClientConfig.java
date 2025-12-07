@@ -29,6 +29,14 @@ public class WebClientConfig {
     @Value("${api.naver-news.client.secret}")
     private String naverClientSecret;
 
+    @Value(("${api.kis.endpoint}"))
+    private String kisEndPoint;
+
+    @Value(("${api.kis.client.id}"))
+    private String kisAppKey;
+
+    @Value(("${api.kis.client.secret}"))
+    private String kisAppSecret;
 
     @Bean // 유튜브 API 사용을 위한 Client
     public WebClient youTubeClient() {
@@ -39,7 +47,7 @@ public class WebClientConfig {
     }
 
 
-    @Bean // 네이버 OpenAPI 사용을 위한 Client
+    @Bean(name = "naverClient") // 네이버 OpenAPI 사용을 위한 Client
     public WebClient naverClient() {
 
         return WebClient.builder()
@@ -47,6 +55,15 @@ public class WebClientConfig {
                 .defaultHeader("X-Naver-Client-Id", naverClientId)
                 .defaultHeader("X-Naver-Client-Secret", naverClientSecret)
                 .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0")
+                .build();
+    }
+    @Bean(name="kisClient")
+    public WebClient kisClient(){
+
+        return WebClient.builder()
+                .baseUrl(kisEndPoint)
+                .defaultHeader("appkey", kisAppKey)
+                .defaultHeader("appsecret", kisAppSecret)
                 .build();
     }
 
