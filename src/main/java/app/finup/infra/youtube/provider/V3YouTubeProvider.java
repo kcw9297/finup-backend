@@ -1,5 +1,6 @@
 package app.finup.infra.youtube.provider;
 
+import app.finup.common.constant.Const;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
@@ -10,6 +11,7 @@ import app.finup.infra.youtube.utils.YouTubeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
@@ -37,6 +39,10 @@ public class V3YouTubeProvider implements YouTubeProvider {
     private String key;
 
 
+    @Cacheable(
+            value = Const.PREFIX_KEY_YOUTUBE_DETAIL,
+            key = "#videoId"
+    )
     @Override
     public YouTube.Detail getVideo(String videoId) {
 
