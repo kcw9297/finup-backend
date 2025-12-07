@@ -19,8 +19,19 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
         SELECT sw
         FROM StudyWord sw
         WHERE sw.study.studyId = :studyId
+        ORDER BY sw.displayOrder
     """)
     List<StudyWord> findByStudyId(Long studyId);
+
+
+    @Query("""
+        SELECT sw
+        FROM StudyWord sw
+        WHERE sw.study.studyId = :studyId
+        ORDER BY sw.displayOrder DESC
+        LIMIT 1
+    """)
+    Optional<StudyWord> findLastByStudyId(Long studyId);
 
 
     @Query("""

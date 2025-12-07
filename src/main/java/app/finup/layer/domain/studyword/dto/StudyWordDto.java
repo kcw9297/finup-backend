@@ -37,10 +37,9 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Add {
 
+        private Long studyId;
         private String name;
         private String meaning;
-        private Long studyId;
-        private Long lastStudyWordId; // 추가 하기 직전, 가장 마지막에 있던 단어번호
     }
 
 
@@ -68,10 +67,14 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Reorder {
 
-        private Long studyId; // 재정렬 시 필요
+        private Long studyId;
         private Long studyWordId;
-        private Long prevStudyWordId;
-        private Long nextStudyWordId;
+        private Integer reorderPosition; // 0번째부터 표기
+
+        public void setIds(Long studyId, Long studyWordId) {
+            this.studyId = studyId;
+            this.studyWordId = studyWordId;
+        }
     }
 
 }
