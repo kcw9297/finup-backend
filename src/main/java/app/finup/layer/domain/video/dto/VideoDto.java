@@ -47,6 +47,23 @@ public final class VideoDto {
         private String videoUrl;
         private String thumbnailUrl;
         private String channelTitle;
+    }
+
+
+    /**
+     * YouTube API 검색 조회 결과 리스트
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RecommendRow {
+
+        // 검색 걸과
+        private String title;
+        private String videoUrl;
+        private String thumbnailUrl;
+        private String channelTitle;
         private String comment; // AI 추천 이유 (30자 이내)
         private String recommendationLevel; // AI 추천도 (지금은 임시로 String)
     }

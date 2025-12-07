@@ -47,11 +47,9 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Add {
 
-        // 프론트에서 얻어오는 정보
+        private String videoUrl;
         private Long ownerId; // 주인이 HOME인 경우 null
         private VideoLinkOwner videoLinkOwner;
-        private String videoUrl;
-        private Long lastVideoLinkId; // 가장 마지막에 있던 영상링크 번호
     }
 
 
@@ -81,7 +79,9 @@ public final class VideoLinkDto {
     public static class Reorder {
 
         private Long videoLinkId;
-        private Long prevVideoLinkId;
-        private Long nextVideoLinkId;
+        private Long ownerId; // 주인이 HOME인 경우 null
+        private VideoLinkOwner videoLinkOwner;
+        private Integer reorderPosition; // 0번째부터 표기
+
     }
 }

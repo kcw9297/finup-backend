@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VideoDtoMapper {
 
-   public static VideoDto.DetailRow toDetailRow(YouTube.Detail video) {
+   public static VideoDto.Detail toDetail(YouTube.Detail video) {
 
-       return VideoDto.DetailRow.builder()
+       return VideoDto.Detail.builder()
                .videoId(video.getVideoId())
                .videoUrl(video.getVideoUrl())
                .title(video.getTitle())
@@ -29,13 +29,13 @@ public final class VideoDtoMapper {
    }
 
 
-    public static VideoDto.SearchRow toSearchRow(YouTube.Row video) {
+    public static VideoDto.Row toRow(YouTube.Row video) {
 
-        return VideoDto.SearchRow.builder()
+        return VideoDto.Row.builder()
                 .title(video.getTitle())
                 .videoUrl(video.getVideoUrl())
                 .thumbnailUrl(video.getThumbnailUrl())
-                .channelTitle(video.getTitle())
+                .channelTitle(video.getChannelTitle())
                 //.comment("") // AI 분석
                 //.recommendationLevel("") // AI 추천도
                 .build();

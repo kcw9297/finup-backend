@@ -39,10 +39,10 @@ public class VideoLinkServiceImpl implements VideoLinkService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<VideoLinkDto.Row> getListByStudyId(Long studyId) {
+    public List<VideoLinkDto.Row> getList(Long ownerId, VideoLinkOwner videoLinkOwner) {
 
         return videoLinkRepository
-                .findByVideoLinkOwnerAndOwnerId(VideoLinkOwner.STUDY, studyId)
+                .findByOwnerIdAndVideoLinkOwner(ownerId, videoLinkOwner)
                 .stream()
                 .map(this::getYouTubeInfoAndMapToRow)
                 .toList();
@@ -69,7 +69,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
             throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS);
 
         // [2] 정렬 순서 계산
-        Double displayOrder = calculateNextOrder(rq.getLastVideoLinkId());
+        Double displayOrder = calculateNextOrder(rq.getOwnerId(), rq.getVideoLinkOwner());
 
         // [3] YouTube 영상 메타데이터 조회
         YouTube.Detail video = youTubeProvider.getVideo(videoId);
@@ -89,14 +89,54 @@ public class VideoLinkServiceImpl implements VideoLinkService {
 
 
     // 삽입할 단어의 정렬 값 계산
-    private Double calculateNextOrder(Long lastVideoLinkId) {
+    private Double calculateNextOrder(Long ownerId, VideoLinkOwner videoLinkOwner) {
 
-        return Objects.isNull(lastVideoLinkId) ?
-                ReorderUtils.DEFAULT_DISPLAY_ORDER :
+        return Objects.isNull(ownerId) ?
+
+                // 소유자번호가 없는 경우 (현재는 HOME 요청인 경우)
                 videoLinkRepository
-                        .findById(lastVideoLinkId)
+                        .findLastByVideoLinkOwner(videoLinkOwner)
                         .map(ReorderUtils::calculateNextOrder)
-                        .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+                        .orElse(ReorderUtils.DEFAULT_DISPLAY_ORDER) :
+
+                // 소유자 번호가 있는 경우
+                videoLinkRepository
+                        .findLastByOwnerIdAndVideoLinkOwner(ownerId, videoLinkOwner)
+                        .map(ReorderUtils::calculateNextOrder)
+                        .orElse(ReorderUtils.DEFAULT_DISPLAY_ORDER);
+    }
+
+
+    @Override
+    public void reorder(VideoLinkDto.Reorder rq) {
+
+        // [1] 정렬 대상 및 전체 목록 조회
+        VideoLink targetLink =
+                videoLinkRepository
+                        .findById(rq.getVideoLinkId())
+                        .orElseThrow(() -> new BusinessException(AppStatus.VIDEO_LINK_NOT_FOUND));
+
+        // displayOrder 순 정렬된 목록
+        List<VideoLink> videoLinks =
+                videoLinkRepository.findByOwnerIdAndVideoLinkOwner(rq.getOwnerId(), rq.getVideoLinkOwner());
+
+
+        // [2] displayOrder 계산 후 갱신
+        targetLink.reorder(calculateOrder(videoLinks, rq.getReorderPosition()));
+    }
+
+    // 정렬 시도 후, 재정렬이 필요하면 재정렬 수행 후 다시 정렬
+    private Double calculateOrder(List<VideoLink> videoLinks, Integer reorderPosition) {
+
+        // [1] 재정렬 수행
+        Double displayOrder = ReorderUtils.calculateReorder(videoLinks, reorderPosition);// 재정렬 수행
+
+        // [2] 만약 null 반환 시, 일괄 재정렬 후 재시도
+        if (Objects.isNull(displayOrder))
+            displayOrder = ReorderUtils.rebalanceAndReorder(videoLinks, reorderPosition);
+
+        // [3] 계산된 재정렬 값 반환
+        return displayOrder;
     }
 
 
@@ -117,63 +157,8 @@ public class VideoLinkServiceImpl implements VideoLinkService {
 
 
     @Override
-    public void reorder(VideoLinkDto.Reorder rq) {
-
-        // [1] 정렬 대상 조회
-        VideoLink targetLink =
-                videoLinkRepository
-                        .findById(rq.getVideoLinkId())
-                        .orElseThrow(() -> new BusinessException(AppStatus.VIDEO_LINK_NOT_FOUND));
-
-        // [2] 대상 양 옆의 영상 조회. 받아온 id가 null 인 경우, 조회하지 않음
-        VideoLink prevLink = findLinkIfExists(rq.getPrevVideoLinkId());
-        VideoLink nextLink = findLinkIfExists(rq.getNextVideoLinkId());
-
-        // [3] displayOrder 계산 후 갱신
-        targetLink.reorder(calculateNextOrder(rq, targetLink, prevLink, nextLink));
+    public void remove(Long videoLinkId) {
+        videoLinkRepository.deleteById(videoLinkId);
     }
 
-    // 있는 영상 조회
-    private VideoLink findLinkIfExists(Long videoLinkId) {
-
-        return Objects.isNull(videoLinkId) ?
-                null :
-                videoLinkRepository
-                        .findById(videoLinkId)
-                        .orElseThrow(() -> new BusinessException(AppStatus.VIDEO_LINK_NOT_FOUND));
-    }
-
-    // 정렬 값 계산
-    private Double calculateNextOrder(VideoLinkDto.Reorder rq,
-                                      VideoLink targetLink, VideoLink prevLink, VideoLink nextLink) {  // 현재 학습에 필요한 전체 링크 조회
-
-        // [1] 재정렬 수행
-        Double displayOrder = ReorderUtils.calculateReorder(targetLink, prevLink, nextLink);
-
-        // [2] 정렬 수행 후, 전체 재정렬이 필요한 경우 수행 (결과가 null이면 전체 재정렬 필요)
-        return Objects.isNull(displayOrder) ? rebalanceAndReCalculate(rq, targetLink) : displayOrder;
-    }
-
-    // 전체 재정렬 (rebalance) 수행 후, 다시 계산
-    private Double rebalanceAndReCalculate(VideoLinkDto.Reorder rq, VideoLink targetLink) {
-
-        // [1] 현재 학습에 속한 전체 단어 조회
-        List<VideoLink> videoLinks =
-                videoLinkRepository.findByVideoLinkOwnerAndOwnerId(targetLink.getVideoLinkOwner(), targetLink.getOwnerId());
-
-        // [2] 재정렬 수행
-        ReorderUtils.rebalance(videoLinks); // 재정렬 수행
-
-        // [3] 재정렬한 결과들을 Map으로 변환 (PK - Entity 자신 쌍)
-        Map<Long, VideoLink> linkMap = videoLinks.stream()
-                .collect(Collectors.toConcurrentMap(VideoLink::getVideoLinkId, Function.identity()));
-
-        // [4] 재정렬 후 엔티티 조회 (이전, 이후 엔티티가 없다면 null)
-        VideoLink newTargetLink = linkMap.get(rq.getVideoLinkId()); // 현재 링크 정보 (재정렬 후)
-        VideoLink newPrevLink = Objects.isNull(rq.getPrevVideoLinkId()) ? null : linkMap.get(rq.getPrevVideoLinkId());
-        VideoLink newNextLink = Objects.isNull(rq.getNextVideoLinkId()) ? null : linkMap.get(rq.getNextVideoLinkId());
-
-        // [5] 다시 계산 후 반환
-        return ReorderUtils.calculateReorder(newTargetLink, newPrevLink, newNextLink);
-    }
 }
