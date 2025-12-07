@@ -4,6 +4,7 @@ import app.finup.infra.youtube.utils.YouTubeUtils;
 import lombok.*;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -36,8 +37,11 @@ public final class YouTubeDtoMapper {
         return YouTube.Detail.builder()
                 .videoUrl(videoUrl)
                 .videoId(item.getId())
+                .publishedAt(Instant.parse(snippet.getPublishedAt()))
                 .title(snippet.getTitle())
+                .description(snippet.getDescription())
                 .channelTitle(snippet.getChannelTitle())
+                .tags(snippet.getTags())
                 .thumbnailUrl(standard.getUrl())
                 .duration(Duration.parse(contentDetails.getDuration()))
                 .viewCount(Long.valueOf(statistics.getViewCount()))

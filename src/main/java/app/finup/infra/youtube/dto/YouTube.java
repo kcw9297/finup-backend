@@ -6,6 +6,7 @@ import lombok.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,8 +43,11 @@ public final class YouTube {
             @Getter
             @JsonIgnoreProperties(ignoreUnknown = true)
             public static class Snippet {
+                private String publishedAt; // 영상 등록일 (2025-11-26T10:17:48Z 형식)
                 private String title;
+                private String description;
                 private String channelTitle;
+                private List<String> tags;
                 private Thumbnails thumbnails;
 
                 @Getter
@@ -147,6 +151,7 @@ public final class YouTube {
         private String videoUrl; // 영상 URL
         private String thumbnailUrl; // high 섬네일 이미지 주소
         private String title; // 제목
+        private String channelTitle; // 채널명
     }
 
 
@@ -167,8 +172,11 @@ public final class YouTube {
 
         // 추출 정보 - snippet
         private String videoId; // 유튜브 영상 고유번호
+        private Instant publishedAt; // 타임존 정보 포함 시간 정보 (업로드일)
         private String title; // 영상 제목 (최대 100자)
+        private String description; // 간단한 본문 내용
         private String channelTitle; // 영상을 업로드한 채널 이름
+        private List<String> tags; // 영상을 업로드한 채널 이름
         private String thumbnailUrl; // high 섬네일 이미지 주소
 
         // 추출 정보 - contentDetails
