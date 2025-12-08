@@ -1,5 +1,6 @@
 package app.finup.layer.domain.stock.dto;
 
+import app.finup.layer.domain.stock.entity.Stock;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -10,10 +11,24 @@ import lombok.NoArgsConstructor;
  * @since 2025-12-04
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class StocksDtoMapper {
+public class StockDtoMapper {
 
-    public static StocksDto.Detail toDetail(String htsKorIsnm, JsonNode output){
-        return StocksDto.Detail.builder()
+    public static StockDto.MarketCapRow toMarketCapRow(JsonNode output) {
+        return StockDto.MarketCapRow.builder()
+                .mkscShrnIscd(output.path("mksc_shrn_iscd").asText())
+                .dataRank(output.path("data_rank").asText())
+                .htsKorIsnm(output.path("hts_kor_isnm").asText())
+                .stckPrpr(output.path("stck_prpr").asText())
+                .prdyVrss(output.path("prdy_vrss").asText())
+                .prdyVrssSign(output.path("prdy_vrss_sign").asText())
+                .prdyCtrt(output.path("prdy_ctrt").asText())
+                .stckAvls(output.path("stck_avls").asText())
+                .mrktWholAvlsRlim(output.path("mrkt_whol_avls_rlim").asText())
+                .build();
+    }
+
+    public static StockDto.Detail toDetail(String htsKorIsnm, JsonNode output){
+        return StockDto.Detail.builder()
                 /* 종목 기본 정보 */
                 // 종목명 헤더
                 .htsKorIsnm(htsKorIsnm)

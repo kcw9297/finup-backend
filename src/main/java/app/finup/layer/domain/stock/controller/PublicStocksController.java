@@ -21,11 +21,16 @@ import org.springframework.web.bind.annotation.*;
 public class PublicStocksController {
 
     private final StockService stockService;
-    /*
+
+    /**
+     * 종목 리스트 페이지 시가총액 조회 API
+     * [GET] stocks/market-cap-ranking
+     */
     @GetMapping("/market-cap-ranking")
     public ResponseEntity<?> getMarketCapRanking() {
-        return Api.ok(stocksService.getMarketCapRanking());
-    }*/
+        return Api.ok(stockService.getMarketCapRow());
+    }
+
     /**
      * 종목명 종목코드 kis 마스터 파일 읽어 DB 저장
      * [GET] stocks/import/kospi
