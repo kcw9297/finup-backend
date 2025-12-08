@@ -14,7 +14,7 @@ import java.util.Objects;
 public final class StudyDto {
 
     /**
-     * 리스트 결과로 사용
+     * 리스트 조회 결과
      */
     @Data
     @Builder

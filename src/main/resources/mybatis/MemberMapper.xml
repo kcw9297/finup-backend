@@ -8,10 +8,8 @@
         m.member_id     AS memberId,
         m.email         AS email,
         m.nickname      AS nickname,
-        CASE m.role
-            WHEN 'ADMIN' THEN '관리자'
-            WHEN 'NORMAL' THEN '일반'
-        END AS memberRole,
+        m.`role`        AS memberRole,
+        m.social        AS socialType,
         m.is_active     AS isActive
     </sql>
     

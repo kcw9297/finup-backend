@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -28,12 +29,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class NewsApiClientImpl implements NewsApiClient {
-    @Value("${api.naver-news.client.id}")
-    private String clientId;
 
-    @Value("${api.naver-news.client.secret}")
-    private String clientSecret;
-
+    private final WebClient naverClient;
     private final ObjectMapper objectMapper;
     private final NewsScraper newsScraper;
 
@@ -45,14 +42,7 @@ public class NewsApiClientImpl implements NewsApiClient {
     }
     //webclient 호출 담당
     private String callNaverApi(String query,String sort, int display){
-        WebClient client = WebClient.builder()
-                .baseUrl("https://openapi.naver.com")
-                .defaultHeader("X-Naver-Client-Id", clientId)
-                .defaultHeader("X-Naver-Client-Secret", clientSecret)
-                .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0")
-                .build();
-
-        return client.get()
+        return naverClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")
                         .queryParam("query", query)

@@ -13,7 +13,7 @@ import lombok.*;
 public final class StudyWordDto {
 
     /**
-     * 리스트 결과로 사용
+     * 리스트 조회 결과
      */
     @Data
     @Builder
@@ -37,10 +37,9 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Add {
 
+        private Long studyId;
         private String name;
         private String meaning;
-        private Long studyId;
-        private Long lastStudyWordId; // 추가 하기 직전, 가장 마지막에 있던 단어번호
     }
 
 
@@ -68,9 +67,14 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Reorder {
 
+        private Long studyId;
         private Long studyWordId;
-        private Long prevStudyWordId;
-        private Long nextStudyWordId;
+        private Integer reorderPosition; // 0번째부터 표기
+
+        public void setIds(Long studyId, Long studyWordId) {
+            this.studyId = studyId;
+            this.studyWordId = studyWordId;
+        }
     }
 
 }

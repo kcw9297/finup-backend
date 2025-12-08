@@ -45,22 +45,14 @@ public class VideoLink extends BaseEntity implements Reorderable {
     private String videoId; // youtube video Id 등 영상 고유 번호
 
     @Column(nullable = false)
-    private String thumbnailUrl;
-
-    @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
     private Double displayOrder;  // 정렬 순서
 
     @Builder
-    public VideoLink(Long ownerId, VideoLinkOwner videoLinkOwner, String videoUrl, String videoId, String thumbnailUrl, String title, Double displayOrder) {
+    public VideoLink(Long ownerId, VideoLinkOwner videoLinkOwner, String videoUrl, String videoId, Double displayOrder) {
         this.ownerId = ownerId;
         this.videoLinkOwner = videoLinkOwner;
         this.videoUrl = videoUrl;
         this.videoId = videoId;
-        this.thumbnailUrl = thumbnailUrl;
-        this.title = title;
         this.displayOrder = displayOrder;
     }
 
@@ -70,14 +62,10 @@ public class VideoLink extends BaseEntity implements Reorderable {
      * 비디오 링크정보 갱신
      * @param videoUrl 비디오 Full URL
      * @param videoId 비디오 아이디 (API 에서 얻어온 번호)
-     * @param thumbnailUrl API에서 제공받은 썸네일 이미지 URL
-     * @param title API에서 제공받은 비디오 제목
      */
-    public void update(String videoUrl, String videoId, String thumbnailUrl, String title) {
+    public void edit(String videoUrl, String videoId) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
-        this.thumbnailUrl = thumbnailUrl;
-        this.title = title;
     }
 
     // 정렬 순서 변경

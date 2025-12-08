@@ -37,6 +37,31 @@ public class Url {
     public static final String MEMBER_ADMIN = ADMIN + MEMBER;
     public static final String MEMBER_PUBLIC = PUBLIC + MEMBER;
 
+    /* study */
+    public static final String STUDY = API + "/studies";
+    public static final String STUDY_ADMIN = ADMIN + STUDY;
+    public static final String STUDY_PUBLIC = PUBLIC + STUDY;
+
+    /* studyProgress */
+    public static final String STUDY_PROGRESS = API + "/study-progresses";
+    public static final String STUDY_PROGRESS_ADMIN = ADMIN + STUDY_PROGRESS;
+    public static final String STUDY_PROGRESS_PUBLIC = PUBLIC + STUDY_PROGRESS;
+
+    /* studyWord */
+    public static final String STUDY_WORD = API + "/study-word";
+    public static final String STUDY_WORD_ADMIN = ADMIN + STUDY_WORD;
+    public static final String STUDY_WORD_PUBLIC = PUBLIC + STUDY_WORD;
+
+    /* videoLink */
+    public static final String VIDEO_LINK = API + "/video-links";
+    public static final String VIDEO_LINK_ADMIN = ADMIN + VIDEO_LINK;
+    public static final String VIDEO_LINK_PUBLIC = PUBLIC + VIDEO_LINK;
+
+    /* bookmark */
+    public static final String BOOKMARK = API + "/bookmarks";
+    public static final String BOOKMARK_ADMIN = ADMIN + BOOKMARK;
+    public static final String BOOKMARK_PUBLIC = PUBLIC + BOOKMARK;
+
     /* news */
     public static final String NEWS = API + "/news";
     public static final String NEWS_PUBLIC = PUBLIC + NEWS;

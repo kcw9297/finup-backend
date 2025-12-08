@@ -58,7 +58,7 @@ public class StudyServiceImpl implements StudyService {
 
 
     @Override
-    public void add(StudyDto.Add rq) {
+    public Long add(StudyDto.Add rq) {
 
         // [1] 엔티티 생성
         Study study = Study.builder()
@@ -69,7 +69,7 @@ public class StudyServiceImpl implements StudyService {
                 .build();
 
         // [2] 엔티티 저장
-        studyRepository.save(study);
+        return studyRepository.save(study).getStudyId();
     }
 
 

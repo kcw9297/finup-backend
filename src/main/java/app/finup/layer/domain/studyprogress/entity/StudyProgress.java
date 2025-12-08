@@ -39,7 +39,7 @@ public class StudyProgress extends BaseEntity {
     @JoinColumn(name = "member_id", updatable = false, nullable = false)
     private Member member; // 학습 중인 회원
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "study_id", updatable = false, nullable = false)
     private Study study;

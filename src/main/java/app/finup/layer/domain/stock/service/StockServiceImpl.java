@@ -53,8 +53,12 @@ public class StockServiceImpl implements StockService {
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
     @Override
     public void importKospi() throws Exception {
-
+        /*
+        * 개발 중이라면 프로젝트 안 폴더에 두고 상대경로로 테스트
+        * 운영/배포용이라면 외부 경로 + 환경변수로 관리하는 것이 안전
+        * */
         String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
+        //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
 
         FileInputStream fis = new FileInputStream(path);
         Workbook workbook = new XSSFWorkbook(fis);

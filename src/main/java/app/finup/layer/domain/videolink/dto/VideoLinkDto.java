@@ -14,7 +14,7 @@ import lombok.*;
 public final class VideoLinkDto {
 
     /**
-     * 리스트 결과로 사용
+     * 리스트 조회 결과
      */
     @Data
     @Builder
@@ -22,12 +22,19 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Row {
 
+        // DB에 저장된 정보
         private Long videoLinkId;
         private String videoId;
         private String videoUrl;
-        private String thumbnailUrl;
-        private String title;
         private Double displayOrder;
+
+        // YouTube API로 조회되는 정보
+        private String title;
+        private String duration;
+        private String thumbnailUrl;
+        private String channelTitle;
+        private Long viewCount;
+        private Long likeCount;
     }
 
 
@@ -40,29 +47,9 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Add {
 
-        // 프론트에서 얻어오는 정보
+        private String videoUrl;
         private Long ownerId; // 주인이 HOME인 경우 null
         private VideoLinkOwner videoLinkOwner;
-        private String videoUrl;
-        private Long lastVideoLinkId; // 가장 마지막에 있던 영상링크 번호
-
-        // 하단 정보는 유튜브 API에서 제공 받은 후 채우는 정보
-        private String videoId;
-        private String thumbnailUrl;
-        private String title;
-
-        /**
-         * API에서 얻어온 정보 추가
-         * @param videoId 영상 고유번호
-         * @param thumbnailUrl 썸네일 이미지 주소
-         * @param title 영상 제목
-         */
-        public void setApiInfo(String videoId, String thumbnailUrl, String title) {
-            this.videoId = videoId;
-            this.thumbnailUrl = thumbnailUrl;
-            this.title = title;
-        }
-
     }
 
 
@@ -78,23 +65,7 @@ public final class VideoLinkDto {
         // 프론트에서 얻어오는 정보
         private Long videoLinkId;
         private String videoUrl;
-
-        // 하단 정보는 유튜브 API에서 제공 받은 후 채우는 정보
         private String videoId;
-        private String thumbnailUrl;
-        private String title;
-
-        /**
-         * API에서 얻어온 정보 추가
-         * @param videoId 영상 고유번호
-         * @param thumbnailUrl 썸네일 이미지 주소
-         * @param title 영상 제목
-         */
-        public void setApiInfo(String videoId, String thumbnailUrl, String title) {
-            this.videoId = videoId;
-            this.thumbnailUrl = thumbnailUrl;
-            this.title = title;
-        }
     }
 
 
@@ -108,7 +79,9 @@ public final class VideoLinkDto {
     public static class Reorder {
 
         private Long videoLinkId;
-        private Long beforeVideoLinkId;
-        private Long afterVideoLinkId;
+        private Long ownerId; // 주인이 HOME인 경우 null
+        private VideoLinkOwner videoLinkOwner;
+        private Integer reorderPosition; // 0번째부터 표기
+
     }
 }
