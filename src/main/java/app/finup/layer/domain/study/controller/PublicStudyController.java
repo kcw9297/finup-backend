@@ -147,8 +147,8 @@ public class PublicStudyController {
      * 학습정보에 속하는 단어 일괄 조회
      * [GET] /{studyId}/words
      */
-    @PostMapping("/{studyId:[0-9]+}/words")
-    public ResponseEntity<?> addWord(@PathVariable Long studyId) {
+    @GetMapping("/{studyId:[0-9]+}/words")
+    public ResponseEntity<?> getListByStudy(@PathVariable Long studyId) {
         return Api.ok(studyWordService.getListByStudy(studyId));
     }
 
