@@ -52,6 +52,11 @@ public class Url {
     public static final String STUDY_WORD_ADMIN = ADMIN + STUDY_WORD;
     public static final String STUDY_WORD_PUBLIC = PUBLIC + STUDY_WORD;
 
+    /* video */
+    public static final String VIDEO = API + "/videos";
+    public static final String VIDEO_ADMIN = ADMIN + VIDEO;
+    public static final String VIDEO_PUBLIC = PUBLIC + VIDEO;
+
     /* videoLink */
     public static final String VIDEO_LINK = API + "/video-links";
     public static final String VIDEO_LINK_ADMIN = ADMIN + VIDEO_LINK;

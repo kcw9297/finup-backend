@@ -44,7 +44,7 @@ public class NoticeController {
      * [GET] /admin/api/notices/{noticeId}
      */
 
-    @GetMapping("/{noticeId}")
+    @GetMapping("/{noticeId:[0-9]+}")
     public ResponseEntity<?> getDetail(@PathVariable Long noticeId) {
         // [1] 상세 조회 요청
         NoticeDto.Detail detail = noticeService.getDetail(noticeId);
@@ -58,7 +58,7 @@ public class NoticeController {
      * [PUT] /admin/api/notices/{noticeId}
      */
 
-    @PutMapping("/{noticeId}")
+    @PutMapping("/{noticeId:[0-9]+}")
     public ResponseEntity<?> editDetail(@PathVariable Long noticeId,
                                         @RequestBody NoticeDto.Edit rq) {
         rq.setNoticeId(noticeId);
@@ -73,7 +73,7 @@ public class NoticeController {
      * [DELETE] /admin/api/notices/{noticeId}
      */
 
-    @DeleteMapping("/{noticeId}")
+    @DeleteMapping("/{noticeId:[0-9]+}")
     public ResponseEntity<?> removeDetail(@PathVariable Long noticeId) {
         noticeService.remove(noticeId);
         return Api.ok();
@@ -83,7 +83,7 @@ public class NoticeController {
      * 공지사항 추가
      * [POST] /admin/api/notices/{adminId}
      */
-    @PostMapping("/{adminId}")
+    @PostMapping("/{adminId:[0-9]+}")
     public ResponseEntity<?> addNotice(@RequestBody NoticeDto.Write rq, @PathVariable Long adminId) {
         NoticeDto.Detail saved = noticeService.write(rq, adminId);
         return Api.ok(saved);
