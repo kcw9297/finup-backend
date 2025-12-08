@@ -55,7 +55,7 @@ public class SecurityConfig {
 
                 // ▶ CSRF 설정 - 만약 Cookie에 AccessToken을 담는 경우 설정 권장 (방어 강화)
                 .csrf(customer -> customer
-                        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT) // 일반&소셜 로그인, 로그아웃
+                        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT, "/**") // 일반&소셜 로그인, 로그아웃
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
                 )

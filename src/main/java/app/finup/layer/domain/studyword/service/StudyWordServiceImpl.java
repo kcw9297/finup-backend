@@ -60,9 +60,10 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_NOT_FOUND));
 
         // [2] 정렬 순서 계산 (첫 항목: 1000.0, 이후: 이전 값 + 1.0)
-        Double displayOrder = Objects.isNull(rq.getLastStudyWordId()) ?
-                ReorderUtils.DEFAULT_DISPLAY_ORDER :
-                calculateNextOrder(rq.getLastStudyWordId());
+        Double displayOrder = studyWordRepository
+                .findLastByStudyId(rq.getStudyId())
+                .map(ReorderUtils::calculateNextOrder)
+                .orElse(ReorderUtils.DEFAULT_DISPLAY_ORDER); // 최초 단어인 경우 기본 값
 
         // [3] 엔티티 생성
         StudyWord studyWord = StudyWord.builder()
@@ -74,16 +75,6 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [4] 엔티티 저장
         studyWordRepository.save(studyWord);
-    }
-
-
-    // 삽입할 단어의 정렬 값 계산
-    private Double calculateNextOrder(Long lastStudyWordId) {
-
-        return studyWordRepository
-                .findById(lastStudyWordId)
-                .map(word -> word.getDisplayOrder() + ReorderUtils.DISPLAY_ORDER_INCREMENT)
-                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
     }
 
 
@@ -132,29 +123,32 @@ public class StudyWordServiceImpl implements StudyWordService {
     @Override
     public void reorder(StudyWordDto.Reorder rq) {
 
-        // [1] 정렬 대상 조회
-        StudyWord targetWord = studyWordRepository
-                .findById(rq.getStudyWordId())
-                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+        // [1] 정렬 대상 및 전체 목록 조회
+        StudyWord targetWord =
+                studyWordRepository
+                        .findById(rq.getStudyWordId())
+                        .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
-        // [2] 대상 양 옆의 단어 조회. 받아온 id가 null 인 경우, 조회하지 않음
-        StudyWord prevWord = findWordIfExists(rq.getPrevStudyWordId());
-        StudyWord nextWord = findWordIfExists(rq.getNextStudyWordId());
+        // displayOrder 순 정렬된 목록
+        List<StudyWord> studyWords = studyWordRepository.findByStudyId(rq.getStudyId());
 
-        // [3] 케이스에 따라 displayOrder 계산 후 갱신
-        Double displayOrder = ReorderUtils.calculateReorder(targetWord, prevWord, nextWord);
-        targetWord.reorder(displayOrder);
+        // [2] 케이스에 따라 displayOrder 계산 후 갱신
+        targetWord.reorder(calculateOrder(studyWords, rq.getReorderPosition()));
     }
 
 
-    // 단어 목록 조회
-    private StudyWord findWordIfExists(Long studyWordId) {
+    // 정렬 시도 후, 재정렬이 필요하면 재정렬 수행 후 다시 정렬
+    private Double calculateOrder(List<StudyWord> studyWords, Integer reorderPosition) {
 
-        return Objects.isNull(studyWordId) ?
-                null :
-                studyWordRepository
-                        .findById(studyWordId)
-                        .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+        // [1] 재정렬 수행
+        Double displayOrder = ReorderUtils.calculateReorder(studyWords, reorderPosition);
+
+        // [2] 만약 null 반환 시, 일괄 재정렬 후 재시도
+        if (Objects.isNull(displayOrder))
+            displayOrder = ReorderUtils.rebalanceAndReorder(studyWords, reorderPosition);
+
+        // [3] 계산된 재정렬 값 반환
+        return displayOrder;
     }
 
 
@@ -170,7 +164,10 @@ public class StudyWordServiceImpl implements StudyWordService {
         studyWordRepository.deleteById(studyWordId); // cascade = CascadeType.ALL 옵션으로 파일 엔티티도 함께 삭제
 
         // [3] 파일 물리적 삭제
-        uploadFileManager.remove(studyWord.getWordImageFile());
+        UploadFile wordImageFile = studyWord.getWordImageFile();
+
+        // 파일이 존재하는 경우에만 삭제 시도
+        if (Objects.nonNull(wordImageFile)) uploadFileManager.remove(wordImageFile);
     }
 
 

@@ -12,11 +12,11 @@ import java.util.List;
 public interface StudyProgressService {
 
     /**
-     * 특정 회원의 진도 목록 일괄 조회
+     * 로그인 회원의 진도 목록 일괄 조회
      * @param memberId 회원번호
      * @return 회원 진도 목록
      */
-    List<StudyProgressDto.Row> getListByMemberId(Long memberId);
+    List<StudyProgressDto.Row> getMyList(Long memberId);
 
 
     /**
@@ -24,7 +24,7 @@ public interface StudyProgressService {
      * @param studyId 단계학습번호
      * @param memberId 회원번호
      */
-    void progress(Long studyId, Long memberId);
+    void start(Long studyId, Long memberId);
 
 
     /**

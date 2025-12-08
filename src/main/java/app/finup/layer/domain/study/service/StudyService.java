@@ -30,8 +30,9 @@ public interface StudyService {
     /**
      * 단계학습 자료 추가
      * @param rq 추가 요청 DTO
+     * @return 생성된 단계학습 번호
      */
-    void add(StudyDto.Add rq);
+    Long add(StudyDto.Add rq);
 
 
     /**

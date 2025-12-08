@@ -37,7 +37,7 @@ public class StudyProgressServiceImpl implements StudyProgressService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<StudyProgressDto.Row> getListByMemberId(Long memberId) {
+    public List<StudyProgressDto.Row> getMyList(Long memberId) {
 
         return studyProgressRepository
                 .findByMemberId(memberId)
@@ -48,7 +48,7 @@ public class StudyProgressServiceImpl implements StudyProgressService {
 
 
     @Override
-    public void progress(Long studyId, Long memberId) {
+    public void start(Long studyId, Long memberId) {
 
         // [1] entity 조회
         StudyProgress studyProgress =

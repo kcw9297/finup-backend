@@ -39,7 +39,7 @@
     <!-- 검색 메소드 카운트 쿼리 -->
     <select id="countForSearch" resultType="int">
         SELECT COUNT(*)
-        FROM reboard r
+        FROM study s
         <!-- 현재는 파라미터 직접 입력이 없어서, 전체 카운트만 함 -->
     </select>
 
