@@ -44,7 +44,8 @@ public class AdminVideoLinkController {
      */
     @PostMapping
     public ResponseEntity<?> add(@RequestBody VideoLinkDto.Add rq) {
-
+        log.info("ADD-REQUEST videoUrl={}, ownerId={}, owner={}",
+                rq.getVideoUrl(), rq.getOwnerId(), rq.getVideoLinkOwner());
         // [1] 학습 영상 추가
         videoLinkService.add(rq);
 
