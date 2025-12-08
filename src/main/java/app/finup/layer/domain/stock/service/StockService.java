@@ -1,10 +1,13 @@
 package app.finup.layer.domain.stock.service;
 
-import app.finup.layer.domain.stock.dto.StocksDto;
+import app.finup.layer.domain.stock.dto.StockDto;
+import java.util.List;
 
 public interface StockService {
-    //List<StocksDto.Row> getMarketCapRanking();
+    // 종목 상세페이지 시가총액 순위 가져오기
+    List<StockDto.MarketCapRow> getMarketCapRow();
+
     //List<StocksDto> getStocks();
     void importKospi() throws Exception;
-    StocksDto.Detail getDetail(String code);
+    StockDto.Detail getDetail(String code);
 }
