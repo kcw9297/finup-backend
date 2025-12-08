@@ -5,7 +5,10 @@ import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * YouTube API DTO 간 변환을 지원하는 클래스
@@ -16,12 +19,39 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class YouTubeDtoMapper {
 
-    public static YouTube.Detail toDetail(YouTube.VideosRp rp, String videoUrl) {
+    public static YouTube.Detail toDetail(YouTube.VideosRp rp, String videoId) {
 
         // [1] items 추출 - 상세 조회시엔 0번째 인덱스에 상세 정보가 있음
         YouTube.VideosRp.Item item = rp.getItems().get(0);
 
-        // [2] items 내 상세 정보 추출
+        // [2] items 내 상세 정보 추출 및 변환
+        return extractItemInfoAndMapToDetail(item, videoId);
+    }
+
+
+    // "id"를 여러개로 detail을 검색한 경우
+    public static List<YouTube.Detail> toDetails(YouTube.VideosRp rp, List<String> videoIds) {
+
+        // [1] items 추출 - 상세 조회시엔 0번째 인덱스에 상세 정보가 있음
+        Map<String, YouTube.VideosRp.Item> itemsMap =
+                rp.getItems()
+                        .stream()
+                        .collect(Collectors.toConcurrentMap(
+                                YouTube.VideosRp.Item::getId,
+                                Function.identity()
+                        ));
+
+        // [2] DTO 일괄 변환 및 반환 (item 내 정보 기반)
+        return videoIds.stream()
+                .filter(videoId -> Objects.nonNull(itemsMap.get(videoId))) // 영상이 정상 존재하는 것만 추출
+                .map(videoId -> extractItemInfoAndMapToDetail(itemsMap.get(videoId), videoId)) // DTO 변환
+                .toList();
+    }
+
+
+    // item 내부에서, 필요 정보를 추출하고
+    private static YouTube.Detail extractItemInfoAndMapToDetail(YouTube.VideosRp.Item item, String videoId) {
+
         // snippet
         YouTube.VideosRp.Item.Snippet snippet = item.getSnippet();
         YouTube.VideosRp.Item.Snippet.Thumbnails thumbnails = snippet.getThumbnails();
@@ -35,7 +65,7 @@ public final class YouTubeDtoMapper {
 
         // [3] 응답 데이터 변환
         return YouTube.Detail.builder()
-                .videoUrl(videoUrl)
+                .videoUrl(YouTubeUtils.toVideoUrl(videoId))
                 .videoId(item.getId())
                 .publishedAt(Instant.parse(snippet.getPublishedAt()))
                 .title(snippet.getTitle())
@@ -48,6 +78,8 @@ public final class YouTubeDtoMapper {
                 .likeCount(Long.valueOf(statistics.getLikeCount()))
                 .build();
     }
+
+
 
 
     public static List<YouTube.Row> toRows(YouTube.SearchRp rp) {
@@ -80,6 +112,5 @@ public final class YouTubeDtoMapper {
                 .title(snippet.getTitle())
                 .build();
     }
-
 
 }

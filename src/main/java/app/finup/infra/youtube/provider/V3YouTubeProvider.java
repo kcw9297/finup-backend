@@ -40,7 +40,7 @@ public class V3YouTubeProvider implements YouTubeProvider {
 
 
     @Cacheable(
-            value = Const.PREFIX_KEY_YOUTUBE_DETAIL,
+            value = "YT",
             key = "#videoId"
     )
     @Override
@@ -52,7 +52,7 @@ public class V3YouTubeProvider implements YouTubeProvider {
         return youTubeClient.get()
 
                 // [1] URI 생성
-                .uri(uriBuilder -> buildVideoURI(uriBuilder, videoId))
+                .uri(uriBuilder -> buildVideoURI(uriBuilder, List.of(videoId)))
 
                 // [2] HTTP 요청 수행
                 .header("Content-Type", "application/json")
@@ -73,7 +73,7 @@ public class V3YouTubeProvider implements YouTubeProvider {
                 .switchIfEmpty(Mono.error(new ProviderException(AppStatus.YOUTUBE_URL_NOT_VALID)))
 
                 // [7] 최종적으로 외부에 제공할 DTO 변환
-                .map(rp -> YouTubeDtoMapper.toDetail(rp, YouTubeUtils.toVideoUrl(videoId)))
+                .map(rp -> YouTubeDtoMapper.toDetail(rp, videoId))
 
                 // [8] 예외 통합 처리 (가장 마지막에 작성해야 함)
                 .onErrorMap(Exception.class, ex -> {
@@ -84,12 +84,51 @@ public class V3YouTubeProvider implements YouTubeProvider {
                 .block();
     }
 
+    @Cacheable(
+            value = "youtubeVideos",
+            key = "T(java.util.stream.Collectors).joining(',', #videoIds.stream().sorted().toArray())"
+    )
+    @Override
+    public List<YouTube.Detail> getVideos(List<String> videoIds) {
+
+        return youTubeClient.get()
+
+                // [1] URI 생성
+                .uri(uriBuilder -> buildVideoURI(uriBuilder, videoIds))
+
+                // [2] HTTP 요청 수행
+                .header("Content-Type", "application/json")
+                .retrieve()
+
+                // [3] JSON 역직렬화
+                .bodyToMono(String.class)
+                .timeout(Duration.ofSeconds(5)) // API 요청 + 응답 역직렬화까지 Timeout 시간
+
+                // [4] 빈 응답 처리 (응답 자체가 없는 경우)
+                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.YOUTUBE_REQUEST_FAILED)))
+
+                // [5] 역직렬화 수행
+                .map(json -> StrUtils.fromJson(json, YouTube.VideosRp.class))
+
+                // [6] 최종적으로 외부에 제공할 DTO 변환 (비어 있는 경우에 대한 예외는 처리하지 않음)
+                .map(rp -> YouTubeDtoMapper.toDetails(rp, videoIds))
+
+                // [7] 예외 통합 처리 (가장 마지막에 작성해야 함)
+                .onErrorMap(Exception.class, ex -> {
+                    LogUtils.showError(this.getClass(), "Youtube 영상 상세 API 요청 실패.\n원인 : %s", ex.getMessage());
+                    if (ex instanceof ProviderException) return ex;
+                    return new ProviderException(AppStatus.YOUTUBE_REQUEST_FAILED, ex);
+                })
+                .block();
+    }
+
+
     // 상세 정보 요청 생성 (건들지 말 것)
-    private URI buildVideoURI(UriBuilder uriBuilder, String videoId) {
+    private URI buildVideoURI(UriBuilder uriBuilder, List<String> videoIds) {
         return uriBuilder
                 .path("/videos") // 유튜브 영상 상세 API
                 .queryParam("key", key) // API KEY
-                .queryParam("id", videoId)
+                .queryParam("id", videoIds)
                 .queryParam("part", List.of("snippet", "contentDetails", "statistics"))
                 .build();
     }

@@ -66,9 +66,10 @@ public class JwtProviderImpl implements JwtProvider {
 
         // [2] jti 기반 Redis 내 RT 조회
         String rt = redisJwtStorage.get(jti);
+        log.warn("rt = {}", rt);
 
         // [3] RT 검증 수행
-        if (Objects.isNull(rt)) throw new JwtVerifyException(AppStatus.TOKEN_EXPIRED); // 조회 결과가 null 이면 만료된 인증
+        if (Objects.isNull(rt)) throw new JwtVerifyException(AppStatus.TOKEN_EXPIRED_RT); // 조회 결과가 null 이면 만료된 인증
         JwtUtils.verify(rt); // 토큰 정보가 유효한지 검증
 
         // [4] 재발급 수행 및 반환
@@ -78,6 +79,19 @@ public class JwtProviderImpl implements JwtProvider {
 
     @Override
     public JwtClaims getClaims(String at) {
+
+        // [1] claims 조회
+        JwtClaims claims = JwtUtils.verifyAndGetClaims(at);
+
+        // [2] jti 기반 RT 조회
+        String jti = claims.getJti();
+        String rt = redisJwtStorage.get(jti);
+
+        // [3] 만약 rt가 존재하지 않는 경우, 예외 반환 (만료)
+        if (Objects.isNull(rt))
+            throw new JwtVerifyException(AppStatus.TOKEN_EXPIRED_RT); // 조회 결과가 null 이면 만료된 인증
+
+
         return JwtUtils.verifyAndGetClaims(at);
     }
 

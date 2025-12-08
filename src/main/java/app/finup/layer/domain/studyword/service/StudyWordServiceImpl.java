@@ -133,19 +133,19 @@ public class StudyWordServiceImpl implements StudyWordService {
         List<StudyWord> studyWords = studyWordRepository.findByStudyId(rq.getStudyId());
 
         // [2] 케이스에 따라 displayOrder 계산 후 갱신
-        targetWord.reorder(calculateOrder(studyWords, rq.getReorderPosition()));
+        targetWord.reorder(calculateOrder(targetWord, studyWords, rq.getReorderPosition()));
     }
 
 
     // 정렬 시도 후, 재정렬이 필요하면 재정렬 수행 후 다시 정렬
-    private Double calculateOrder(List<StudyWord> studyWords, Integer reorderPosition) {
+    private Double calculateOrder(StudyWord targetWord, List<StudyWord> studyWords, Integer reorderPosition) {
 
         // [1] 재정렬 수행
-        Double displayOrder = ReorderUtils.calculateReorder(studyWords, reorderPosition);
+        Double displayOrder = ReorderUtils.calculateReorder(targetWord, studyWords, reorderPosition);
 
         // [2] 만약 null 반환 시, 일괄 재정렬 후 재시도
         if (Objects.isNull(displayOrder))
-            displayOrder = ReorderUtils.rebalanceAndReorder(studyWords, reorderPosition);
+            displayOrder = ReorderUtils.rebalanceAndReorder(targetWord, studyWords, reorderPosition);
 
         // [3] 계산된 재정렬 값 반환
         return displayOrder;

@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * VideoLinkService 구현 클래스
@@ -122,18 +119,18 @@ public class VideoLinkServiceImpl implements VideoLinkService {
 
 
         // [2] displayOrder 계산 후 갱신
-        targetLink.reorder(calculateOrder(videoLinks, rq.getReorderPosition()));
+        targetLink.reorder(calculateOrder(targetLink, videoLinks, rq.getReorderPosition()));
     }
 
     // 정렬 시도 후, 재정렬이 필요하면 재정렬 수행 후 다시 정렬
-    private Double calculateOrder(List<VideoLink> videoLinks, Integer reorderPosition) {
+    private Double calculateOrder(VideoLink targetLink, List<VideoLink> videoLinks, Integer reorderPosition) {
 
         // [1] 재정렬 수행
-        Double displayOrder = ReorderUtils.calculateReorder(videoLinks, reorderPosition);// 재정렬 수행
+        Double displayOrder = ReorderUtils.calculateReorder(targetLink, videoLinks, reorderPosition);// 재정렬 수행
 
         // [2] 만약 null 반환 시, 일괄 재정렬 후 재시도
         if (Objects.isNull(displayOrder))
-            displayOrder = ReorderUtils.rebalanceAndReorder(videoLinks, reorderPosition);
+            displayOrder = ReorderUtils.rebalanceAndReorder(targetLink, videoLinks, reorderPosition);
 
         // [3] 계산된 재정렬 값 반환
         return displayOrder;

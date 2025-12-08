@@ -30,7 +30,7 @@ public final class YouTube {
         private static final long serialVersionUID = 1L;
 
         // 검색 결과 (key : items)
-        private List<Item> items; // 길이가 1인 응답으로 제공
+        private List<Item> items; // 단일 조회인 경우 길이가 1인 응답으로 제공
 
         @Getter
         @JsonIgnoreProperties(ignoreUnknown = true)
