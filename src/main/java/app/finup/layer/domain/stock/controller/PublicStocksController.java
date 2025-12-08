@@ -28,7 +28,7 @@ public class PublicStocksController {
     }*/
     /**
      * 종목명 종목코드 kis 마스터 파일 읽어 DB 저장
-     * [GET] stocks/detail/{code}
+     * [GET] stocks/import/kospi
      */
     @GetMapping("/import/kospi")
     public ResponseEntity<?> importKospi() throws Exception {
