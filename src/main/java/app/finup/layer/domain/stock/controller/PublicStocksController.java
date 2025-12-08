@@ -29,7 +29,6 @@ public class PublicStocksController {
     @GetMapping("/market-cap-ranking")
     public ResponseEntity<?> getMarketCapRanking() {
         return Api.ok(stockService.getMarketCapRow());
-        //return null;
     }
 
     /**
