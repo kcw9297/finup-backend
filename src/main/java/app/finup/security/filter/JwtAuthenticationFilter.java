@@ -114,8 +114,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 인증 예외 발생 시 처리
         } catch (JwtVerifyException e) {
 
-            // [2] 만료 이외의 사유로 토큰 유효성 검사에 실패한 경우, 그대로 예외 던짐
-            if (!StrUtils.equalsStatus(e.getAppStatus(), AppStatus.TOKEN_EXPIRED)) throw e;
+            // [2] AT만료 이외의 사유인 경우 그대로 던짐 (RT 만료인 경우도 던짐)
+            if (!StrUtils.equalsStatus(e.getAppStatus(), AppStatus.TOKEN_EXPIRED))
+                throw e;
 
             // [3] Claims 조회 시도
             return reissueAndGetClaims(response, at);

@@ -28,6 +28,7 @@ public enum AppStatus {
     TOKEN_NOT_FOUND(401, "로그인이 필요한 서비스입니다.", "TOKEN_NOT_FOUND"),
     TOKEN_INVALID(403, "유효하지 않은 요청입니다. 다시 로그인해 주세요.", "TOKEN_INVALID"),
     TOKEN_EXPIRED(403, "로그인이 만료되었습니다. 다시 로그인해 주세요.", "TOKEN_EXPIRED"),
+    TOKEN_EXPIRED_RT(403, "RefreshToken 만료", "TOKEN_EXPIRED_RT"),
     TOKEN_REISSUE_FAILED(403, "잘못된 요청입니다. 다시 로그인해 주세요.", "TOKEN_REISSUE_FAILED"),
 
     /* 범용 유틸 클래스 상태 */
@@ -90,6 +91,7 @@ public enum AppStatus {
     /* 범용 상태 */
     OK(200, "요청에 성공했습니다.", "OK"),
     SERVER_ERROR(500, "서버 오류가 발생했습니다. 잠시 후에 다시 시도해 주세요.", "SERVER_ERROR"),
+    METHOD_NOT_ALLOWED(405, "지원하지 않는 형식입니다.", "METHOD_NOT_ALLOWED"),
     CACHE_EXPIRED(403, "정보가 만료되었습니다.", "CACHE_EXPIRED"),
     UNAUTHORIZED(401, "로그인이 필요한 서비스입니다.", "UNAUTHORIZED"),
     ACCESS_DENIED(403, "잘못된 요청입니다.", "ACCESS_DENIED");

@@ -20,7 +20,4 @@ public class Const {
     /* 접두사 상수 */
     public static final String PREFIX_KEY_JWT = "RT:";
     public static final String PREFIX_KEY_NEWS = "News:";
-    public static final String PREFIX_KEY_YOUTUBE_DETAIL = "YT:DETAIL:";
-    public static final String PREFIX_KEY_YOUTUBE_SEARCH = "YT:SEARCH:";
-    public static final String PREFIX_KEY_YOUTUBE_HOME = "YT:HOME";
 }

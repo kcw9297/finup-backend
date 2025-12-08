@@ -13,12 +13,21 @@ import java.util.List;
 public interface YouTubeProvider {
 
     /**
-     * 유튜브 영상 정보 조회 - ID 기반 (11자리)
+     * 유튜브 단일 영상 조회
      * 조회 시 quota 1개 소모
      * @param videoId 유튜브 영상 고유번호(아이디) - 11자리
      * @return 유튜브 영상 정보
      */
     YouTube.Detail getVideo(String videoId);
+
+
+    /**
+     * 입력한 id 개수에 대응하는 영상 목록 조회
+     * 조회 시 50개까진 quota 1개 소모
+     * @param videoIds 유튜브 영상 고유번호(아이디) 목록
+     * @return 유튜브 영상 정보 목록
+     */
+    List<YouTube.Detail> getVideos(List<String> videoIds);
 
 
     /**
