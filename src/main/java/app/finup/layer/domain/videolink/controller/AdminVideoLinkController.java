@@ -4,6 +4,7 @@ import app.finup.common.constant.Url;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
+import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
 import app.finup.layer.domain.videolink.service.VideoLinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,18 @@ public class AdminVideoLinkController {
 
     private final VideoLinkService videoLinkService;
 
+    /**
+     * 현재 자원에 속하는 영상 목록 조회
+     * [GET] /video-links
+     * @param ownerId 영상 소유자 번호
+     * @param videoLinkOwner 영상 소유자 (HOME, STUDY, ...)
+     */
+    @GetMapping
+    public ResponseEntity<?> getList(@RequestParam Long ownerId,
+                                     @RequestParam VideoLinkOwner videoLinkOwner) {
+
+        return Api.ok(videoLinkService.getList(ownerId, videoLinkOwner));
+    }
     /**
      * 학습 영상 추가
      * [POST] /video-links
