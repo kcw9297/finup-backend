@@ -25,7 +25,7 @@ public class StockNewsServiceImpl implements StockNewsService {
     private final NewsRemoveDuplicateService duplicateService;
     private final NewsRedisStorage newsRedisStorage;
 
-    private static final Duration DURATION_NEWS = Duration.ofMinutes(10); // 30분
+    private static final Duration DURATION_NEWS = Duration.ofMinutes(35); // 35분
     private static final int NEWS_LIMIT = 50;
 
     @Override
