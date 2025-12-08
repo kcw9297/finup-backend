@@ -1,5 +1,8 @@
 package app.finup.layer.domain.stockChart.service;
 
+import app.finup.layer.domain.stockChart.dto.StockChartDto;
+import app.finup.layer.domain.stockChart.enums.CandleType;
+
 public interface StockChartService {
-    String inquireDaily(String token, String trId, String code);
+    StockChartDto.Row inquireDaily(String code, CandleType candleType);
 }

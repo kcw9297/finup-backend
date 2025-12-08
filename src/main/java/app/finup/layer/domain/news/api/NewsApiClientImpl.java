@@ -35,9 +35,9 @@ public class NewsApiClientImpl implements NewsApiClient {
     private final NewsScraper newsScraper;
 
     @Override
-    public List<NewsDto.Row> fetchNews(String query,String sort, int display) {
+    public List<NewsDto.Row> fetchNews(String query, String sort, int display) {
 
-        String json = callNaverApi(query,sort,display);
+        String json = callNaverApi(query, sort, display);
         return parseNaverJson(json);
     }
     //webclient 호출 담당

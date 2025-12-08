@@ -8,16 +8,28 @@ import lombok.*;
  * @since 2025-12-01
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class StocksDto {
+public class StockDto {
 
     /**
      * 종목 시가총액 순위 리스트 담기 위해 사용
      */
     @Data
     @AllArgsConstructor
-    //@NoArgsConstructor
-    //@Builder
+    @NoArgsConstructor
+    @Builder
     public static class MarketCapRow {
+
+        private String mkscShrnIscd;          // 유가증권 단축 종목코드
+        private String dataRank;              // 데이터 순위
+        private String htsKorIsnm;            // HTS 한글 종목명
+        private String stckPrpr;              // 주식 현재가
+        private String prdyVrss;              // 전일 대비
+        private String prdyVrssSign;          // 전일 대비 부호
+        private String prdyCtrt;              // 전일 대비율
+        //private String acmlVol;               // 누적 거래량
+        //private String lstnStcn;              // 상장 주수
+        private String stckAvls;              // 시가 총액
+        private String mrktWholAvlsRlim;      // 시장 전체 시가총액 비중
 
     }
 

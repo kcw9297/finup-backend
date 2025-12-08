@@ -38,7 +38,7 @@ public class BaseAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 
         log.warn("지원하지 않는 HTTP 메소드: {} - {}", ex.getMethod(), request.getDescription(false));
-        return Api.fail(AppStatus.SERVER_ERROR);
+        return Api.fail(AppStatus.METHOD_NOT_ALLOWED);
     }
 
     /**
