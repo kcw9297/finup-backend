@@ -14,5 +14,4 @@ public interface NewsService {
     List<NewsDto.Row> getNews(String category);
     void refreshCategory(String category);
     void refreshAllCategories();
-
 }

@@ -25,7 +25,7 @@ public class NewsServiceImpl implements NewsService {
     private final NewsApiClient newsApiClient;
     private final NewsRedisStorage newsRedisStorage;
     private final NewsRemoveDuplicateService duplicateService;
-    private static final Duration DURATION_NEWS = Duration.ofMinutes(10); // 30분
+    private static final Duration DURATION_NEWS = Duration.ofMinutes(35); // 35분
     private static final int NEWS_LIMIT = 100;
     /**
      * 프론트에서 호출하는 메인 메서드
