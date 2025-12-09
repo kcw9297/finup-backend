@@ -12,6 +12,7 @@ import app.finup.layer.domain.studyword.service.StudyWordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,7 +31,7 @@ public class AdminStudyController {
     private final StudyWordService studyWordService;
 
     /**
-     * 페이징 리스트 조회 (무한 스크롤)
+     * 페이징 리스트 조회
      * [GET] /studies/search
      * @param rq 페이징 요청 DTO
      */
@@ -61,7 +62,7 @@ public class AdminStudyController {
      * @param rq 학습정보 추가 요청 DTO
      */
     @PostMapping
-    public ResponseEntity<?> add(@RequestBody StudyDto.Add rq) {
+    public ResponseEntity<?> add(@RequestBody @Validated StudyDto.Add rq) {
 
         // [1] 추가 수행
         Long studyId = studyService.add(rq);

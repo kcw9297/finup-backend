@@ -35,7 +35,7 @@ public class StudyController {
     private final StudyWordService studyWordService;
 
     /**
-     * 페이징 리스트 조회 (무한 스크롤)
+     * 페이징 리스트 조회
      * [GET] /studies/search
      * @param rq 페이징 요청 DTO
      */

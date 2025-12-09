@@ -41,18 +41,15 @@ public class TextValidator implements ConstraintValidator<Text, String> {
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        // [1] 패턴
-        String pattern = "^[가-힣a-zA-Z0-9\\s\\r\\n]{%d,%d}$".formatted(min, max);
-
-        // [2] 기본 메세지 비활성화
+        // [1] 기본 메세지 비활성화
         context.disableDefaultConstraintViolation();
 
-        // [3] 검증 수행
+        // [2] 검증 수행
         // null이 가능한 경우, 입력이 null이면 통과
         if (nullable && Objects.isNull(value)) return true;
 
-        // 패턴 검증
-        if (Objects.isNull(value) || !value.matches(pattern)) {
+        // 길이 검증
+        if (Objects.isNull(value) || value.length() < this.min || value.length() > this.max) {
             context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
             return false;
         }
