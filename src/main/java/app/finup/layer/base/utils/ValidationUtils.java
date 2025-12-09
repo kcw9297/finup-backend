@@ -1,7 +1,9 @@
-package app.finup.common.utils;
+package app.finup.layer.base.utils;
 
+import jakarta.validation.ConstraintValidatorContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.safety.Safelist;
@@ -9,8 +11,16 @@ import org.jsoup.safety.Safelist;
 import java.util.List;
 import java.util.Objects;
 
+
+/**
+ * 검증기 기능에 활용하기 위한 유틸 클래스
+ * @author kcw
+ * @since 2025-12-09
+ */
+
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class HtmlUtils {
+public class ValidationUtils {
 
     // HTML Safelist (불필요한 태그가 삽입되지 않도록, 아래 태그와 속성만 허용)
     private static final Safelist SAFELIST = Safelist.relaxed()
@@ -51,15 +61,15 @@ public final class HtmlUtils {
 
     /**
      * 불필요한 HTML 태그 정화(제거)
-     * @param htmlContent 원문 HTML 문자열
+     * @param text 원문 문자열
      * @return 정화된 HTML 문자열
      */
-    public static String purifyHtml(String htmlContent) {
+    public static String purifyHtml(String text) {
 
-        return Objects.isNull(htmlContent) || htmlContent.isBlank() ?
+        return Objects.isNull(text) || text.isBlank() ?
                 "" :
                 Jsoup.clean(
-                        htmlContent,
+                        text,
                         "https://example.com", // 상대경로 허용을 위한 더미 주소
                         SAFELIST, // custom safelist
                         new Document.OutputSettings().prettyPrint(false) // 개행문자 허용
@@ -68,13 +78,13 @@ public final class HtmlUtils {
 
     /**
      * HTML 정화 후, 내부 이미지 src 요소 추출
-     * @param htmlContent 원문 HTML 문자열
+     * @param text 원문 HTML 문자열
      * @return 정화 후 추출된 이미지 파일명 리스트
      */
-    public static List<String> purifyAndExtractImageNameFromHtml(String htmlContent) {
+    public static List<String> purifyAndExtractImageNameFromHtmlText(String text) {
 
         // [1] HTML 내 위험 코드 정화
-        String purified = purifyHtml(htmlContent);
+        String purified = purifyHtml(text);
         Document purifiedDoc = Jsoup.parse(purified);
 
         // [2] 이미지 태그만 추출 후  src 속성만 추출 후 반환
@@ -87,12 +97,32 @@ public final class HtmlUtils {
 
     /**
      * HTML 태그를 제거한 문자열만 추출
-     * @param htmlContent 원문 HTML 문자열
+     * @param text 원문 문자열
      * @return 사용자가 작성한 "순수" 문자열 반환
      */
-    public static String removeHtmlTags(String htmlContent) {
-        return Objects.isNull(htmlContent) ? null : Jsoup.parse(htmlContent).text();
+    public static String removeHtmlTags(String text) {
+        return Objects.isNull(text) ? null : Jsoup.parse(text).text();
+    }
+
+
+    /**
+     * 문자열이 SAFELIST 규칙을 준수하는지 검증
+     * @param text 검증할 문자열
+     * @return 허용되지 않은 태그/속성이 포함되면 false (통과 시 true)
+     */
+    public static boolean isValidText(String text) {
+        return Objects.isNull(text) || text.isBlank() || Jsoup.isValid(text, SAFELIST);
+    }
+
+
+    /**
+     * Bean Validation 검증기에 커스텀 메세지 삽입 (기본 메세지 무효화)
+     * @param context ConstraintValidatorContext
+     * @param message 오류 메세지
+     */
+    public static void addViolation(ConstraintValidatorContext context, String message) {
+        context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(message)
+                .addConstraintViolation();
     }
 }
-
-

@@ -7,7 +7,7 @@ import app.finup.layer.base.validation.validator.IntRangeValidator;
 import java.lang.annotation.*;
 
 /**
- * int 타입 범위 검증을 적용할 애노테이션
+ * int 타입 범위 검증을 적용할 어노테이션
  * @author kcw
  * @since 2025-11-26
  */

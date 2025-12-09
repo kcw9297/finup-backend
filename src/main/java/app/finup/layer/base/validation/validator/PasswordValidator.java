@@ -1,5 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
+import app.finup.layer.base.utils.ValidationUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import app.finup.layer.base.validation.annotation.Password;
@@ -21,7 +22,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
     public void initialize(Password annotation) {
 
         // 사용자 입력 오류 메세지
-        String message = annotation.message();
+        message = annotation.message();
         this.message = Objects.isNull(message) || message.isBlank() ?
                 "공백제외 영문/숫자/특수문자를 8~20자 사이로 입력해야 합니다." : message;
     }
@@ -32,12 +33,9 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
         // [1] 검증 패턴
         String pattern = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@#$%^&+=!])(?=\\S+$)[a-zA-Z\\d@#$%^&+=!]{8,20}$";
 
-        // [2] 기본 메세지 비활성화
-        context.disableDefaultConstraintViolation();
-
-        // [3] 검증 수행
+        // [2] 검증 수행
         if (Objects.isNull(value) || value.isBlank() || !value.matches(pattern)) {
-            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+            ValidationUtils.addViolation(context, message);
             return false;
         }
 

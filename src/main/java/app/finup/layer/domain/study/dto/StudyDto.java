@@ -117,9 +117,17 @@ public final class StudyDto {
     public static class Edit {
 
         private Long studyId;
+
+        @NoSpecialText(min = 5, max = 20)
         private String name;
+
+        @NoSpecialText(min = 5, max = 20)
         private String summary;
+
+        @Text(min = 10, max = 100)
         private String description;
+
+        @Select
         private Integer level;
     }
 

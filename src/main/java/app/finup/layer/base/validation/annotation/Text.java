@@ -7,7 +7,7 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 /**
- * 특수문자와 무관하게, 문자열 길이만을 검증을 위한 애노테이션
+ * 특수문자와 무관하게, 문자열 길이만을 검증을 위한 어노테이션
  * @author kcw
  * @since 2025-11-26
  */
