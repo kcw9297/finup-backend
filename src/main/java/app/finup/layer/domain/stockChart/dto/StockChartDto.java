@@ -30,5 +30,12 @@ public class StockChartDto {
         private String stck_lwpr; //주식 최저가
         private String stck_clpr; //주식 종가
         private String acml_vol; //누적 거래량
+
+        private Double ma5;
+        private Double ma20;
+        private Double ma60;
+
+        private Double volumeMa5;
+        private Double volumeMa20;
     }
 }
