@@ -23,8 +23,20 @@ import org.springframework.web.bind.annotation.*;
 public class AdminVideoController {
     private final VideoService videoService;
 
-    @GetMapping
-    public ResponseEntity<?> getVideo(@RequestParam("url") String url) {
+    @GetMapping("/{videoId}")
+    public ResponseEntity<?> getVideoDetail(@PathVariable String videoId) {
+        // 유튜브 URL로 변환
+        String videoUrl = "https://www.youtube.com/watch?v=" + videoId;
+
+        VideoDto.Detail detail = videoService.getDetail(videoUrl);
+
+        return Api.ok(detail);
+    }
+
+
+    @PostMapping
+    public ResponseEntity<?> add(@RequestBody VideoDto.Detail rq) {
+        String url = rq.getVideoUrl();
         log.info("YouTube API 요청 URL: {}", url);
 
         VideoDto.Detail video = videoService.getDetail(url);
