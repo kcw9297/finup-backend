@@ -33,7 +33,7 @@ public class MemberController {
     /**
      * 회원 리스트
      * [GET] api/members/list
-     * @param rq 게시글 검색 요청 DTO
+     * @param rq 회원 목록 검색 요청 DTO
      */
     @GetMapping("/list")
     public ResponseEntity<?> getList(MemberDto.Search rq) {
