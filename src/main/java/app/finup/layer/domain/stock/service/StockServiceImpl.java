@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * StocksService 구현 클래스
@@ -46,6 +47,7 @@ public class StockServiceImpl implements StockService {
         * 개발 중이라면 프로젝트 안 폴더에 두고 상대경로로 테스트
         * 운영/배포용이라면 외부 경로 + 환경변수로 관리하는 것이 안전
         * */
+        String path = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         //String path = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx";
         //String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
@@ -80,10 +82,28 @@ public class StockServiceImpl implements StockService {
         //System.out.println("요청 종목코드: [" + code + "]");
 
         //[1] 종목코드(String code)로 DB에서 한글 종목명 가져오기
+        Stock stock;
+        try {
+            Optional<Stock> optional = stockRepository.findByMkscShrnIscd(code);
+            if (optional.isPresent()) {
+                stock = optional.get();
+            } else {
+                importKospi();
+                stock = stockRepository.findByMkscShrnIscd(code)
+                        .orElseThrow(() -> new RuntimeException("종목 없음!"));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("종목 정보 조회/갱신 실패", e);
+        }
+        String htsKorIsnm = stock.getHtsKorIsnm();
+
+        /*
         Stock stock = stockRepository.findByMkscShrnIscd(code)
                 .orElseThrow(() -> new RuntimeException("종목 없음!"));
-        String htsKorIsnm = stock.getHtsKorIsnm();
-        //log.info("종목이름:"+htsKorIsnm);
+        String htsKorIsnm = stock.getHtsKorIsnm();*/
+
+        //System.out.println("종목이름: " + htsKorIsnm);
+
         //[2] api 호출, parsing
         JsonNode jsonNode = stockApiClient.fetchDetail(code);
 
