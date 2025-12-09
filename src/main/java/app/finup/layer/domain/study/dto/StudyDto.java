@@ -1,5 +1,9 @@
 package app.finup.layer.domain.study.dto;
 
+import app.finup.layer.base.validation.annotation.NoSpecialText;
+import app.finup.layer.base.validation.annotation.Select;
+import app.finup.layer.base.validation.annotation.Text;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.Objects;
@@ -89,9 +93,16 @@ public final class StudyDto {
     @NoArgsConstructor
     public static class Add {
 
+        @NoSpecialText(min = 5, max = 20)
         private String name;
+
+        @NoSpecialText(min = 5, max = 20)
         private String summary;
+
+        @Text(min = 10, max = 100)
         private String description;
+
+        @Select
         private Integer level;
     }
 
