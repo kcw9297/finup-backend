@@ -53,7 +53,7 @@ public class NoSpecialTextValidator implements ConstraintValidator<NoSpecialText
         if (nullable && Objects.isNull(value)) return true;
 
         // 패턴 검증
-        if (!value.matches(pattern)) {
+        if (Objects.isNull(value) || !value.matches(pattern)) {
             context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
             return false;
         }
