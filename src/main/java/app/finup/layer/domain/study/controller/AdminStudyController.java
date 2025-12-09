@@ -7,7 +7,6 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.study.dto.StudyDto;
 import app.finup.layer.domain.study.service.StudyService;
-import app.finup.layer.domain.studyprogress.service.StudyProgressService;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import app.finup.layer.domain.studyword.service.StudyWordService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminStudyController {
 
     private final StudyService studyService;
-    private final StudyProgressService studyProgressService;
     private final StudyWordService studyWordService;
 
     /**
