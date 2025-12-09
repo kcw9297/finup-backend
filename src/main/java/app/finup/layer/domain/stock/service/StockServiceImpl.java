@@ -12,7 +12,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.io.FileInputStream;
+
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -45,11 +46,16 @@ public class StockServiceImpl implements StockService {
         * 개발 중이라면 프로젝트 안 폴더에 두고 상대경로로 테스트
         * 운영/배포용이라면 외부 경로 + 환경변수로 관리하는 것이 안전
         * */
-        String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
+        //String path = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx";
+        //String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
 
-        FileInputStream fis = new FileInputStream(path);
-        Workbook workbook = new XSSFWorkbook(fis);
+        //FileInputStream fis = new FileInputStream(path);
+        InputStream is = getClass().getClassLoader().getResourceAsStream("data/kospi_code.xlsx");
+        if(is==null){
+            throw new IllegalArgumentException("파일을 찾을 수 없습니다.");
+        }
+        Workbook workbook = new XSSFWorkbook(is);
         Sheet sheet = workbook.getSheetAt(0);
 
         for (Row row : sheet) {
@@ -77,8 +83,7 @@ public class StockServiceImpl implements StockService {
         Stock stock = stockRepository.findByMkscShrnIscd(code)
                 .orElseThrow(() -> new RuntimeException("종목 없음!"));
         String htsKorIsnm = stock.getHtsKorIsnm();
-        //System.out.println("종목이름: " + htsKorIsnm);
-
+        //log.info("종목이름:"+htsKorIsnm);
         //[2] api 호출, parsing
         JsonNode jsonNode = stockApiClient.fetchDetail(code);
 
