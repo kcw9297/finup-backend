@@ -10,6 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import app.finup.common.enums.AppStatus;
 
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * UploadFileService 구현 클래스
+ * @author kcw
+ * @since 2025-11-26
+ */
+
 @Slf4j
 @Service
 @Transactional
@@ -26,6 +35,24 @@ public class UploadFileServiceImpl implements UploadFileService {
                 .findById(uploadFileId)
                 .map(UploadFileDtoMapper::toDetail)
                 .orElseThrow(() -> new BusinessException(AppStatus.UPLOAD_FILE_NOT_FOUND));
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UploadFileDto.Detail> getOrphanList() {
+
+        return uploadFileRepository
+                .findByFileOwnerIsNull()
+                .stream()
+                .map(UploadFileDtoMapper::toDetail)
+                .toList();
+    }
+
+
+    @Override
+    public void removeAll(Collection<Long> uploadFileIds) {
+        uploadFileRepository.deleteAllById(uploadFileIds);
     }
 
 }

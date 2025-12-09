@@ -36,11 +36,9 @@ public class UploadFile extends BaseEntity {
     @Column(nullable = false)
     private Long size;
 
-    @Column(nullable = false, updatable = false)
     private Long ownerId; // 소유 주인 엔티티 고유번호
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, updatable = false)
     private FileOwner fileOwner;
 
     @Enumerated(EnumType.STRING)
@@ -59,6 +57,15 @@ public class UploadFile extends BaseEntity {
         this.fileOwner = fileOwner;
         this.fileType = fileType;
         this.filePath = filePath;
+    }
+
+
+    /**
+     * 파일 삭제 처리 (Soft Delete)
+     * 추후 물리적 파일과 직접 삭제는 스케줄러에서 처리
+     */
+    public void remove() {
+        this.fileOwner = null;
     }
 
 }

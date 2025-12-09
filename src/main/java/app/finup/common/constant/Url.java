@@ -27,6 +27,11 @@ public class Url {
     /* auth */
     public static final String AUTH = API + "/auth";
 
+    /* uploadFile */
+    public static final String UPLOAD_FILE = API + "/upload-file";
+    public static final String UPLOAD_FILE_PUBLIC = PUBLIC + UPLOAD_FILE;
+    public static final String UPLOAD_FILE_ADMIN = ADMIN + UPLOAD_FILE;
+
     /* reboard */
     public static final String REBOARD = API + "/reboards";
     public static final String REBOARD_PUBLIC = PUBLIC + REBOARD;
