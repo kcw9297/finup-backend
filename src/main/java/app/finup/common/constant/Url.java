@@ -92,7 +92,6 @@ public class Url {
     public static final String LEVEL_ADMIN = ADMIN + LEVEL;
     public static final String LEVEL_PUBLIC = PUBLIC + LEVEL;
 
-
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */

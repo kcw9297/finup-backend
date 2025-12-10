@@ -18,4 +18,11 @@ public interface MemberService {
      * @return 페이징된 DTO 리스트
      */
     Page<MemberDto.Row> search(MemberDto.Search rq);
+
+
+    /**
+     * 회원 정보 전체 리스트(Pdf 다운로드 전용)
+     * @return 회원 리스트
+     */
+    List<MemberDto.Row> getMemberList();
 }

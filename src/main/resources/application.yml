@@ -60,3 +60,7 @@ api:
   youtube:
     endpoint: ${API_YOUTUBE_ENDPOINT}
     key: ${API_YOUTUBE_KEY}
+
+  finance-dict:
+    endpoint: ${API_FINANCE_DICT_ENDPOINT}
+    key: ${API_FINANCE_DICT_KEY}

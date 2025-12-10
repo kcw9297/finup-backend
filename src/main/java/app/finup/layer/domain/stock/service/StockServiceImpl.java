@@ -40,7 +40,6 @@ public class StockServiceImpl implements StockService {
         return marketCapRowList;
     }
 
-
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
     @Override
     public void importKospi() throws Exception {
