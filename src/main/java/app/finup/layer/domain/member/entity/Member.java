@@ -7,8 +7,6 @@ import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(
@@ -54,8 +52,7 @@ public class Member extends BaseEntity {
 
     @OneToOne(
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
-            orphanRemoval = true // null 설정 시 이미지 엔티티 자동 삭제 처리
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE} // 이미지 자동 저장/수정 처리
     )
     @JoinColumn(name = "profile_image_id")
     private UploadFile profileImage;

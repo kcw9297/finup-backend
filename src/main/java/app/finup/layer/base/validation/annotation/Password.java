@@ -7,7 +7,7 @@ import app.finup.layer.base.validation.validator.PasswordValidator;
 import java.lang.annotation.*;
 
 /**
- * 비밀번호 검증을 적용할 애노테이션
+ * 비밀번호 검증을 적용할 어노테이션
  * @author kcw
  * @since 2025-11-26
  */

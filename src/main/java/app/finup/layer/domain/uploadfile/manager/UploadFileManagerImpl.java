@@ -70,24 +70,24 @@ public class UploadFileManagerImpl implements UploadFileManager {
 
 
     @Override
-    public String store(MultipartFile file, UploadFile uploadFile) {
+    public String store(MultipartFile file, String filePath) {
 
         // [1] 파일 업로드 경로 조합
-        String storePath = getStorePath(uploadFile);
+        String storePath = getStorePath(filePath);
 
         // [2] 파일 업로드 수행
         fileProvider.upload(file, storePath);
 
         // [3] 저장된 file fullUrl 반환 (내부 메소드 사용)
-        return getFullUrl(uploadFile.getFilePath());
+        return getFullUrl(filePath);
     }
 
 
     @Override
-    public byte[] download(UploadFile uploadFile) {
+    public byte[] download(String filePath) {
 
         // [1] 파일 업로드 경로 조합
-        String storePath = getStorePath(uploadFile);
+        String storePath = getStorePath(filePath);
 
         // [2] 파일 다운로드 처리를 위한 바이트 스트림 추출 및 반환
         return fileProvider.download(storePath);
@@ -95,10 +95,10 @@ public class UploadFileManagerImpl implements UploadFileManager {
 
 
     @Override
-    public void remove(UploadFile uploadFile) {
+    public void remove(String filePath) {
 
         // [1] 파일 업로드 경로 조합
-        String storePath = getStorePath(uploadFile);
+        String storePath = getStorePath(filePath);
 
         // [2] 파일 삭제
         fileProvider.remove(storePath);
@@ -112,13 +112,9 @@ public class UploadFileManagerImpl implements UploadFileManager {
     }
 
 
-    // 파일 업로드 경로 조합
-    private String getStorePath(UploadFile uploadFile) {
+    // 배포/로컬 환경에 따라 업로드 주소 생성 및 반환
+    private String getStorePath(String filePath) {
 
-        // [1] 저장 파일 주소 추출
-        String filePath = uploadFile.getFilePath();
-
-        // [2] 배포/로컬 환경에 따라 업로드 주소 생성 및 반환
         return EnvUtils.isProd(env) ?
                 filePath : // AWS S3는 상대 경로 그대로 사용
                 "%s/%s".formatted(fileDir, filePath);
