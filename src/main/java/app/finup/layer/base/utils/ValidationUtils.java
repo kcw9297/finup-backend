@@ -22,43 +22,6 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidationUtils {
 
-    // HTML Safelist (불필요한 태그가 삽입되지 않도록, 아래 태그와 속성만 허용)
-    private static final Safelist SAFELIST = Safelist.relaxed()
-            .addTags("font", "mark", "video", "source", "iframe")
-            // img src 허용
-            .addAttributes("img", "src", "style", "width", "height", "class")
-            .addAttributes("span", "style", "class")
-            .addAttributes("font", "face", "size", "color", "style")
-            .addAttributes("p", "style", "class", "align")
-            .addAttributes("div", "style", "class", "align")
-            .addAttributes("h1", "style", "class")
-            .addAttributes("h2", "style", "class")
-            .addAttributes("h3", "style", "class")
-            .addAttributes("h4", "style", "class")
-            .addAttributes("h5", "style", "class")
-            .addAttributes("h6", "style", "class")
-            .addAttributes("blockquote", "style", "class")
-            .addAttributes("pre", "style", "class")
-            .addAttributes("code", "style", "class")
-            .addAttributes("strong", "style", "class")
-            .addAttributes("em", "style", "class")
-            .addAttributes("u", "style", "class")
-            .addAttributes("a", "href", "target", "rel") // href 추가
-            .addAttributes("table", "style", "class", "border", "width", "cellpadding", "cellspacing")
-            .addAttributes("tr", "style", "class")
-            .addAttributes("td", "style", "class", "colspan", "rowspan", "width", "height")
-            .addAttributes("th", "style", "class", "colspan", "rowspan", "width", "height", "scope")
-            .addAttributes("thead", "style", "class")
-            .addAttributes("tbody", "style", "class")
-            .addAttributes("ul", "style", "class")
-            .addAttributes("ol", "style", "class", "start", "type")
-            .addAttributes("li", "style", "class")
-            .addAttributes("video", "src", "controls", "width", "height", "style", "class")
-            .addAttributes("source", "src", "type")
-            .addAttributes("iframe", "src", "width", "height", "style", "class", "frameborder", "allowfullscreen")
-            .preserveRelativeLinks(true);
-
-
     /**
      * 불필요한 HTML 태그 정화(제거)
      * @param text 원문 문자열
@@ -71,7 +34,7 @@ public class ValidationUtils {
                 Jsoup.clean(
                         text,
                         "https://example.com", // 상대경로 허용을 위한 더미 주소
-                        SAFELIST, // custom safelist
+                        Safelist.none(), // custom safelist
                         new Document.OutputSettings().prettyPrint(false) // 개행문자 허용
                 );
     }
@@ -111,7 +74,7 @@ public class ValidationUtils {
      * @return 허용되지 않은 태그/속성이 포함되면 false (통과 시 true)
      */
     public static boolean isValidText(String text) {
-        return Objects.isNull(text) || text.isBlank() || Jsoup.isValid(text, SAFELIST);
+        return Objects.isNull(text) || text.isBlank() || Jsoup.isValid(text, Safelist.none());
     }
 
 

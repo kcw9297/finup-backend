@@ -27,7 +27,7 @@ public class IntRangeValidator implements ConstraintValidator<IntRange, Integer>
 
         // 기본 파라미터
         min = Math.max(annotation.min(), 0);
-        max = Math.max(annotation.max(), 0);
+        max = Math.max(annotation.max(), 1);
         nullable = annotation.nullable();
 
         // 숫자 포메팅
@@ -37,7 +37,7 @@ public class IntRangeValidator implements ConstraintValidator<IntRange, Integer>
         // 사용자 입력 오류 메세지
         message = annotation.message();
         if (Objects.isNull(message) || message.isBlank()) {
-            if (Objects.equals(min, 0)) message = "최대 %s 이내의 양수를 입력해야 합니다.".formatted(maxStr);
+            if (min == 0) message = "최대 %s 이내의 양수를 입력해야 합니다.".formatted(maxStr);
             else message = "%s-%s 이내의 양수를 입력해야 합니다.".formatted(minStr, maxStr);
         }
     }
