@@ -46,7 +46,7 @@ public class WebClientConfig {
     private String dataPortalSecret;
 
 
-    @Bean // 유튜브 API 사용을 위한 Client
+    @Bean(name = "youTubeClient") // 유튜브 API 사용을 위한 Client
     public WebClient youTubeClient() {
 
         return WebClient.builder()
@@ -66,6 +66,7 @@ public class WebClientConfig {
                 .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0")
                 .build();
     }
+
     @Bean(name="kisClient")
     public WebClient kisClient(){
 
@@ -73,6 +74,14 @@ public class WebClientConfig {
                 .baseUrl(kisEndPoint)
                 .defaultHeader("appkey", kisAppKey)
                 .defaultHeader("appsecret", kisAppSecret)
+                .build();
+    }
+
+    @Bean(name="kisAuthClient")
+    public WebClient kisAuthClient(){
+
+        return WebClient.builder()
+                .baseUrl(kisEndPoint)
                 .build();
     }
 
