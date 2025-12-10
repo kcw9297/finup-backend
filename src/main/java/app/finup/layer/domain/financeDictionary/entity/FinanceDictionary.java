@@ -1,0 +1,38 @@
+package app.finup.layer.domain.financeDictionary.entity;
+
+import app.finup.layer.base.entity.BaseEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
+
+@Entity
+@Table(name = "finance_dictionary")
+@DynamicUpdate
+@Getter
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class FinanceDictionary extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long termId;
+
+    @Column(nullable = false, unique = true)
+    private String name;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String description;
+
+    @Builder
+    public FinanceDictionary(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    // 혹시 몰라 일단 업데이트 로직 넣음
+    public void updateDescription(String description) {
+        this.description = description;
+    }
+}

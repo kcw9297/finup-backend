@@ -86,6 +86,9 @@ public enum AppStatus {
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),
 
+
+    /* 금융 사전 API */
+    FINANCE_DICT_API_FAILED(400, "KSD 금융용어 API 호출을 실패하였습니다.", "FINANCE_DICT_API_FAILED"),
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* 범용 상태 */
