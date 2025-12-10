@@ -7,7 +7,7 @@
 
     <!-- 검색 메소드 -->
     <select id="search" resultType="StudyWordRow">
-        SELECT sw.study_word_id, sw.name, sw.meaning, uf.file_path
+        SELECT sw.study_word_id, sw.name, sw.meaning, uf.file_path as image_url
         FROM study_word sw
         LEFT JOIN upload_file uf ON sw.study_word_id = uf.owner_id AND uf.file_owner = 'STUDY_WORD'
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
