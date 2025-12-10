@@ -1,14 +1,10 @@
 package app.finup.layer.domain.studyword.entity;
 
 import app.finup.layer.base.entity.BaseEntity;
-import app.finup.layer.base.inter.Reorderable;
-import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 /**
  * 단계별 학습 단어 엔티티 클래스
@@ -24,7 +20,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudyWord extends BaseEntity implements Reorderable {
+public class StudyWord extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,8 +32,6 @@ public class StudyWord extends BaseEntity implements Reorderable {
     @Column(nullable = false)
     private String meaning;
 
-    @Column(nullable = false)
-    private Double displayOrder; // 정렬 순서
 
     @OneToOne(
             fetch = FetchType.LAZY,
@@ -46,18 +40,11 @@ public class StudyWord extends BaseEntity implements Reorderable {
     @JoinColumn(name = "word_image_id")
     private UploadFile wordImageFile; // 단어 이미지
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "study_id", nullable = false, updatable = false)
-    private Study study;
-
 
     @Builder
-    public StudyWord(String name, String meaning, Study study, Double displayOrder) {
+    public StudyWord(String name, String meaning) {
         this.name = name;
         this.meaning = meaning;
-        this.study = study;
-        this.displayOrder = displayOrder;
     }
 
     /* 갱신 메소드 */
@@ -88,13 +75,6 @@ public class StudyWord extends BaseEntity implements Reorderable {
     public void edit(String name, String meaning) {
         this.name = name;
         this.meaning = meaning;
-    }
-
-
-    // 정렬 순서 변경
-    @Override
-    public void reorder(Double displayOrder) {
-        this.displayOrder = displayOrder;
     }
 }
 

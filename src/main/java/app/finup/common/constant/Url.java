@@ -53,7 +53,7 @@ public class Url {
     public static final String STUDY_PROGRESS_PUBLIC = PUBLIC + STUDY_PROGRESS;
 
     /* studyWord */
-    public static final String STUDY_WORD = API + "/study-word";
+    public static final String STUDY_WORD = API + "/study-words";
     public static final String STUDY_WORD_ADMIN = ADMIN + STUDY_WORD;
     public static final String STUDY_WORD_PUBLIC = PUBLIC + STUDY_WORD;
 
@@ -91,7 +91,6 @@ public class Url {
     public static final String LEVEL = API + "/levels";
     public static final String LEVEL_ADMIN = ADMIN + LEVEL;
     public static final String LEVEL_PUBLIC = PUBLIC + LEVEL;
-
 
     /* ======================================== 작성 영역 끝 ========================================================= */
 

@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class NewsApiClientImpl implements NewsApiClient {
-
+    @Qualifier("naverClient")
     private final WebClient naverClient;
     private final ObjectMapper objectMapper;
     private final NewsScraper newsScraper;
@@ -41,7 +41,7 @@ public class NewsApiClientImpl implements NewsApiClient {
         return parseNaverJson(json);
     }
     //webclient 호출 담당
-    private String callNaverApi(String query,String sort, int display){
+    private String callNaverApi(String query, String sort, int display){
         return naverClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/v1/search/news.json")

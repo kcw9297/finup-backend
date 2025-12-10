@@ -28,14 +28,14 @@ public class TextValidator implements ConstraintValidator<Text, String> {
 
         // 기본 파라미터
         message = annotation.message();
-        min = Math.max(annotation.min(), 0);
-        max = Math.max(annotation.max(), 0);
+        min = Math.max(annotation.min(), 1);
+        max = Math.max(annotation.max(), 2);
         nullable = annotation.nullable();
 
         // 사용자 입력 오류 메세지
         if (Objects.isNull(message) || message.isBlank()) {
-            if (Objects.equals(min, 0)) message = "최대 %d자 이내 내용을 입력해야 합니다.".formatted(max);
-            else message = "%d-%d자 사이 이내 내용을 입력해야 합니다.".formatted(min, max);
+            if (min == 1) message = "최대 %d자 이내 내용을 입력해야 합니다.".formatted(max);
+            else message = "%d-%d자 사이 내용을 입력해야 합니다.".formatted(min, max);
         }
     }
 
