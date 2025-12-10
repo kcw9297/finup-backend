@@ -69,5 +69,11 @@ public class WebClientConfig {
                 .build();
     }
 
+    @Bean(name="kisAuthClient")
+    public WebClient kisAuthClient(){
 
+        return WebClient.builder()
+                .baseUrl(kisEndPoint)
+                .build();
+    }
 }

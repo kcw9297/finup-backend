@@ -2,6 +2,7 @@ package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
+import app.finup.layer.domain.stock.api.AuthStockApiClient;
 import app.finup.layer.domain.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class PublicStocksController {
     @GetMapping("/import/kospi")
     public ResponseEntity<?> importKospi() throws Exception {
         stockService.importKospi();
-        return Api.ok();
+        return Api.ok("kospi 파일 읽어 DB 저장");
     }
 
     /**
@@ -50,4 +51,5 @@ public class PublicStocksController {
     public ResponseEntity<?> getDetail(@PathVariable String code) {
         return Api.ok(stockService.getDetail(code));
     }
+
 }
