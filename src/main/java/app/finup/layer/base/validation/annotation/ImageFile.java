@@ -17,6 +17,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = ImageFileValidator.class)  // Validator 클래스 지정
 @Documented
 public @interface ImageFile {
+    String message() default "";
     long maxSizeMB() default 10;
     boolean nullable() default false;
     Class<?>[] groups() default {};

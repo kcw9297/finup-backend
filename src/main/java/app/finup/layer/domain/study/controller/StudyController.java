@@ -4,13 +4,10 @@ package app.finup.layer.domain.study.controller;
 import app.finup.common.constant.Url;
 import app.finup.common.dto.Page;
 import app.finup.common.dto.Pagination;
-import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.study.dto.StudyDto;
 import app.finup.layer.domain.study.service.StudyService;
 import app.finup.layer.domain.studyprogress.service.StudyProgressService;
-import app.finup.layer.domain.studyword.dto.StudyWordDto;
-import app.finup.layer.domain.studyword.service.StudyWordService;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +29,6 @@ public class StudyController {
 
     private final StudyService studyService;
     private final StudyProgressService studyProgressService;
-    private final StudyWordService studyWordService;
 
     /**
      * 페이징 리스트 조회
@@ -91,16 +87,6 @@ public class StudyController {
 
         // [2] 성공 응답 반환
         return Api.ok();
-    }
-
-
-    /**
-     * 학습정보에 속하는 단어 일괄 조회
-     * [GET] /{studyId}/words
-     */
-    @GetMapping("/{studyId:[0-9]+}/words")
-    public ResponseEntity<?> getListByStudy(@PathVariable Long studyId) {
-        return Api.ok(studyWordService.getListByStudy(studyId));
     }
 
 

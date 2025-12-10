@@ -1,5 +1,6 @@
 package app.finup.layer.domain.studyword.service;
 
+import app.finup.common.dto.Page;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,10 +14,10 @@ import java.util.List;
 public interface StudyWordService {
 
     /**
-     * 단계별 학습 개념에 속하는 단어 리스트 조회
-     * @param studyId 페이징 요청 DTO
+     * 개념 학습 단어 페이징 목록 조회
+     * @param rq 페이징 요청 DTO
      */
-    List<StudyWordDto.Row> getListByStudy(Long studyId);
+    Page<StudyWordDto.Row> search(StudyWordDto.Search rq);
 
 
     /**
@@ -31,9 +32,8 @@ public interface StudyWordService {
      * 이미 업로드한 이미지가 있는 경우, 새로운 이미지로 대체
      * @param studyWordId 학습단어번호
      * @param file 업로드 이미지 파일
-     * @return 이미지가 속하는 학습번호 (캐싱 처리 목적)
      */
-    Long uploadImage(Long studyWordId, MultipartFile file);
+    void uploadImage(Long studyWordId, MultipartFile file);
 
 
     /**
@@ -41,13 +41,6 @@ public interface StudyWordService {
      * @param rq 변경 요청 DTO
      */
     void edit(StudyWordDto.Edit rq);
-
-
-    /**
-     * 단어 정렬 위치 변경 (정렬 순서 갱신)
-     * @param rq 재정렬(위치변경) 요청 DTO
-     */
-    void reorder(StudyWordDto.Reorder rq);
 
 
     /**

@@ -4,7 +4,6 @@ import app.finup.layer.domain.studyword.entity.StudyWord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 
@@ -14,25 +13,6 @@ import java.util.Optional;
  * @since 2025-12-02
  */
 public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
-
-    @Query("""
-        SELECT sw
-        FROM StudyWord sw
-        WHERE sw.study.studyId = :studyId
-        ORDER BY sw.displayOrder
-    """)
-    List<StudyWord> findByStudyId(Long studyId);
-
-
-    @Query("""
-        SELECT sw
-        FROM StudyWord sw
-        WHERE sw.study.studyId = :studyId
-        ORDER BY sw.displayOrder DESC
-        LIMIT 1
-    """)
-    Optional<StudyWord> findLastByStudyId(Long studyId);
-
 
     @Query("""
         SELECT sw

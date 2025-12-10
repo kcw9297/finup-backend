@@ -1,5 +1,6 @@
 package app.finup.layer.domain.studyword.service;
 
+import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.layer.base.utils.ReorderUtils;
@@ -8,6 +9,7 @@ import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
+import app.finup.layer.domain.studyword.mapper.StudyWordMapper;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
@@ -36,67 +38,40 @@ import java.util.Objects;
 @Transactional
 public class StudyWordServiceImpl implements StudyWordService {
 
-    // 사용 상수
-    private final String CACHE_VALUE = "STUDY_WORDS";
-
     private final StudyWordRepository studyWordRepository;
-    private final StudyRepository studyRepository;
+    private final StudyWordMapper studyWordMapper;
     private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
 
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(
-            value = CACHE_VALUE,
-            key = "#studyId"
-    )
-    public List<StudyWordDto.Row> getListByStudy(Long studyId) {
+    public Page<StudyWordDto.Row> search(StudyWordDto.Search rq) {
 
-        return studyWordRepository
-                .findByStudyId(studyId)
-                .stream()
-                .map(studyWord -> StudyWordDtoMapper.toRow(studyWord, uploadFileManager::getFullUrl))
-                .toList();
+        // [1] 검색
+        List<StudyWordDto.Row> rp = studyWordMapper.search(rq);
+        Integer count = studyWordMapper.countForSearch(rq);
+
+        // [2] 검색 결과 반환 (페이징 객체로 변환)
+        return Page.of(rp, count, rq.getPageNum(), rq.getPageSize());
     }
 
 
     @Override
-    @CacheEvict(
-            value = CACHE_VALUE,
-            key = "#rq.studyId"
-    )
     public void add(StudyWordDto.Add rq) {
 
-        // [1] 필요 엔티티 조회
-        Study study = studyRepository
-                .findById(rq.getStudyId())
-                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_NOT_FOUND));
-
-        // [2] 정렬 순서 계산 (첫 항목: 1000.0, 이후: 이전 값 + 1.0)
-        Double displayOrder = studyWordRepository
-                .findLastByStudyId(rq.getStudyId())
-                .map(ReorderUtils::calculateNextOrder)
-                .orElse(ReorderUtils.DEFAULT_DISPLAY_ORDER); // 최초 단어인 경우 기본 값
-
-        // [3] 엔티티 생성
+        // [1] 엔티티 생성
         StudyWord studyWord = StudyWord.builder()
                 .name(rq.getName())
                 .meaning(rq.getMeaning())
-                .displayOrder(displayOrder)
-                .study(study)
                 .build();
 
-        // [4] 엔티티 저장
+        // [2] 엔티티 저장
         studyWordRepository.save(studyWord);
     }
 
 
     @Override
-    @CacheEvict(
-            value = CACHE_VALUE,
-            key = "#result"
-    )
-    public Long uploadImage(Long studyWordId, MultipartFile file) {
+    public void uploadImage(Long studyWordId, MultipartFile file) {
 
         // [1] 단어 정보 조회
         StudyWord studyWord =
@@ -114,9 +89,6 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [4] 새롭게 추가된 파일 생성
         uploadFileManager.store(file, newImageFile.getFilePath());
-
-        // [5] 캐싱 처리를 위한 학습번호 반환 (#result 에서 감지)
-        return studyWord.getStudy().getStudyId();
     }
 
 
@@ -127,38 +99,6 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .findWithImageById(rq.getStudyWordId())
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND))
                 .edit(rq.getName(), rq.getMeaning());
-    }
-
-
-    @Override
-    public void reorder(StudyWordDto.Reorder rq) {
-
-        // [1] 정렬 대상 및 전체 목록 조회
-        StudyWord targetWord =
-                studyWordRepository
-                        .findById(rq.getStudyWordId())
-                        .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
-
-        // displayOrder 순 정렬된 목록
-        List<StudyWord> studyWords = studyWordRepository.findByStudyId(rq.getStudyId());
-
-        // [2] 케이스에 따라 displayOrder 계산 후 갱신
-        targetWord.reorder(calculateOrder(targetWord, studyWords, rq.getReorderPosition()));
-    }
-
-
-    // 정렬 시도 후, 재정렬이 필요하면 재정렬 수행 후 다시 정렬
-    private Double calculateOrder(StudyWord targetWord, List<StudyWord> studyWords, Integer reorderPosition) {
-
-        // [1] 재정렬 수행
-        Double displayOrder = ReorderUtils.calculateReorder(targetWord, studyWords, reorderPosition);
-
-        // [2] 만약 null 반환 시, 일괄 재정렬 후 재시도
-        if (Objects.isNull(displayOrder))
-            displayOrder = ReorderUtils.rebalanceAndReorder(targetWord, studyWords, reorderPosition);
-
-        // [3] 계산된 재정렬 값 반환
-        return displayOrder;
     }
 
 
