@@ -12,8 +12,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +38,6 @@ public class StockServiceImpl implements StockService {
         return marketCapRowList;
     }
 
-
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
     @Override
     public void importKospi() throws Exception {
@@ -52,12 +50,13 @@ public class StockServiceImpl implements StockService {
         //String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
 
-        //FileInputStream fis = new FileInputStream(path);
+        FileInputStream fis = new FileInputStream(path);
+        /*
         InputStream is = getClass().getClassLoader().getResourceAsStream("data/kospi_code.xlsx");
         if(is==null){
             throw new IllegalArgumentException("파일을 찾을 수 없습니다.");
-        }
-        Workbook workbook = new XSSFWorkbook(is);
+        }*/
+        Workbook workbook = new XSSFWorkbook(fis);
         Sheet sheet = workbook.getSheetAt(0);
 
         for (Row row : sheet) {
