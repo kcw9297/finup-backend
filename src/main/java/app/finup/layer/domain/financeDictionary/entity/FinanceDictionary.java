@@ -9,11 +9,11 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name = "finance_dictionary")
 @DynamicUpdate
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class FinanceDictionary extends BaseEntity {
+public class FinanceDictionary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

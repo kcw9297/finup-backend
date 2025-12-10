@@ -92,6 +92,9 @@ public class Url {
     public static final String LEVEL_ADMIN = ADMIN + LEVEL;
     public static final String LEVEL_PUBLIC = PUBLIC + LEVEL;
 
+    /* dictionary */
+    public static final String DICTIONARY = API + "/dict";
+    public static final String ADMIN_DICTIONARY = ADMIN + DICTIONARY;
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */

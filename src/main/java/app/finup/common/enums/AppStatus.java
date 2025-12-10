@@ -89,6 +89,8 @@ public enum AppStatus {
 
     /* 금융 사전 API */
     FINANCE_DICT_API_FAILED(400, "KSD 금융용어 API 호출을 실패하였습니다.", "FINANCE_DICT_API_FAILED"),
+    FINANCE_DICT_ALREADY_INITIALIZED(400, "금융 용어 사전은 이미 초기화되었습니다.", "FINANCE_DICT_ALREADY_INITIALIZED"),
+
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* 범용 상태 */
