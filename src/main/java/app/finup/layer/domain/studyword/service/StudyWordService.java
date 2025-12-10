@@ -31,8 +31,9 @@ public interface StudyWordService {
      * 이미 업로드한 이미지가 있는 경우, 새로운 이미지로 대체
      * @param studyWordId 학습단어번호
      * @param file 업로드 이미지 파일
+     * @return 이미지가 속하는 학습번호 (캐싱 처리 목적)
      */
-    void uploadImage(Long studyWordId, MultipartFile file);
+    Long uploadImage(Long studyWordId, MultipartFile file);
 
 
     /**

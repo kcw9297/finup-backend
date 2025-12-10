@@ -87,7 +87,7 @@ public class LocalFileProvider implements FileProvider {
             Path path = Paths.get(storePath);
 
             // [2] 파일이 존재하는 경우 파일 삭제
-            if (Files.exists(path)) Files.delete(path);
+            if (Files.exists(path)) Files.deleteIfExists(path);
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());

@@ -1,25 +1,24 @@
 package app.finup.layer.base.validation.annotation;
 
+import app.finup.layer.base.validation.validator.ImageFileValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import app.finup.layer.base.validation.validator.EditorContentValidator;
 
 import java.lang.annotation.*;
 
 /**
- * 에디터 작성 내용 검증을 적용할 애노테이션
+ * 이미지 파일 검증을 위한 어노테이션
  * @author kcw
- * @since 2025-11-26
+ * @since 2025-12-09
  */
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = EditorContentValidator.class)  // Validator 클래스 지정
+@Constraint(validatedBy = ImageFileValidator.class)  // Validator 클래스 지정
 @Documented
-public @interface EditorContent {
-    String message() default "";
-    int min() default 1;
-    int max() default 2000;
+public @interface ImageFile {
+    long maxSizeMB() default 10;
+    boolean nullable() default false;
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

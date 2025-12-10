@@ -1,5 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
+import app.finup.layer.base.utils.ValidationUtils;
 import app.finup.layer.base.validation.annotation.Text;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -10,7 +11,7 @@ import java.util.Objects;
 /**
  * 특수문자와 무관하게, 문자열 길이만을 검증할 클래스
  * @author kcw
- * @since 2025-11-2697
+ * @since 2025-11-26
  */
 
 @Slf4j
@@ -26,31 +27,34 @@ public class TextValidator implements ConstraintValidator<Text, String> {
     public void initialize(Text annotation) {
 
         // 기본 파라미터
-        this.message = annotation.message();
-        this.min = Math.max(annotation.min(), 0);
-        this.max = Math.max(annotation.max(), 0);
-        this.nullable = annotation.nullable();
+        message = annotation.message();
+        min = Math.max(annotation.min(), 0);
+        max = Math.max(annotation.max(), 0);
+        nullable = annotation.nullable();
 
         // 사용자 입력 오류 메세지
         if (Objects.isNull(message) || message.isBlank()) {
-            if (Objects.equals(min, 0)) this.message = "최대 %d자 이내 내용을 입력해야 합니다.".formatted(max);
-            else this.message = "%d-%d자 사이 이내 내용을 입력해야 합니다.".formatted(min, max);
+            if (Objects.equals(min, 0)) message = "최대 %d자 이내 내용을 입력해야 합니다.".formatted(max);
+            else message = "%d-%d자 사이 이내 내용을 입력해야 합니다.".formatted(min, max);
         }
     }
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
 
-        // [1] 기본 메세지 비활성화
-        context.disableDefaultConstraintViolation();
-
-        // [2] 검증 수행
         // null이 가능한 경우, 입력이 null이면 통과
         if (nullable && Objects.isNull(value)) return true;
 
+        // 허용하지 않는 태그 여부 검증
+        if (!ValidationUtils.isValidText(value)) {
+            ValidationUtils.addViolation(context, "허용되지 않는 문자열이 존재합니다.");
+            return false;
+        }
+
         // 길이 검증
-        if (Objects.isNull(value) || value.length() < this.min || value.length() > this.max) {
-            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+        String pureContext = ValidationUtils.removeHtmlTags(value); // HTML 태그 제거
+        if (Objects.isNull(pureContext) || pureContext.length() < min || pureContext.length() > max) {
+            ValidationUtils.addViolation(context, message);
             return false;
         }
 

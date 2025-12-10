@@ -79,7 +79,7 @@ public class AdminStudyController {
      */
     @PutMapping("/{studyId:[0-9]+}")
     public ResponseEntity<?> edit(@PathVariable Long studyId,
-                                  @RequestBody StudyDto.Edit rq) {
+                                  @RequestBody @Validated StudyDto.Edit rq) {
 
         // [1] 갱신 수행
         rq.setStudyId(studyId);

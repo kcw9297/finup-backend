@@ -34,23 +34,23 @@ public interface UploadFileManager {
     /**
      * 물리적 파일 저장
      * @param file 업로드 파일
-     * @param uploadFile 대상 파일 엔티티 클래스
+     * @param filePath 대상 파일 주소
      * @return 저장에 성공한 파일 fullUrl
      */
-    String store(MultipartFile file, UploadFile uploadFile);
+    String store(MultipartFile file, String filePath);
 
 
     /**
      * 파일 다운로드
-     * @param uploadFile 대상 파일 엔티티 클래스
+     * @param filePath 대상 파일 주소
      * @return 읽은 파일 바이트 배열
      */
-    byte[] download(UploadFile uploadFile);
+    byte[] download(String filePath);
 
 
     /**
      * 파일 물리적 삭제
-     * @param uploadFile 대상 파일 엔티티 클래스
+     * @param filePath 대상 파일 주소
      */
-    void remove(UploadFile uploadFile);
+    void remove(String filePath);
 }

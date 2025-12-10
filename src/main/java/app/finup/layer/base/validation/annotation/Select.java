@@ -7,7 +7,7 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 /**
- * Select 선택 값 검증을 위한 애노테이션
+ * Select 선택 값 검증을 위한 어노테이션
  * @author kcw
  * @since 2025-12-09
  */

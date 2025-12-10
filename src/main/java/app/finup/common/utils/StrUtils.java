@@ -145,4 +145,19 @@ public final class StrUtils {
     public static boolean equalsStatus(AppStatus status1, AppStatus status2) {
         return Objects.equals(status1.getStatus(), status2.getStatus());
     }
+
+
+    /**
+     * 파일 확장자 추출
+     * @param filename 대상 파일명
+     */
+    public static String getFileExt(String filename) {
+
+        // 파일 확장자가 있는 인덱스
+        int extIdx = filename.lastIndexOf('.');
+
+        // 파일 확장자가 존재하는 경우에만, 추출 후 반환
+        return extIdx == -1 || extIdx == filename.length() - 1 ?
+                "" : filename.substring(extIdx + 1);
+    }
 }

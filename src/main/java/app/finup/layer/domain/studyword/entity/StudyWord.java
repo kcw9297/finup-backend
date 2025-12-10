@@ -41,8 +41,7 @@ public class StudyWord extends BaseEntity implements Reorderable {
 
     @OneToOne(
             fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, // 이미지 자동 저장/수정/삭제 처리
-            orphanRemoval = true // null 설정 시 이미지 엔티티 자동 삭제 처리
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE} // 이미지 자동 저장/수정 처리
     )
     @JoinColumn(name = "word_image_id")
     private UploadFile wordImageFile; // 단어 이미지
@@ -76,7 +75,8 @@ public class StudyWord extends BaseEntity implements Reorderable {
      * 현재 단어 내 등록 이미지 제거 (연관관계 해제)
      */
     public void removeImage() {
-        this.wordImageFile = null;
+        wordImageFile.remove(); // Soft Delete 처리
+        wordImageFile = null;
     }
 
 

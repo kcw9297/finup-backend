@@ -2,7 +2,6 @@ package app.finup.layer.domain.studyword.service;
 
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.common.utils.LogUtils;
 import app.finup.layer.base.utils.ReorderUtils;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
@@ -16,6 +15,8 @@ import app.finup.layer.domain.uploadfile.enums.FileType;
 import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,12 +36,20 @@ import java.util.Objects;
 @Transactional
 public class StudyWordServiceImpl implements StudyWordService {
 
+    // 사용 상수
+    private final String CACHE_VALUE = "STUDY_WORDS";
+
     private final StudyWordRepository studyWordRepository;
     private final StudyRepository studyRepository;
     private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
 
+
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(
+            value = CACHE_VALUE,
+            key = "#studyId"
+    )
     public List<StudyWordDto.Row> getListByStudy(Long studyId) {
 
         return studyWordRepository
@@ -52,6 +61,10 @@ public class StudyWordServiceImpl implements StudyWordService {
 
 
     @Override
+    @CacheEvict(
+            value = CACHE_VALUE,
+            key = "#rq.studyId"
+    )
     public void add(StudyWordDto.Add rq) {
 
         // [1] 필요 엔티티 조회
@@ -79,7 +92,11 @@ public class StudyWordServiceImpl implements StudyWordService {
 
 
     @Override
-    public void uploadImage(Long studyWordId, MultipartFile file) {
+    @CacheEvict(
+            value = CACHE_VALUE,
+            key = "#result"
+    )
+    public Long uploadImage(Long studyWordId, MultipartFile file) {
 
         // [1] 단어 정보 조회
         StudyWord studyWord =
@@ -87,26 +104,19 @@ public class StudyWordServiceImpl implements StudyWordService {
                         .findWithImageById(studyWordId)
                         .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
-        // [2] 변경 전 원래 이미지 정보 추출
+        // [2] 변경 전 원래 이미지 정보 추출 후, 소유자를 null로 변경
         UploadFile oldImageFile = studyWord.getWordImageFile();
+        oldImageFile.remove(); // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
 
         // [3] 새롭게 등록하는 파일 엔티티 생성 후, 삽입
         UploadFile newImageFile = uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
-        studyWord.uploadImage(newImageFile); // cascade = CascadeType.ALL 옵션으로 인해 자동 저장됨
+        studyWord.uploadImage(newImageFile); // cascade 옵션으로 인해 자동 저장됨
 
-        // [5] 새롭게 추가된 파일 생성
-        uploadFileManager.store(file, newImageFile);
+        // [4] 새롭게 추가된 파일 생성
+        uploadFileManager.store(file, newImageFile.getFilePath());
 
-        // [6] 만약 이전 파일이 존재하는 경우, 물리적 파일 삭제 수행
-        // 삭제 실패는 치명적이지 않으므로, 로그로 기록
-        try {
-            if (Objects.nonNull(oldImageFile)) uploadFileManager.remove(oldImageFile);
-        } catch (Exception e) {
-            LogUtils.showWarn(this.getClass(),
-                    "기존 파일 삭제 실패. 신규 파일은 정상 등록 : storePath:%s, message:%s",
-                    oldImageFile.getFilePath(), e.getMessage()
-            );
-        }
+        // [5] 캐싱 처리를 위한 학습번호 반환 (#result 에서 감지)
+        return studyWord.getStudy().getStudyId();
     }
 
 
@@ -161,13 +171,8 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
         // [2] 엔티티 삭제
-        studyWordRepository.deleteById(studyWordId); // cascade = CascadeType.ALL 옵션으로 파일 엔티티도 함께 삭제
-
-        // [3] 파일 물리적 삭제
-        UploadFile wordImageFile = studyWord.getWordImageFile();
-
-        // 파일이 존재하는 경우에만 삭제 시도
-        if (Objects.nonNull(wordImageFile)) uploadFileManager.remove(wordImageFile);
+        studyWord.removeImage(); // 이미지 Soft Delete 처리
+        studyWordRepository.deleteById(studyWordId); // 단어 엔티티 삭제
     }
 
 
@@ -179,10 +184,7 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .findWithImageById(studyWordId)
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
-        // [2] 파일 제거
+        // [2] 이미지 Soft Delete 처리
         studyWord.removeImage();
-
-        // [3] 파일 물리적 삭제
-        uploadFileManager.remove(studyWord.getWordImageFile());
     }
 }
