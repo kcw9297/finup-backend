@@ -13,9 +13,6 @@
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
         <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">
             <choose>
-                <when test="filter eq 'studyWordId'">
-                    AND sw.study_word_id LIKE CONCAT('%', #{keyword}, '%')
-                </when>
                 <when test="filter eq 'name'">
                     AND sw.name LIKE CONCAT('%', #{keyword}, '%')
                 </when>
@@ -61,9 +58,6 @@
         WHERE 1=1
         <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">
             <choose>
-                <when test="filter eq 'studyWordId'">
-                    AND sw.study_word_id LIKE CONCAT('%', #{keyword}, '%')
-                </when>
                 <when test="filter eq 'name'">
                     AND sw.name LIKE CONCAT('%', #{keyword}, '%')
                 </when>

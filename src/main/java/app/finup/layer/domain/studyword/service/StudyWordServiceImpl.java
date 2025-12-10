@@ -81,7 +81,7 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [2] 변경 전 원래 이미지 정보 추출 후, 소유자를 null로 변경
         UploadFile oldImageFile = studyWord.getWordImageFile();
-        oldImageFile.remove(); // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
+        if (Objects.nonNull(oldImageFile)) oldImageFile.remove(); // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
 
         // [3] 새롭게 등록하는 파일 엔티티 생성 후, 삽입
         UploadFile newImageFile = uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
@@ -110,9 +110,12 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .findWithImageById(studyWordId)
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
-        // [2] 엔티티 삭제
-        studyWord.removeImage(); // 이미지 Soft Delete 처리
-        studyWordRepository.deleteById(studyWordId); // 단어 엔티티 삭제
+        // [2] 단어 내 이미지 삭제 (존재 시)
+        UploadFile wordImageFile = studyWord.getWordImageFile();
+        if (Objects.nonNull(wordImageFile)) wordImageFile.remove(); // 이미지 Soft Delete 처리
+
+        // [3] 단어 삭제
+        studyWordRepository.deleteById(studyWordId);
     }
 
 
@@ -125,6 +128,7 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
         // [2] 이미지 Soft Delete 처리
-        studyWord.removeImage();
+        UploadFile wordImageFile = studyWord.getWordImageFile();
+        if (Objects.nonNull(wordImageFile)) wordImageFile.remove(); // 이미지 Soft Delete 처리
     }
 }

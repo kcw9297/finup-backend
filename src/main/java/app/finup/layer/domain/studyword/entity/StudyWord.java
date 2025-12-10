@@ -59,15 +59,6 @@ public class StudyWord extends BaseEntity {
 
 
     /**
-     * 현재 단어 내 등록 이미지 제거 (연관관계 해제)
-     */
-    public void removeImage() {
-        wordImageFile.remove(); // Soft Delete 처리
-        wordImageFile = null;
-    }
-
-
-    /**
      * 단어명 수정
      * @param name 단어명
      * @param meaning 단어 뜻

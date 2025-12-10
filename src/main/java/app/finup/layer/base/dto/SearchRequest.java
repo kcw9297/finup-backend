@@ -7,12 +7,10 @@ import java.util.Objects;
 @Data
 public abstract class SearchRequest {
 
-    private String order;
     private Integer pageNum;
     private Integer pageSize;
 
     public SearchRequest() {
-        this.order = "latest";
         this.pageNum = 0;
         this.pageSize = 5;
     }
