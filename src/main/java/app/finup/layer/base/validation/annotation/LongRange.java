@@ -7,7 +7,7 @@ import app.finup.layer.base.validation.validator.LongRangeValidator;
 import java.lang.annotation.*;
 
 /**
- * long 타입 범위 검증을 적용할 애노테이션
+ * long 타입 범위 검증을 적용할 어노테이션
  * @author kcw
  * @since 2025-11-26
  */

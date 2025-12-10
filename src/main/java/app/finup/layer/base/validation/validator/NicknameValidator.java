@@ -1,5 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
+import app.finup.layer.base.utils.ValidationUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import app.finup.layer.base.validation.annotation.Nickname;
@@ -21,7 +22,7 @@ public class NicknameValidator implements ConstraintValidator<Nickname, String> 
     public void initialize(Nickname annotation) {
 
         // 사용자 입력 오류 메세지
-        String message = annotation.message();
+        message = annotation.message();
         this.message = Objects.isNull(message) || message.isBlank() ?
                 "3-12자 사이 한글/영문/숫자를 입력해야 합니다." : message;
     }
@@ -32,12 +33,9 @@ public class NicknameValidator implements ConstraintValidator<Nickname, String> 
         // [1] 패턴
         String pattern = "^[가-힣a-zA-Z0-9]{3,12}$";
 
-        // [2] 기본 메세지 비활성화
-        context.disableDefaultConstraintViolation();
-
-        // [3] 검증 수행
+        // [2] 검증 수행
         if (Objects.isNull(value) || value.isBlank() || !value.matches(pattern)) {
-            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+            ValidationUtils.addViolation(context, message);
             return false;
         }
 

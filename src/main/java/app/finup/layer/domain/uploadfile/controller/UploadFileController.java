@@ -1,5 +1,6 @@
 package app.finup.layer.domain.uploadfile.controller;
 
+import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/upload-files")
+@RequestMapping(Url.UPLOAD_FILE)
 @RequiredArgsConstructor
-public class FileController {
+public class UploadFileController {
 
     @GetMapping("/{fileId}/download")
     public ResponseEntity<?> download(@PathVariable Long fileId) {

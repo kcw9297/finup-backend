@@ -7,7 +7,7 @@ import app.finup.layer.base.validation.validator.EmailValidator;
 import java.lang.annotation.*;
 
 /**
- * 이메일 검증을 적용할 애노테이션
+ * 이메일 검증을 적용할 어노테이션
  * @author kcw
  * @since 2025-11-26
  */

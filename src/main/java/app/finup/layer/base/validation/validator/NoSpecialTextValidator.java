@@ -1,5 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
+import app.finup.layer.base.utils.ValidationUtils;
 import app.finup.layer.base.validation.annotation.NoSpecialText;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -27,15 +28,15 @@ public class NoSpecialTextValidator implements ConstraintValidator<NoSpecialText
     public void initialize(NoSpecialText annotation) {
 
         // 기본 파라미터
-        this.message = annotation.message();
-        this.min = Math.max(annotation.min(), 0);
-        this.max = Math.max(annotation.max(), 0);
-        this.nullable = annotation.nullable();
+        message = annotation.message();
+        min = Math.max(annotation.min(), 0);
+        max = Math.max(annotation.max(), 0);
+        nullable = annotation.nullable();
 
         // 사용자 입력 오류 메세지
         if (Objects.isNull(message) || message.isBlank()) {
-            if (Objects.equals(min, 0)) this.message = "최대 %d자 이내 한글/영문/숫자를 입력해야 합니다.".formatted(max);
-            else this.message = "%d-%d자 사이 한글/영문/숫자를 입력해야 합니다.".formatted(min, max);
+            if (Objects.equals(min, 0)) message = "최대 %d자 이내 한글/영문/숫자를 입력해야 합니다.".formatted(max);
+            else message = "%d-%d자 사이 한글/영문/숫자를 입력해야 합니다.".formatted(min, max);
         }
     }
 
@@ -45,16 +46,13 @@ public class NoSpecialTextValidator implements ConstraintValidator<NoSpecialText
         // [1] 패턴
         String pattern = "^[가-힣a-zA-Z0-9\\s]{%d,%d}$".formatted(min, max);
 
-        // [2] 기본 메세지 비활성화
-        context.disableDefaultConstraintViolation();
-
-        // [3] 검증 수행
+        // [2] 검증 수행
         // null이 가능한 경우, 입력이 null이면 통과
         if (nullable && Objects.isNull(value)) return true;
 
         // 패턴 검증
         if (Objects.isNull(value) || !value.matches(pattern)) {
-            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+            ValidationUtils.addViolation(context, message);
             return false;
         }
 

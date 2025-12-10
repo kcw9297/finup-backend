@@ -1,5 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
+import app.finup.layer.base.utils.ValidationUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import app.finup.layer.base.validation.annotation.Email;
@@ -21,7 +22,7 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
     public void initialize(Email annotation) {
 
         // 사용자 입력 오류 메세지
-        String message = annotation.message();
+        message = annotation.message();
         this.message = Objects.isNull(message) || message.isBlank() ?
                 "30자 이내 이메일 형식을 입력해야 합니다." : message;
     }
@@ -44,16 +45,12 @@ public class EmailValidator implements ConstraintValidator<Email, String> {
         // [1] 검증 메세지 & 패턴
         String pattern = "^(?=.{1,30}$)[a-zA-Z0-9][a-zA-Z0-9._-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*\\.[a-zA-Z]{2,}$";
 
-        // [2] 기본 메세지 비활성화
-        context.disableDefaultConstraintViolation();
-
-        // [3] 검증 수행
+        // [2] 검증 수행
         if (Objects.isNull(value) || !value.matches(pattern)) {
-            context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+            ValidationUtils.addViolation(context, message);
             return false;
         }
 
-        // 검증 통과
         return true;
     }
 }
