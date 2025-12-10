@@ -1,5 +1,8 @@
 package app.finup.layer.domain.studyword.dto;
 
+import app.finup.layer.base.dto.SearchRequest;
+import app.finup.layer.base.validation.annotation.NoSpecialText;
+import app.finup.layer.base.validation.annotation.Text;
 import lombok.*;
 
 
@@ -11,6 +14,24 @@ import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StudyWordDto {
+
+    /**
+     * 검색 요청
+     */
+    @Data
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = false)
+    public static class Search extends SearchRequest {
+
+        private Integer rowSize = 3; // 표시할 줄 수
+        private String filter;
+        private String keyword;
+
+        public Search() {
+            super.setPageSize(3 * this.rowSize); // 한 줄에는 3개만 보임
+        }
+    }
+
 
     /**
      * 리스트 조회 결과
@@ -37,8 +58,10 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Add {
 
-        private Long studyId;
+        @NoSpecialText(max = 20)
         private String name;
+
+        @Text(min = 10, max = 100)
         private String meaning;
     }
 
@@ -53,28 +76,13 @@ public final class StudyWordDto {
     public static class Edit {
 
         private Long studyWordId;
+
+        @NoSpecialText(max = 20)
         private String name;
+
+        @Text(min = 10, max = 100)
         private String meaning;
     }
 
-
-    /**
-     * 단어 순서 재정렬
-     */
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Reorder {
-
-        private Long studyId;
-        private Long studyWordId;
-        private Integer reorderPosition; // 0번째부터 표기
-
-        public void setIds(Long studyId, Long studyWordId) {
-            this.studyId = studyId;
-            this.studyWordId = studyWordId;
-        }
-    }
 
 }
