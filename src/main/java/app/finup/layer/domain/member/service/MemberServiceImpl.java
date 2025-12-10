@@ -31,4 +31,12 @@ public class MemberServiceImpl implements MemberService {
 
         return Page.of(rp, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }
+    @Override
+    @Transactional(readOnly = true)
+    public List<MemberDto.Row> getMemberList() {
+        return memberRepository.findAll().stream()
+                .map(MemberDtoMapper::toRow)
+                .toList();
+    }
+
 }

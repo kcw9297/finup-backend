@@ -43,4 +43,18 @@ public class MemberController {
         // [2] 페이징 응답 전달
         return Api.ok(rp.getRows(), Pagination.of(rp));
     }
+
+    /**
+     * 회원 전체 리스트(PDF 전용)
+     * [GET] api/members/list/all
+     */
+
+    @GetMapping("/list/all")
+    public ResponseEntity<?> getAllMemberList() {
+        // [1] 요청
+        List<MemberDto.Row> rows = memberService.getMemberList();
+
+        // [2] 페이징 응답 전달
+        return Api.ok(rows);
+    }
 }
