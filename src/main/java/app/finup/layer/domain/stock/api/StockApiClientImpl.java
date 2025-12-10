@@ -2,7 +2,6 @@ package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
-import app.finup.layer.domain.stock.redis.AuthTokenStore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,6 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class StockApiClientImpl implements StockApiClient {
-    // 이 부분 나중에 import해서 쓸거니까 지우기
-   /*
-    @Value("${API_KIS_LOCAL_ACCESS_TOKEN}")
-    private String ACCESS_TOKEN;*/
 
     private final AuthStockApiClient authStockApiClient;
     private final WebClient kisClient;
@@ -30,8 +25,6 @@ public class StockApiClientImpl implements StockApiClient {
     public static final String MARKET_CAP = "/uapi/domestic-stock/v1/ranking/market-cap";
     //종목 상세 페이지 데이터
     public static final String DETAIL = "/uapi/domestic-stock/v1/quotations/inquire-price";
-
-    //
 
     // 종목 상세페이지 시가총액 순위 가져오기
     @Override

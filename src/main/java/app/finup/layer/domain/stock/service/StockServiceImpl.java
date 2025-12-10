@@ -12,9 +12,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +37,6 @@ public class StockServiceImpl implements StockService {
 
         return marketCapRowList;
     }
-
 
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
     @Override

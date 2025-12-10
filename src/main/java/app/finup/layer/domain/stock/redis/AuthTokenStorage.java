@@ -5,7 +5,7 @@ package app.finup.layer.domain.stock.redis;
  * @author lky
  * @since 2025-12-10
  */
-public interface AuthTokenStore {
+public interface AuthTokenStorage {
     void setToken(String token);
     String getToken();
 }

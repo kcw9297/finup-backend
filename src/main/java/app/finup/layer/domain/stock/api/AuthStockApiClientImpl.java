@@ -1,7 +1,7 @@
 package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.TokenDto;
-import app.finup.layer.domain.stock.redis.AuthTokenStore;
+import app.finup.layer.domain.stock.redis.AuthTokenStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,23 +21,23 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
     private String APP_SECRET;
 
     private final WebClient kisAuthClient;
-    private final AuthTokenStore authTokenStore;
+    private final AuthTokenStorage authTokenStorage;
 
     /* api URI */
     public static final String AUTH = "/oauth2/tokenP";
 
 
     /**
-     * kis 접근 토근 발급하기
+     * kis 접근 토큰 발급하기
      * Redis에 토큰 있으면 그대로 반환
      * 없거나 만료되었으면 refreshToken() 호출, 새 토큰 발급, Redis 저장 후 반환
      */
     @Override
     public String getToken() {
-        String token = authTokenStore.getToken();
+        String token = authTokenStorage.getToken();
         if (token == null) {
             refreshToken();
-            token = authTokenStore.getToken();
+            token = authTokenStorage.getToken();
             System.out.println("토큰 갱신발급함");
         }else{
             System.out.println("토큰 레디스에서 가져옴");
@@ -45,7 +45,7 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
         return token;
     }
 
-    //kis 접근 토근 갱신하기
+    //kis 접근 토큰 갱신하기
     @Override
     public void refreshToken() {
         TokenDto.Token token = kisAuthClient.post()
@@ -63,6 +63,6 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
             log.error("KIS 접근 토큰 발급 불가");
             throw new IllegalStateException("접근토큰 null");
         }
-        authTokenStore.setToken(token.getAccessToken());
+        authTokenStorage.setToken(token.getAccessToken());
     }
 }
