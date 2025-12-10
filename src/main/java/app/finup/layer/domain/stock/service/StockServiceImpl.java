@@ -12,7 +12,9 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,11 +53,10 @@ public class StockServiceImpl implements StockService {
         //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
 
         FileInputStream fis = new FileInputStream(path);
-        /*
-        InputStream is = getClass().getClassLoader().getResourceAsStream("data/kospi_code.xlsx");
-        if(is==null){
+        //InputStream is = getClass().getClassLoader().getResourceAsStream("test/kospi_code.xlsx");
+        if(fis==null){
             throw new IllegalArgumentException("파일을 찾을 수 없습니다.");
-        }*/
+        }
         Workbook workbook = new XSSFWorkbook(fis);
         Sheet sheet = workbook.getSheetAt(0);
 
