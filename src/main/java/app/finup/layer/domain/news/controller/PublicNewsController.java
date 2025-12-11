@@ -30,11 +30,5 @@ public class PublicNewsController {
 
     }
 
-    @GetMapping("/detail-ai")
-    public ResponseEntity<?> getArticleByAi(@RequestParam String url){
-        Map<String,Object> ai = newsAiService.getNewsAi(url);
-
-        return Api.ok(Map.of("ai",ai));
-    }
 
 }
