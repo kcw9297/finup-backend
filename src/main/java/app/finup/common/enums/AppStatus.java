@@ -67,6 +67,7 @@ public enum AppStatus {
 
     /* 학습 단어 StudyWord */
     STUDY_WORD_NOT_FOUND(400, "단어 목록이 갱신되었습니다. 새로고침 후 다시 시도해주세요.", "STUDY_WORD_NOT_FOUND"),
+    STUDY_WORD_IMAGE_NOT_FOUND(400, "등록된 이미지가 없습니다.", "STUDY_WORD_IMAGE_NOT_FOUND"),
     STUDY_WORD_OK_ADD(200, "학습 단어를 추가했습니다.", "STUDY_WORD_OK_ADD"),
     STUDY_WORD_OK_UPLOAD_IMAGE(200, "학습 단어 이미지를 등록했습니다.", "STUDY_WORD_OK_UPLOAD_IMAGE"),
     STUDY_WORD_OK_EDIT(200, "학습 단어를 수정했습니다.", "STUDY_WORD_OK_EDIT"),
