@@ -2,10 +2,13 @@ package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
+import app.finup.layer.domain.stock.dto.YoutubeVideoDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
@@ -17,8 +20,14 @@ import java.util.*;
 public class StockApiClientImpl implements StockApiClient {
 
     private final AuthStockApiClient authStockApiClient;
+    @Qualifier("kisClient")
     private final WebClient kisClient;
+    @Qualifier("youTubeClient")
+    private final WebClient youTubeClient;
     private final ObjectMapper objectMapper;
+
+    @Value("API_YOUTUBE_KEY")
+    private String API_YOUTUBE_KEY;
 
     /*api URI*/
     //종목 리스트 시가총액 순위
@@ -145,6 +154,36 @@ public class StockApiClientImpl implements StockApiClient {
             log.error("상세 정보 파싱 실패: {}", e.getMessage());
             return null;
         }
+    }
+
+    //AI분석 키워드를 바탕으로 추천 유튜브 영상 가져오기
+    @Override
+    public List<YoutubeVideoDto.YoutubeVideo> fetchYoutubeVideo(String keyword){
+        return youTubeClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/search")
+                        .queryParam("part", "snippet")
+                        .queryParam("q", keyword)
+                        .queryParam("type", "video")
+                        .queryParam("maxResults", 1)
+                        .queryParam("key", API_YOUTUBE_KEY)
+                        .build())
+                .retrieve()
+                .bodyToMono(YoutubeVideoDto.YoutubeSearchResponse.class)
+                .map(this::convertToDtoList)
+                .block();
+    }
+
+    //유튜브 API 결과 데이터 가공해서 Dto 반환
+    private List<YoutubeVideoDto.YoutubeVideo> convertToDtoList(YoutubeVideoDto.YoutubeSearchResponse response) {
+        return response.getItems().stream()
+                .map(item -> YoutubeVideoDto.YoutubeVideo.builder()
+                        .videoId(item.getId().getVideoId())
+                        .title(item.getSnippet().getTitle())
+                        .channelTitle(item.getSnippet().getChannelTitle())
+                        .thumbnailUrl(item.getSnippet().getThumbnails().getHigh().getUrl())
+                        .build())
+                .toList();
     }
 
 }

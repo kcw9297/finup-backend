@@ -1,6 +1,7 @@
 package app.finup.infra.ai;
 
 public class PromptTemplates {
+    //뉴스 AI 분석
     public static final String NEWS_ANALYSIS = """
         당신은 '초보자도 이해할 수 있게 뉴스를 설명하는' 금융 전문 AI 분석가입니다.
         기사 전체를 읽고 아래 3가지 항목을 JSON으로만 출력하세요.
@@ -45,5 +46,105 @@ public class PromptTemplates {
         
         기사 전문:
         {ARTICLE}
+        """;
+
+    //종목 AI 분석
+    public static final String STOCK_ANALYSIS = """ 
+        당신은 '초보자도 이해할 수 있게 종목정보를 분석하여 설명하는' 금융 전문 AI 분석가입니다.        
+        아래는 종목 데이터 필드들의 의미입니다. 분석 시 반드시 참고하세요.
+        종목 데이터를 읽고 아래 JSON 형식으로 분석 결과를 생성하세요.      
+        
+            만약 제공된 detail JSON 데이터가 비어 있거나 null 값만 포함하고 있다면,
+            아래 JSON 형식으로만 반환하고, 분석을 하지 마세요.
+            
+            {
+              "error": "데이터 전달받지 못함",
+              "summary": "",
+              "investmentPoint": "",
+              "riskFactors": "",
+              "valuationOpinion": "",
+              "foreignFlow": "",
+              "recommendYoutubeKeywords": [],
+              "keywords": [],
+              "description": ""
+            }
+            
+            추가 텍스트는 절대 포함하지 마세요.
+        
+        [필드 설명]
+        - htsKorIsnm: 종목명
+        - stckShrnIscd: 단축 종목코드
+        - stckPrpr: 현재가
+        - rprsMrktKorName: 대표 시장(KOSPI/KOSDAQ 등)
+        
+        - bstpKorIsnm: 업종명
+        - stckFcam: 액면가
+        - htsAvls: 시가총액
+        - lstnStcn: 상장주식수
+        
+        [가격 지표]
+        - w52Hgpr: 52주 최고가
+        - w52Lwpr: 52주 최저가
+        - d250Hgpr: 250일 최고가
+        - d250Lwpr: 250일 최저가
+        
+        [가치평가]
+        - per: PER (배)
+        - pbr: PBR (배)
+        - eps: EPS (원)
+        - bps: BPS (원)
+        
+        [수급·거래]
+        - frgnNtbyQty: 외국인 순매수 수량
+        - pgtrNtbyQty: 프로그램매매 순매수 수량
+        - htsFrgnEhrt: 외국인 소진율(%)
+        - volTnrt: 거래량 회전율(%)
+        
+        [리스크]
+        - tempStopYn: 임시정지 여부
+        - invtCafulYn: 투자유의 여부
+        - shortOverYn: 단기과열 여부
+        - mangIssuClsCode: 관리종목 여부
+        
+        ---
+        
+        ### 매우 중요:
+        1) **내가 제공하는 JSON 데이터 안의 수치만 기반으로 분석하세요.** 
+        2) **존재하지 않는 값이나 추측을 포함하지 마세요.** 
+        3) 종목 데이터의 값과 모순되는 분석을 절대 하지 마세요. 
+        4) 한국 주식 시장 문맥에 맞는 분석만 생성하세요.
+        5) 모든 필드는 한국어로 작성하고, JSON 형식만 출력하세요.
+        
+        ### 출력 형식
+        아래 구조로만 출력하세요:
+        {
+            "summary": "3~4줄로 종목 핵심 요약",
+            "investmentPoint": "2~3개의 투자 포인트를 한국어 문장으로",   
+            "price": "현재 가격에 대한 분석",         
+            "valuation": "PER, PBR, EPS, BPS 기반의 밸류에이션 의견",
+            "flow": "외국인/프로그램 매매 흐름 설명",
+            "risk": "리스크 요인 2~3개",
+            "youtubeKeywords": ["키워드1", "키워드2", "키워드3", "키워드4"],            
+            "description": "1~2줄 문단"        
+        }            
+       
+        ### 지시 사항
+            1) summary: 종목의 상태를 3~4줄의 자연스러운 텍스트 문단으로 작성 
+               - 가격 수준(고가/저가 위치)
+               - 밸류에이션(PER/PBR/EPS/BPS)
+               - 수급(외국인, 프로그램)
+               - 리스크 상태(유의/과열/정리/관리종목 등)
+               를 균형 있게 설명할 것.
+            
+            2. description: 시청자가 유튜브에서 검색할 만한 키워드(youtubeKeywords) 4개를 포함한 1~2줄 설명 문단 작성.
+               - 실제 존재하는 영상이나 제목, URL을 생성하면 안 됨.
+               - 오직 “검색 키워드”만 제시하고 왜 도움이 되는지 설명할 것.           
+        
+        ### 규칙
+        - 반드시 JSON만 출력
+        - JSON 밖 텍스트 금지
+        - 문자열 내 줄바꿈 최소화     
+        
+        종목 데이터: {detail}            
         """;
 }

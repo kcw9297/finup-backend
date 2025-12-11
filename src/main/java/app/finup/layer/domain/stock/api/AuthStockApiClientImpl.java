@@ -38,9 +38,9 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
         if (token == null) {
             refreshToken();
             token = authTokenStorage.getToken();
-            System.out.println("토큰 갱신발급함");
+            log.info("kis 접근 토큰 갱신발급함");
         }else{
-            System.out.println("토큰 레디스에서 가져옴");
+            log.info("kis 접근 토큰 Redis에서 가져옴");
         }
         return token;
     }
@@ -65,6 +65,6 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
             throw new IllegalStateException("접근토큰 null");
         }
         authTokenStorage.setToken(token.getAccessToken());
-        log.warn("토큰 발급 완료");
+        log.info("kis 접근 토큰 발급 완료");
     }
 }

@@ -16,7 +16,7 @@ public class AuthTokenStorageImpl implements AuthTokenStorage {
 
     @Override
     public void setToken(String token) {
-        srt.opsForValue().set("token", token, Duration.ofHours(23));
+        srt.opsForValue().set("token", token, Duration.ofHours(23).plusMinutes(30));
     }
 
     @Override

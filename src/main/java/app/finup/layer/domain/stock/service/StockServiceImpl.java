@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * StocksService 구현 클래스
+ * StockService 구현 클래스
  * @author lky
  * @since 2025-12-03
  */
