@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -33,7 +34,7 @@ public class KbThinkScraper {
 
     private WebDriver createDriver() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
+//        options.addArguments("--headless=new");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-gpu");
@@ -61,28 +62,44 @@ public class KbThinkScraper {
             driver.get(url);
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("ul.list_dic")));
 
-            List<WebElement> items = driver.findElements(By.cssSelector("ul.list_dic > li"));
+            // [1] 페이지 완전 로딩
+            wait.until(webDriver ->
+                    ((JavascriptExecutor) webDriver).executeScript("return document.readyState")
+                            .equals("complete"));
+
+            log.warn("=== AFTER PAGE LOAD ===");
+            log.warn(driver.getPageSource());   // 강제 출력
+            log.warn("=== END ===");
+
+            // [2] 실제 리스트가 생길 때까지 기다림 (검사 버튼 효과와 동일)
+            wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.cssSelector("div.dictionary-list-comp__list")
+            ));
+
+            List<WebElement> items = driver.findElements(By.cssSelector("div.dictionary-list-comp__list"));
 
             for (WebElement item : items) {
 
-                String name = item.findElement(By.tagName("strong")).getText();
+                String name = item.findElement(By.cssSelector(".dictionary-list-comp__list_title")).getText();
 
                 String summary = "";
-                List<WebElement> pTags = item.findElements(By.tagName("p"));
-                if (!pTags.isEmpty()) {
-                    summary = pTags.get(0).getText();
-                }
+                List<WebElement> enNames = item.findElements(By.cssSelector(".dictionary-list-comp__list_en"));
+                if (!enNames.isEmpty()) summary = enNames.get(0).getText();
 
-                WebElement link = item.findElement(By.tagName("a"));
-                String detailUrl = link.getDomAttribute("href");
+                String desc = item.findElement(By.cssSelector(".dictionary-list-comp__list_desc")).getText();
 
-                termList.add(new TermSummary(name, summary, detailUrl));
+                // KBThink는 detail 링크가 없을 수 있으므로 name을 key로 저장
+                termList.add(new TermSummary(name, summary + " " + desc, null));
             }
 
         } catch (Exception e) {
             log.error("fetchList Error:", e);
+            try {
+                log.warn("=== PAGE SOURCE START ===");
+                log.warn(driver.getPageSource());
+                log.warn("=== PAGE SOURCE END ===");
+            } catch (Exception ignore) {}
         } finally {
             driver.quit();
         }
@@ -100,15 +117,26 @@ public class KbThinkScraper {
         WebDriver driver = createDriver();
 
         try {
+            // [1] 드라이버에 상세 페이지 전달
             driver.get(detailUrl);
 
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".entry")));
+            // [2] 페이지 로딩 완료
+            wait.until(webDriver ->
+                    ((JavascriptExecutor) webDriver)
+                            .executeScript("return document.readyState")
+                            .equals("complete"));
 
-            WebElement content = driver.findElement(By.cssSelector(".entry"));
+            // [3] 실제 상세 설명이 렌더링될 때까지 기다림
+            wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.cssSelector("div.dictionary-view-comp__detail_desc")
+            ));
+
+            WebElement content = driver.findElement(By.cssSelector("div.dictionary-view-comp__detail_desc"));
             return sanitize(content.getText());
         } catch (Exception e) {
             log.error("fetchDetail Error:", e);
+            log.debug("DETAIL PAGE SOURCE:\n{}", driver.getPageSource());
             return "";
         } finally {
             driver.quit();
