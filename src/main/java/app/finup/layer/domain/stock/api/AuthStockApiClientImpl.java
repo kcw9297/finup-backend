@@ -14,10 +14,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthStockApiClientImpl implements AuthStockApiClient {
 
-    @Value(("${api.kis.client.id}"))
+    @Value("${api.kis.client.id}")
     private String APP_KEY;
 
-    @Value(("${api.kis.client.secret}"))
+    @Value("${api.kis.client.secret}")
     private String APP_SECRET;
 
     private final WebClient kisAuthClient;
@@ -48,6 +48,7 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
     //kis 접근 토큰 갱신하기
     @Override
     public void refreshToken() {
+
         TokenDto.Token token = kisAuthClient.post()
                 .uri(AUTH)
                 .bodyValue(Map.of(
@@ -64,5 +65,6 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
             throw new IllegalStateException("접근토큰 null");
         }
         authTokenStorage.setToken(token.getAccessToken());
+        log.warn("토큰 발급 완료");
     }
 }
