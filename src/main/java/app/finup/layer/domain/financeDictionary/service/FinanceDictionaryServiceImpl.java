@@ -6,7 +6,9 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.ProviderException;
 import app.finup.infra.dictionary.dto.DictionaryProviderDto;
 import app.finup.infra.dictionary.provider.DictionaryProvider;
+import app.finup.infra.dictionary.provider.KbThinkScraper;
 import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDto;
+import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDtoMapper;
 import app.finup.layer.domain.financeDictionary.entity.FinanceDictionary;
 import app.finup.layer.domain.financeDictionary.repository.FinanceDictionaryRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class FinanceDictionaryServiceImpl implements FinanceDictionaryService {
 
     private final DictionaryProvider dictionaryProvider;
     private final FinanceDictionaryRepository financeDictionaryRepository;
+    private final KbThinkScraper kbThinkScraper;
 
     @Override
     public void refreshTerms() {
@@ -60,5 +63,37 @@ public class FinanceDictionaryServiceImpl implements FinanceDictionaryService {
     @Transactional(readOnly = true)
     public Boolean isInitialized() {
         return financeDictionaryRepository.count() > 0;
+    }
+
+    @Override
+    @Transactional
+    public void crawlAllFromKbThink() {
+        Integer page = 1;
+
+        while (true) {
+            List<KbThinkScraper.TermSummary> list =
+                    kbThinkScraper.fetchList(page);
+
+            if (list.isEmpty()) break;
+
+            for (KbThinkScraper.TermSummary item : list) {
+
+                // 상세 설명
+                String detail = kbThinkScraper.fetchDetail(item.getDetailUrl());
+
+                // 중복 확인 후 저장
+                financeDictionaryRepository.findByName(item.getName())
+                        .ifPresentOrElse(
+                                entity -> entity.updateDescription(detail),
+                                () -> financeDictionaryRepository.save(
+                                        FinanceDictionary.builder()
+                                                .name(item.getName())
+                                                .description(detail)
+                                                .build()
+                                )
+                        );
+            }
+            page++;
+        }
     }
 }

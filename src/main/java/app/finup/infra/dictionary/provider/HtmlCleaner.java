@@ -8,6 +8,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
 
+/**
+ * HTML 데이터로 오는 데이터 정제하는 클래스
+ * @author khj
+ * @since 2025-12-11
+ */
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
