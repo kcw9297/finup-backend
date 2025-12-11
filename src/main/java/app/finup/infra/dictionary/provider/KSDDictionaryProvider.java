@@ -39,6 +39,8 @@ public class KSDDictionaryProvider implements DictionaryProvider {
             // [1] API 호출
             String xml = restTemplate.getForObject(url, String.class);
 
+            log.error("★ KSD 응답 원문:\n{}", xml);
+
             // [2] XML -> DTO 변환
             XmlDtoUtil rp = xmlMapper.readValue(xml, XmlDtoUtil.class);
 

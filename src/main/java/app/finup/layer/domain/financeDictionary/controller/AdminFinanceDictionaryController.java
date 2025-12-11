@@ -1,0 +1,44 @@
+package app.finup.layer.domain.financeDictionary.controller;
+
+import app.finup.common.constant.Url;
+import app.finup.common.enums.AppStatus;
+import app.finup.common.utils.Api;
+import app.finup.layer.domain.financeDictionary.service.FinanceDictionaryService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+
+/**
+ * 용어사전 REST API 요청 후 불러오는 컨트롤러 클래스 (일반적으로 DB 비었을 때 단 한번만 실행)
+ * @author khj
+ * @since 2025-12-10
+ */
+
+
+@Slf4j
+@RestController
+@RequestMapping(Url.ADMIN_DICTIONARY)
+@RequiredArgsConstructor
+public class AdminFinanceDictionaryController {
+
+    private final FinanceDictionaryService financeDictionaryService;
+
+    /**
+     * 금융 용어 초기 적재 (1회 전용)
+     * [POST] /admin/dict/init
+     */
+
+    @PostMapping("/init")
+    public ResponseEntity<?> initDictionary() {
+        if (financeDictionaryService.isInitialized()) {
+            return Api.fail(AppStatus.FINANCE_DICT_ALREADY_INITIALIZED);
+        }
+
+        financeDictionaryService.refreshTerms();
+        return Api.ok("금융 용어 사전 초기 적재 완료");
+    }
+}
