@@ -2,7 +2,9 @@ package app.finup.layer.domain.news.service;
 
 import app.finup.infra.ai.AiManager;
 import app.finup.infra.ai.PromptTemplates;
+import app.finup.layer.domain.news.component.NewsContentExtractor;
 import app.finup.layer.domain.news.dto.NewsDto;
+import app.finup.layer.domain.news.dto.NewsDtoMapper;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
@@ -24,63 +26,25 @@ import java.util.Map;
 public class NewsAiServiceImpl implements NewsAiService {
 
     private final AiManager aiManager;
-    private final NewsRedisStorage newsRedisStorage;
+    private final NewsContentExtractor extractor;
 
-    private static final Duration DURATION_AI = Duration.ofHours(6);
     @Override
-    public Map<String, Object> getNewsAi(String url) {
-
-        String hash = DigestUtils.md5DigestAsHex(url.getBytes());
-        String key = "NEWS_AI:" + hash;
-
-        //조회
-        Map<String, Object> cashAi = newsRedisStorage.getNews(key, new TypeReference<>() {});
-        if(cashAi != null) {
-            log.debug("[NEWS_AI] HIT {}", url);
-            return cashAi;
+    public NewsDto.Ai analyze(String url) {
+        String article = extractor.extract(url);
+        if(article.isBlank()){
+            return null;
         }
-        //없으면 ai실행
-        String article = extractArticle(url);
         String prompt = PromptTemplates.NEWS_ANALYSIS.replace("{ARTICLE}", article);
-        Map<String, Object> freshAi= aiManager.runJsonPrompt(prompt);
-
-        //키워드 정렬
-        List<Map<String, String>> keywords = (List<Map<String, String>>) freshAi.get("keywords");
+        Map<String, Object> result= aiManager.runJsonPrompt(prompt);
+        List<Map<String, String>> keywords = (List<Map<String, String>>) result.get("keywords");
         if(keywords != null){
             keywords.sort(Comparator.comparing(k -> k.get("term")));
-            freshAi.put("keywords", keywords);
+            result.put("keywords", keywords);
         }
-        newsRedisStorage.saveNews(key, freshAi, DURATION_AI);
 
-        return freshAi;
+        return NewsDtoMapper.toAi(result);
     }
 
-    @Override
-    public String extractArticle(String url) {
-        try {
-            // User-Agent 지정 중요 (언론사 일부 bot 차단 있음)
-            Document doc = Jsoup.connect(url)
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                    .timeout(5000)
-                    .get();
-
-            // 언론사별 본문 CSS 선택자 시도
-            String content = tryExtractContent(doc);
-
-            return content;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ""; // 오류 시 빈 문자열
-        }
-    }
-
-    private String tryExtractContent(Document doc) {
-        Element content = doc.selectFirst("dic_area");
-        if(content != null) return content.text();
-
-        return "";
-    }
 
 
 }
