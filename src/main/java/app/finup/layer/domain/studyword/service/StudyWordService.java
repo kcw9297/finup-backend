@@ -4,8 +4,6 @@ import app.finup.common.dto.Page;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 /**
  * 단계별 학습 단어 서비스 인터페이스
  * @author kcw
@@ -30,10 +28,12 @@ public interface StudyWordService {
     /**
      * 학습 단어 내 이미지 업로드 (학습용 이미지)
      * 이미 업로드한 이미지가 있는 경우, 새로운 이미지로 대체
+     *
      * @param studyWordId 학습단어번호
-     * @param file 업로드 이미지 파일
+     * @param file        업로드 이미지 파일
+     * @return
      */
-    void uploadImage(Long studyWordId, MultipartFile file);
+    String uploadImage(Long studyWordId, MultipartFile file);
 
 
     /**

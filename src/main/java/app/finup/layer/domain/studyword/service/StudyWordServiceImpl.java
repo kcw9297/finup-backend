@@ -3,11 +3,7 @@ package app.finup.layer.domain.studyword.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.layer.base.utils.ReorderUtils;
-import app.finup.layer.domain.study.entity.Study;
-import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
-import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
 import app.finup.layer.domain.studyword.mapper.StudyWordMapper;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
@@ -17,8 +13,6 @@ import app.finup.layer.domain.uploadfile.enums.FileType;
 import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,17 +36,21 @@ public class StudyWordServiceImpl implements StudyWordService {
     private final StudyWordMapper studyWordMapper;
     private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
 
-
     @Override
     @Transactional(readOnly = true)
     public Page<StudyWordDto.Row> search(StudyWordDto.Search rq) {
 
         // [1] 검색
-        List<StudyWordDto.Row> rp = studyWordMapper.search(rq);
+        List<StudyWordDto.Row> rows = studyWordMapper.search(rq);
         Integer count = studyWordMapper.countForSearch(rq);
 
-        // [2] 검색 결과 반환 (페이징 객체로 변환)
-        return Page.of(rp, count, rq.getPageNum(), rq.getPageSize());
+        // [2] filePath 상대주소에, 현재 프로젝트 파일 도메인 첨부
+        rows.stream()
+                .filter(row -> Objects.nonNull(row.getImageUrl()))
+                .forEach(row -> row.setImageUrl(uploadFileManager.getFullUrl(row.getImageUrl())));
+
+        // [3] 검색 결과 반환 (페이징 객체로 변환)
+        return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
     }
 
 
@@ -71,7 +69,7 @@ public class StudyWordServiceImpl implements StudyWordService {
 
 
     @Override
-    public void uploadImage(Long studyWordId, MultipartFile file) {
+    public String uploadImage(Long studyWordId, MultipartFile file) {
 
         // [1] 단어 정보 조회
         StudyWord studyWord =
@@ -81,7 +79,7 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [2] 변경 전 원래 이미지 정보 추출 후, 소유자를 null로 변경
         UploadFile oldImageFile = studyWord.getWordImageFile();
-        oldImageFile.remove(); // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
+        if (Objects.nonNull(oldImageFile)) oldImageFile.remove(); // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
 
         // [3] 새롭게 등록하는 파일 엔티티 생성 후, 삽입
         UploadFile newImageFile = uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
@@ -89,6 +87,9 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [4] 새롭게 추가된 파일 생성
         uploadFileManager.store(file, newImageFile.getFilePath());
+
+        // [5] 업로드한 파일 주소 반환
+        return uploadFileManager.getFullUrl(newImageFile.getFilePath());
     }
 
 
@@ -110,9 +111,12 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .findWithImageById(studyWordId)
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
-        // [2] 엔티티 삭제
-        studyWord.removeImage(); // 이미지 Soft Delete 처리
-        studyWordRepository.deleteById(studyWordId); // 단어 엔티티 삭제
+        // [2] 단어 내 이미지 삭제 (존재 시)
+        UploadFile wordImageFile = studyWord.getWordImageFile();
+        if (Objects.nonNull(wordImageFile)) wordImageFile.remove(); // 이미지 Soft Delete 처리
+
+        // [3] 단어 삭제
+        studyWordRepository.deleteById(studyWordId);
     }
 
 
@@ -125,6 +129,7 @@ public class StudyWordServiceImpl implements StudyWordService {
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
         // [2] 이미지 Soft Delete 처리
-        studyWord.removeImage();
+        UploadFile wordImageFile = studyWord.getWordImageFile();
+        if (Objects.nonNull(wordImageFile)) wordImageFile.remove(); // 이미지 Soft Delete 처리
     }
 }

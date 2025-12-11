@@ -62,6 +62,7 @@ public class AdminStudyWordController {
         return Api.ok(AppStatus.STUDY_WORD_OK_ADD);
     }
 
+
     /**
      * 단어 이미지 등록
      * [POST] /study-words/{studyWordId}/image
@@ -72,10 +73,10 @@ public class AdminStudyWordController {
                                          @RequestParam @ImageFile MultipartFile wordImage) {
 
         // [1] 이미지 업로드 수행
-        studyWordService.uploadImage(studyWordId, wordImage);
+        String imageUrl = studyWordService.uploadImage(studyWordId, wordImage);
 
         // [2] 성공 응답 반환
-        return Api.ok(AppStatus.STUDY_WORD_OK_UPLOAD_IMAGE);
+        return Api.ok(AppStatus.STUDY_WORD_OK_UPLOAD_IMAGE, imageUrl);
     }
 
 
@@ -95,7 +96,6 @@ public class AdminStudyWordController {
         // [2] 성공 응답 반환
         return Api.ok(AppStatus.STUDY_WORD_OK_EDIT);
     }
-
 
 
     /**

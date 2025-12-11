@@ -24,8 +24,8 @@ public class ImageFileValidator implements ConstraintValidator<ImageFile, Multip
     private long maxSizeBytes;
     private boolean nullable;
     private long maxSizeMB;
-    private final List<String> ALLOWED_EXTS = List.of(".jpg", ".jpeg", ".png", ".gif");
-    private static final List<String> ALLOWED_MIME_TYPES = List.of("image/jpeg", "image/png", "image/gif");
+    private final List<String> ALLOWED_EXTS = List.of("jpg", "jpeg", "png", "gif", "webp");
+    private static final List<String> ALLOWED_MIME_TYPES = List.of("image/jpeg", "image/png", "image/gif", "image/webp");
 
     @Override
     public void initialize(ImageFile annotation) {

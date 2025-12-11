@@ -24,6 +24,7 @@ public final class StudyWordDto {
     public static class Search extends SearchRequest {
 
         private Integer rowSize = 3; // 표시할 줄 수
+        private String order = "latest";
         private String filter;
         private String keyword;
 
