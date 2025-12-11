@@ -52,4 +52,14 @@ public class PublicStocksController {
         return Api.ok(stockService.getDetail(code));
     }
 
+    /**
+     * 종목 뉴스 리스트  조회 API
+     * [GET] stocks/news?category={category}&stockName={stockName}
+     * @param  category  // 문자열도 있음
+     */
+    @GetMapping("/news")
+    public ResponseEntity<?> getNews(String category, String stockName) {
+        return Api.ok(stockService.getStockNews(stockName, category));
+    }
+
 }

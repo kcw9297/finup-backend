@@ -1,5 +1,6 @@
 package app.finup.layer.domain.stock.service;
 
+import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.stock.dto.StockDto;
 import java.util.List;
 
@@ -10,4 +11,5 @@ public interface StockService {
     //List<StocksDto> getStocks();
     void importKospi() throws Exception;
     StockDto.Detail getDetail(String code);
+    List<NewsDto.Row> getStockNews(String stockName, String category);
 }
