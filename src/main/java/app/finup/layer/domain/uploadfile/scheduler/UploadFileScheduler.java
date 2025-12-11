@@ -32,7 +32,7 @@ public class UploadFileScheduler {
     /**
      * 고아 파일 삭제 스케줄링 로직
      */
-    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
     public void removeOrphanFiles() {
 
         // [1] 고아 파일을 기록할 리스트
