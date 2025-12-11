@@ -4,7 +4,6 @@ import app.finup.layer.base.dto.SearchRequest;
 import app.finup.layer.base.validation.annotation.NoSpecialText;
 import app.finup.layer.base.validation.annotation.Select;
 import app.finup.layer.base.validation.annotation.Text;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.Objects;

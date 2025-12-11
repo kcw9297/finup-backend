@@ -59,6 +59,17 @@ public class StudyWord extends BaseEntity {
 
 
     /**
+     * 단어 이미지 삭제
+     * @return 삭제 처리한 이미지 파일 엔티티
+     */
+    public UploadFile removeImage() {
+        UploadFile file = wordImageFile;
+        wordImageFile = null;
+        return file; // 삭제한 파일 엔티티 반환
+    }
+
+
+    /**
      * 단어명 수정
      * @param name 단어명
      * @param meaning 단어 뜻

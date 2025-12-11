@@ -23,10 +23,10 @@ public final class StudyWordDto {
     @EqualsAndHashCode(callSuper = false)
     public static class Search extends SearchRequest {
 
-        private Integer rowSize = 3; // 표시할 줄 수
+        private Integer rowSize = 2; // 표시할 줄 수
         private String order = "latest";
-        private String filter;
-        private String keyword;
+        private String filter = "";
+        private String keyword = "";
 
         public Search() {
             super.setPageSize(3 * this.rowSize); // 한 줄에는 3개만 보임
@@ -84,6 +84,5 @@ public final class StudyWordDto {
         @Text(min = 10, max = 100)
         private String meaning;
     }
-
 
 }
