@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 용어사전 REST API 요청 후 불러오는 컨트롤러 클래스 (일반적으로 DB 비었을 때 단 한번만 실행)
+ * (+ 웹 스크래퍼 포함)
  * @author khj
  * @since 2025-12-10
  */
@@ -29,7 +30,7 @@ public class AdminFinanceDictionaryController {
 
     /**
      * 금융 용어 초기 적재 (1회 전용)
-     * [POST] /admin/dict/init
+     * [POST] /admin/api/dict/init
      */
 
     @PostMapping("/init")
@@ -40,5 +41,16 @@ public class AdminFinanceDictionaryController {
 
         financeDictionaryService.refreshTerms();
         return Api.ok("금융 용어 사전 초기 적재 완료");
+    }
+
+    /**
+     * KBThink 전체 크롤링 후 DB 반영
+     * [POST] /admin/api/dict/kbthink/init
+     */
+    @PostMapping("/kbthink/init")
+    public ResponseEntity<?> initFromKbThink() {
+        log.info("▶ KBThink Crawl API 호출됨!");
+        financeDictionaryService.crawlAllFromKbThink();
+        return Api.ok("KBThink 용어 전체 수집 완료");
     }
 }
