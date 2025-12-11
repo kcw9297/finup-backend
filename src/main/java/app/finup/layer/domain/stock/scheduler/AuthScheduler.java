@@ -20,7 +20,7 @@ public class AuthScheduler {
 
     @Scheduled(fixedRate = 1000 * 60 * 60 * 23)
     public void refreshAuth() {
-        log.info("[SCHEDULER] 종목 캐시 자동 갱신 실행");
+        log.info("[SCHEDULER] kis 접근 토큰 스케쥴러 실행");
         authStockApiClient.refreshToken();
     }
 }
