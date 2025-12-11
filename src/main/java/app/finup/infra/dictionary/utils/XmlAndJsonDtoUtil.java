@@ -16,7 +16,9 @@ import java.util.List;
 
 @Data
 @JacksonXmlRootElement(localName = "response")
-public class XmlDtoUtil {
+public class XmlAndJsonDtoUtil {
+
+
     @JacksonXmlProperty(localName = "header")
     private Header header;
 

@@ -5,6 +5,7 @@ import app.finup.layer.domain.notice.dto.NoticeDto;
 import app.finup.layer.domain.reboard.dto.ReboardDto;
 import app.finup.layer.domain.study.dto.StudyDto;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
+import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -58,6 +59,7 @@ public class DatabaseConfig {
         registry.registerAlias("StudyRow", StudyDto.Row.class);
         registry.registerAlias("StudyWordRow", StudyWordDto.Row.class);
         registry.registerAlias("MemberRow", MemberDto.Row.class);
+        registry.registerAlias("VideoLinkRow", VideoLinkDto.Row.class);
     }
 
 }

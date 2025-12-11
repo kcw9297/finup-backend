@@ -26,6 +26,9 @@ public class WebClientConfig {
     @Value(("${api.finance-dict.endpoint}"))
     private String dataPortalEndPoint;
 
+    @Value("${API_KEXIM_ENDPOINT}")
+    private String keximEndpoint;
+
     // 필요 상수
     @Value("${api.naver-news.client.id}")
     private String naverClientId;
@@ -45,20 +48,20 @@ public class WebClientConfig {
     @Value(("${api.finance-dict.key}"))
     private String dataPortalSecret;
 
+    @Value("${API_KEXIM_KEY}")
+    private String KEXIM_KEY;
+
 
     @Bean(name = "youTubeClient") // 유튜브 API 사용을 위한 Client
     public WebClient youTubeClient() {
-
         return WebClient.builder()
                 .baseUrl(youtubeEndpoint)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
 
-
     @Bean(name = "naverClient") // 네이버 OpenAPI 사용을 위한 Client
     public WebClient naverClient() {
-
         return WebClient.builder()
                 .baseUrl(naverEndPoint)
                 .defaultHeader("X-Naver-Client-Id", naverClientId)
@@ -69,7 +72,6 @@ public class WebClientConfig {
 
     @Bean(name="kisClient")
     public WebClient kisClient(){
-
         return WebClient.builder()
                 .baseUrl(kisEndPoint)
                 .defaultHeader("appkey", kisAppKey)
@@ -79,7 +81,6 @@ public class WebClientConfig {
 
     @Bean(name="kisAuthClient")
     public WebClient kisAuthClient(){
-
         return WebClient.builder()
                 .baseUrl(kisEndPoint)
                 .build();
@@ -91,6 +92,13 @@ public class WebClientConfig {
                 .baseUrl(dataPortalEndPoint)
                 .defaultHeader("dataPortalApiKey", dataPortalEndPoint)
                 .defaultHeader("dataPortalSecret", dataPortalSecret)
+                .build();
+    }
+
+    @Bean(name="keximClient")
+    public WebClient keximClient() {
+        return WebClient.builder()
+                .baseUrl(keximEndpoint)
                 .build();
     }
 }

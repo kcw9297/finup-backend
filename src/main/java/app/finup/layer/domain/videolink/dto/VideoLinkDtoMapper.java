@@ -3,7 +3,6 @@ package app.finup.layer.domain.videolink.dto;
 import app.finup.common.utils.FormatUtils;
 import app.finup.infra.youtube.dto.YouTube;
 import app.finup.layer.domain.videolink.entity.VideoLink;
-import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
 import lombok.*;
 
 /**
@@ -23,7 +22,7 @@ public final class VideoLinkDtoMapper {
                .videoLinkId(entity.getVideoLinkId())
                .videoId(entity.getVideoId())
                .videoUrl(entity.getVideoUrl())
-               .displayOrder(entity.getDisplayOrder())
+
 
                // API에서 얻은 정보
                .title(video.getTitle())

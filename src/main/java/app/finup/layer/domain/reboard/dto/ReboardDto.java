@@ -1,5 +1,6 @@
 package app.finup.layer.domain.reboard.dto;
 
+import app.finup.common.constant.Const;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -45,7 +46,7 @@ public final class ReboardDto {
         private Long idx;
         private String name;
         private String subject;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = Const.ASIA_SEOUL)
         private LocalDateTime regdate;
     }
 

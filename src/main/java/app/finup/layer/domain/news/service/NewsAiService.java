@@ -1,8 +1,9 @@
 package app.finup.layer.domain.news.service;
 
+import app.finup.layer.domain.news.dto.NewsDto;
+
 import java.util.Map;
 
 public interface NewsAiService {
-    Map<String, Object> getNewsAi(String article);
-    String extractArticle(String url);
+    NewsDto.Ai analyze(String url);
 }
