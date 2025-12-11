@@ -2,12 +2,16 @@ package app.finup.layer.domain.stock.service;
 
 import app.finup.infra.ai.AiManager;
 import app.finup.infra.ai.PromptTemplates;
+import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
+import app.finup.layer.domain.stock.dto.YoutubeVideoDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import java.util.Map;
 
 
@@ -24,6 +28,7 @@ public class StockAiServiceImpl implements StockAiService {
 
     private final AiManager aiManager;
     private final ObjectMapper objectMapper;
+    private final StockApiClient stockApiClient;
 
     //종목 분석 Ai 데이터 가져오기
     @Override
@@ -42,7 +47,14 @@ public class StockAiServiceImpl implements StockAiService {
 
             // 4) GPT JSON 요청
             Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
+    /*
+            // 5) 유튜브 데이터 요청
+            List<YoutubeVideoDto.YoutubeVideo> youtube getYoutubeVideo(keyword);
 
+            return Map.of(
+                    "detailAi", detailAi,
+                    "youtube", youtube
+                    )*/
             return detailAi;
 
         } catch (Exception e) {
@@ -50,6 +62,8 @@ public class StockAiServiceImpl implements StockAiService {
             return Map.of("error", "AI 분석 실패");
         }
     }
+
+    //Detail DTO Json 형식으로 변환
     private Map<String, Object> convertDetailToStructuredJson(StockDto.Detail detail) {
         return Map.of(
                 "basic", Map.of(
@@ -89,5 +103,8 @@ public class StockAiServiceImpl implements StockAiService {
         );
     }
 
+    private List<YoutubeVideoDto.YoutubeVideo> getYoutubeVideo(String keyword) {
+        return stockApiClient.fetchYoutubeVideo(keyword);
+    }
 
 }
