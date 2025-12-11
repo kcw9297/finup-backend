@@ -2,7 +2,6 @@ package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.stock.api.AuthStockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.service.StockAiService;
 import app.finup.layer.domain.stock.service.StockService;
@@ -57,11 +56,11 @@ public class PublicStocksController {
 
     /**
      * 종목 상세페이지 조회 API
-     * [GET] stocks/detail-ai/{code}
+     * [GET] stocks/detail/stock-ai/{code}
      * @param code 종목코드 // 문자열도 있음
      */
-    @GetMapping("/detail-ai/{code}")
-    public ResponseEntity<?> getDetailAi(@PathVariable String code) {
+    @GetMapping("/detail/stock-ai/{code}")
+    public ResponseEntity<?> getStockAi(@PathVariable String code) {
         StockDto.Detail detail = (stockService.getDetail(code));
         return Api.ok(stockAiService.getStockAi(detail));
     }

@@ -36,8 +36,6 @@ public class StockAiServiceImpl implements StockAiService {
             String detailJson = objectMapper.writerWithDefaultPrettyPrinter()
                     .writeValueAsString(structured);
 
-            System.out.println("AI 원본 종목데이터: "+detailJson);
-
             // 3) 템플릿에 삽입
             String prompt = PromptTemplates.STOCK_ANALYSIS
                     .replace("{detail}", detailJson);
