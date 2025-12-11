@@ -1,8 +1,10 @@
 package app.finup.layer.domain.videolink.dto;
 
 
-import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
+import app.finup.layer.base.dto.SearchRequest;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
  * 학습용 비디오 링크 DTO 클래스
@@ -22,19 +24,30 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Row {
 
-        // DB에 저장된 정보
         private Long videoLinkId;
         private String videoId;
         private String videoUrl;
-        private Double displayOrder;
-
-        // YouTube API로 조회되는 정보
         private String title;
         private String duration;
         private String thumbnailUrl;
         private String channelTitle;
+        private LocalDateTime publishedAt;
         private Long viewCount;
         private Long likeCount;
+        private String tags; // 태그 문자열
+    }
+
+    /**
+     * 검색 요청
+     */
+    @Data
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = false)
+    public static class Search extends SearchRequest {
+
+        private String filter = "";
+        private String keyword = "";
+        private String order = "latest";
     }
 
 
@@ -47,9 +60,8 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Add {
 
+        // 사용자 입력 데이터 @YoutubeUrl 검증 애노테이션 추가 예정
         private String videoUrl;
-        private Long ownerId; // 주인이 HOME인 경우 null
-        private VideoLinkOwner videoLinkOwner;
     }
 
 
@@ -62,26 +74,8 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Edit {
 
-        // 프론트에서 얻어오는 정보
         private Long videoLinkId;
         private String videoUrl;
-        private String videoId;
     }
 
-
-    /**
-     * 링크 정보 수정
-     */
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Reorder {
-
-        private Long videoLinkId;
-        private Long ownerId; // 주인이 HOME인 경우 null
-        private VideoLinkOwner videoLinkOwner;
-        private Integer reorderPosition; // 0번째부터 표기
-
-    }
 }

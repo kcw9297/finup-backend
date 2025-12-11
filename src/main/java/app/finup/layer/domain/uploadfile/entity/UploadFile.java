@@ -64,7 +64,7 @@ public class UploadFile extends BaseEntity {
      * 파일 삭제 처리 (Soft Delete)
      * 추후 물리적 파일과 직접 삭제는 스케줄러에서 처리
      */
-    public void remove() {
+    public void softRemove() {
         this.fileOwner = null;
     }
 

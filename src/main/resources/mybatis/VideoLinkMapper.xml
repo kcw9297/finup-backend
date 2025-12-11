@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.finup.layer.domain.videolink.mapper.VideoLinkMapper">
+
+    <!-- 검색 메소드 -->
+    <select id="search" resultType="VideoLinkRow">
+        SELECT vl.video_link_id, vl.video_url, vl.video_id, vl.title,
+               vl.thumbnail_url, vl.channel_title, vl.duration,
+               vl.published_at, vl.last_synced_at, vl.video_count, vl.like_count, vl.tags
+        FROM video_link vl
+        WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
+        <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">
+            <choose>
+                <when test="filter eq 'name'">
+                    AND vl.name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'channelName'">
+                    AND vl.channel_name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'nameChannelName'">
+                    AND (vl.name LIKE CONCAT('%', #{keyword}, '%') OR vl.channel_name LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+            </choose>
+        </if>
+        ORDER BY
+        <trim suffixOverrides=","> <!-- IDE 자동완성을 위해 추가 -->
+            <choose>
+                <when test="order neq null and order neq ''">
+                    <choose>
+                        <when test="order eq 'latest'">
+                            vl.cdate DESC,
+                        </when>
+                        <when test="order eq 'oldest'">
+                            vl.cdate,
+                        </when>
+                        <when test="order eq 'duration'">
+                            vl.duration DESC,
+                        </when>
+                        <when test="order eq 'popular'">
+                            vl.like_count DESC,
+                        </when>
+                        <otherwise>
+                            vl.cdate DESC,
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    vl.cdate DESC,
+                </otherwise>
+            </choose>
+        </trim>
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 검색 메소드 카운트 쿼리 -->
+    <select id="countForSearch" resultType="int">
+        SELECT COUNT(*)
+        FROM video_link vl
+        WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
+        <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">
+            <choose>
+                <when test="filter eq 'name'">
+                    AND vl.name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'channelName'">
+                    AND vl.channel_name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'nameChannelName'">
+                    AND (vl.name LIKE CONCAT('%', #{keyword}, '%') OR vl.channel_name LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+            </choose>
+        </if>
+    </select>
+
+</mapper>

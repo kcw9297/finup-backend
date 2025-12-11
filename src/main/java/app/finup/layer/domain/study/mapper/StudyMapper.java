@@ -16,7 +16,7 @@ import java.util.List;
 public interface StudyMapper {
 
     /**
-     * 단계 학습 검색 (현재는 무한 스크롤을 위한 정렬/페이징만 수행)
+     * 단계 학습 검색
      * @param rq 검색 요청 DTO
      * @return 페이징된 단계 학습정보 DTO 리스트
      */

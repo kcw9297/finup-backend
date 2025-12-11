@@ -84,10 +84,6 @@ public class V3YouTubeProvider implements YouTubeProvider {
                 .block();
     }
 
-    @Cacheable(
-            value = "youtubeVideos",
-            key = "T(java.util.stream.Collectors).joining(',', #videoIds.stream().sorted().toArray())"
-    )
     @Override
     public List<YouTube.Detail> getVideos(List<String> videoIds) {
 
