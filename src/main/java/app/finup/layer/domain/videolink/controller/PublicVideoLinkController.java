@@ -2,17 +2,12 @@ package app.finup.layer.domain.videolink.controller;
 
 
 import app.finup.common.constant.Url;
-import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.videolink.dto.VideoLinkDto;
-import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
 import app.finup.layer.domain.videolink.service.VideoLinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 학습용 영상 정보 공개용 REST API 클래스
@@ -28,16 +23,5 @@ public class PublicVideoLinkController {
 
     private final VideoLinkService videoLinkService;
 
-    /**
-     * 현재 자원에 속하는 영상 목록 조회
-     * [GET] /video-links
-     * @param ownerId 영상 소유자 번호
-     * @param videoLinkOwner 영상 소유자 (HOME, STUDY, ...)
-     */
-    @GetMapping
-    public ResponseEntity<?> getList(@RequestParam Long ownerId,
-                                     @RequestParam VideoLinkOwner videoLinkOwner) {
 
-        return Api.ok(videoLinkService.getList(ownerId, videoLinkOwner));
-    }
 }
