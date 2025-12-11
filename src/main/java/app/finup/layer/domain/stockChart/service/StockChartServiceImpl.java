@@ -1,5 +1,6 @@
 package app.finup.layer.domain.stockChart.service;
 
+import app.finup.layer.domain.stock.api.AuthStockApiClient;
 import app.finup.layer.domain.stockChart.dto.StockChartDto;
 import app.finup.layer.domain.stockChart.enums.CandleType;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,12 +25,11 @@ import java.util.List;
 public class StockChartServiceImpl implements StockChartService {
     @Qualifier("kisClient")
     private final WebClient kisClient;
-
-    @Value("${api.kis.local.access-token}")
-    private String token;
+    private final AuthStockApiClient authStockApiClient;
 
     @Override
     public StockChartDto.Row inquireDaily(String code, CandleType candleType) {
+        String accessToken = authStockApiClient.getToken();
         String type = candleType.getKisCode();
         try {
             String json = kisClient.get()
@@ -40,7 +40,7 @@ public class StockChartServiceImpl implements StockChartService {
                             .queryParam("FID_PERIOD_DIV_CODE", type)
                             .queryParam("FID_ORG_ADJ_PRC", "0")
                             .build())
-                    .header("authorization", "Bearer " + token)
+                    .header("authorization", "Bearer " + accessToken)
                     .header("tr_id", "FHKST01010400")
                     .header("custtype", "P")
                     .retrieve()
