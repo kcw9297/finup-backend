@@ -53,6 +53,7 @@ public class NewsApiClientImpl implements NewsApiClient {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
+
     }
 
     //네이버가 제공한 내용 json으로 파싱
