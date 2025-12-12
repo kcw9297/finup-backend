@@ -1,7 +1,11 @@
 package app.finup.layer.domain.member.dto;
 
+import app.finup.layer.base.validation.annotation.Password;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.layer.domain.member.enums.MemberSocial;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.Objects;
@@ -67,5 +71,17 @@ public final class MemberDto {
             return pageSize;
         }
 
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Join {
+        @Email
+        private String email;
+
+        @Password
+        private String password;
     }
 }

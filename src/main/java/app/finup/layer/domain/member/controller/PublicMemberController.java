@@ -2,7 +2,7 @@ package app.finup.layer.domain.member.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.member.dto.MemberJoinDto;
+import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +30,8 @@ public class PublicMemberController {
      */
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@Valid @RequestBody MemberJoinDto.JoinMember rq) {
-        MemberJoinDto.JoinMember rp = memberService.join(rq);
+    public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
+        MemberDto.Join rp = memberService.join(rq);
         return Api.ok(rp);
     }
 }
