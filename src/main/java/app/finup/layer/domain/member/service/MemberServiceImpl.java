@@ -51,7 +51,7 @@ public class MemberServiceImpl implements MemberService {
     //  회원가입
     @Override
     @Transactional
-    public MemberJoinDto.JoinNember join(MemberJoinDto.JoinNember rq) {
+    public MemberJoinDto.JoinMember join(MemberJoinDto.JoinMember rq) {
 
         // 1) 이메일 중복 체크
         if (memberRepository.existsByEmail(rq.getEmail())) {
@@ -87,7 +87,7 @@ public class MemberServiceImpl implements MemberService {
         log.info("[MEMBER] join done memberId={}", newMember.getMemberId()); // 끝
 
 
-        MemberJoinDto.JoinNember newMemberJoinDto = MemberDtoMapper.toMemberJoinDto(newMember);
+        MemberJoinDto.JoinMember newMemberJoinDto = MemberDtoMapper.toMemberJoinDto(newMember);
 
         // 7) 인증 완료 마크 제거 (재사용 방지)
         try {

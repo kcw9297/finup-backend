@@ -13,7 +13,7 @@ public class MemberJoinDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class JoinNember {
+    public static class JoinMember {
         @NotBlank(message = "이메일은 필수입니다.")
         @Email(message = "이메일 형식이 올바르지 않습니다.")
         private String email;

@@ -32,5 +32,5 @@ public interface MemberService {
      *
      * @return 가입한 회원 정보
      */
-    MemberJoinDto.JoinNember join(MemberJoinDto.JoinNember rq);
+    MemberJoinDto.JoinMember join(MemberJoinDto.JoinMember rq);
 }

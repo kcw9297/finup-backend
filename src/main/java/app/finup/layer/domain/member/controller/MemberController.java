@@ -57,15 +57,6 @@ public class MemberController {
         // [2] 페이징 응답 전달
         return Api.ok(rows);
     }
-    /**
-     * 회원가입
-     * [POST]
-     */
 
-    @PostMapping
-    public ResponseEntity<?> join(@Valid @RequestBody MemberJoinDto.JoinNember rq) {
-        MemberJoinDto.JoinNember rp = memberService.join(rq);
-        return Api.ok(rp);
-    }
 
 }
