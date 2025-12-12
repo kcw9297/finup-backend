@@ -119,4 +119,15 @@ public class StockAiServiceImpl implements StockAiService {
         return youtubeList;
     }
 
+
+/*
+    @Override
+    public StockDto.YoutubeSearchResponse getYoutube(String keyword){
+        return null;
+    }
+
+    @Override
+    public void refreshYoutubeVideo(String keyword){
+
+    }*/
 }
