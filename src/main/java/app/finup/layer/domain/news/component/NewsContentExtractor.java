@@ -72,7 +72,7 @@ public class NewsContentExtractor {
             Element body = doc.body();
             String fallback = cleanText(body.text());
 
-            if (fallback.length() > 100) {
+            if (fallback.length() > 30) {
                 log.info("[EXTRACTOR] fallback 사용 url={}", url);
                 return fallback;
             }
