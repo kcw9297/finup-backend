@@ -2,6 +2,8 @@ package app.finup.layer.domain.stock.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 /**
  * 종목 DTO 클래스
  * @author lky
@@ -178,49 +180,59 @@ public class StockDto {
     }
 
     /**
-     * 종목 리스트 조회 RequestHeader를 담기 위해 사용
+     * 종목 추천 영상 유튜브 정보 담기 위해 사용
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class YoutubeVideo {
 
+        private String keyword;       // 키워드
+        private String videoId;       // 비디오ID
+        private String title;         // 제목
+        private String channelTitle;  // 채널명
+        private String thumbnailUrl;  // 썸네일
+
+    }
+
+    /**
+     *  API 원본 JSON 매핑 DTO
+     */
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public class Header {
-        private String contentType = "application/json; charset=utf-8";       // content-type
-        private String authorization;     // 접근토큰
-        private String appkey;            // 앱키
-        private String appsecret;         // 앱시크릿키
-        @Nullable
-        private String personalseckey;    // 고객식별키
-        private String trId;              // 거래ID
-        @Nullable
-        private String trCont;            // 연속 거래 여부
-        private String custtype;          // 고객 타입
-        @Nullable
-        private String seqNo;             // 일련번호
-        @Nullable
-        private String macAddress;        // 맥주소
-        @Nullable
-        private String phoneNumber;       // 핸드폰번호
-        @Nullable
-        private String ipAddr;            // 접속 단말 공인 IP
-        @Nullable
-        private String gtUid;             // Global UID
-    }*/
+    public static class YoutubeSearchResponse {
+        private List<Item> items;
 
-    /**
-     * 종목 리스트 조회 RequestQueryParam 담기 위해 사용
+        @Data
+        public static class Item {
+            private Id id;
+            private Snippet snippet;
+        }
 
-    @Data
-    public class RequestQueryParam {
-        private String fidInputPrice2;
-        private String fidCondMrktDivCode;
-        private String fidCondScrDivCode;
-        private String fidDivClsCode;
-        private String fidInputIscd;
-        private String fidTrgtClsCode;
-        private String fidTrgtExlsClsCode;
-        private String fidInputPrice1;
-        private String fidVolCnt;
-    } */
+        @Data
+        public static class Id {
+            private String videoId;
+        }
 
+        @Data
+        public static class Snippet {
+            private String title;
+            private String channelTitle;
+            private Thumbnails thumbnails;
+            private String description;
+        }
+
+        @Data
+        public static class Thumbnails {
+            private High high;
+        }
+
+        @Data
+        public static class High {
+            private String url;
+        }
+    }
 }

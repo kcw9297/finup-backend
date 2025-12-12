@@ -2,7 +2,6 @@ package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
-import app.finup.layer.domain.stock.dto.YoutubeVideoDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class StockApiClientImpl implements StockApiClient {
     private final WebClient youTubeClient;
     private final ObjectMapper objectMapper;
 
-    @Value("API_YOUTUBE_KEY")
+    @Value("${API_YOUTUBE_KEY}")
     private String API_YOUTUBE_KEY;
 
     /*api URI*/
@@ -158,8 +157,8 @@ public class StockApiClientImpl implements StockApiClient {
 
     //AI분석 키워드를 바탕으로 추천 유튜브 영상 가져오기
     @Override
-    public List<YoutubeVideoDto.YoutubeVideo> fetchYoutubeVideo(String keyword){
-        return youTubeClient.get()
+    public StockDto.YoutubeSearchResponse fetchYoutubeVideo(String keyword){
+        return  youTubeClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search")
                         .queryParam("part", "snippet")
@@ -169,21 +168,8 @@ public class StockApiClientImpl implements StockApiClient {
                         .queryParam("key", API_YOUTUBE_KEY)
                         .build())
                 .retrieve()
-                .bodyToMono(YoutubeVideoDto.YoutubeSearchResponse.class)
-                .map(this::convertToDtoList)
+                .bodyToMono(StockDto.YoutubeSearchResponse.class)
                 .block();
-    }
-
-    //유튜브 API 결과 데이터 가공해서 Dto 반환
-    private List<YoutubeVideoDto.YoutubeVideo> convertToDtoList(YoutubeVideoDto.YoutubeSearchResponse response) {
-        return response.getItems().stream()
-                .map(item -> YoutubeVideoDto.YoutubeVideo.builder()
-                        .videoId(item.getId().getVideoId())
-                        .title(item.getSnippet().getTitle())
-                        .channelTitle(item.getSnippet().getChannelTitle())
-                        .thumbnailUrl(item.getSnippet().getThumbnails().getHigh().getUrl())
-                        .build())
-                .toList();
     }
 
 }

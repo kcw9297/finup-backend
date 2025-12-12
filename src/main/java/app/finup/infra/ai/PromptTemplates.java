@@ -54,21 +54,20 @@ public class PromptTemplates {
         아래는 종목 데이터 필드들의 의미입니다. 분석 시 반드시 참고하세요.
         종목 데이터를 읽고 아래 JSON 형식으로 분석 결과를 생성하세요.      
         
-            만약 제공된 detail JSON 데이터가 비어 있거나 null 값만 포함하고 있다면,
-            아래 JSON 형식으로만 반환하고, 분석을 하지 마세요.
-            
-            {
-              "error": "데이터 전달받지 못함",
-              "summary": "",
-              "investmentPoint": "",
-              "riskFactors": "",
-              "valuationOpinion": "",
-              "foreignFlow": "",
-              "recommendYoutubeKeywords": [],
-              "keywords": [],
-              "description": ""
-            }
-            
+        만약 제공된 detail JSON 데이터가 비어 있거나 null 값만 포함하고 있다면,
+        아래 JSON 형식으로만 반환하고, 분석을 하지 마세요.
+        
+        {
+            "error": "데이터 전달받지 못함",
+            "summary": "",
+            "investmentPoint": "",   
+            "price": "",         
+            "valuation": "",
+            "flow": "",
+            "risk": "",
+            "youtubeKeywords": ["", "", "", ""],            
+            "description": ""        
+        }   
             추가 텍스트는 절대 포함하지 마세요.
         
         [필드 설명]

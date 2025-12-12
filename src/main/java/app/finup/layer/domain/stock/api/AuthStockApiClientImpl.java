@@ -4,6 +4,7 @@ import app.finup.layer.domain.stock.dto.TokenDto;
 import app.finup.layer.domain.stock.redis.AuthTokenStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,6 +21,7 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
     @Value("${api.kis.client.secret}")
     private String APP_SECRET;
 
+    @Qualifier("kisAuthClient")
     private final WebClient kisAuthClient;
     private final AuthTokenStorage authTokenStorage;
 

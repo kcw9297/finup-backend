@@ -1,9 +1,14 @@
 package app.finup.layer.domain.stock.dto;
 
-import app.finup.layer.domain.stock.entity.Stock;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.text.StringEscapeUtils;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Stocks api 데이터 -> DTO 매퍼 클래스
@@ -67,6 +72,19 @@ public class StockDtoMapper {
                 .shortOverYn(output.path("short_over_yn").asText())
                 .mangIssuClsCode(output.path("mang_issu_cls_code").asText())
 
+                .build();
+    }
+
+    public static StockDto.YoutubeVideo toYoutube(String keyword, StockDto.YoutubeSearchResponse response) {
+
+        StockDto.YoutubeSearchResponse.Item item = response.getItems().get(0);
+
+        return StockDto.YoutubeVideo.builder()
+                .keyword(keyword)
+                .videoId(item.getId().getVideoId())
+                .title(StringEscapeUtils.unescapeHtml4(item.getSnippet().getTitle()))
+                .channelTitle(StringEscapeUtils.unescapeHtml4(item.getSnippet().getChannelTitle()))
+                .thumbnailUrl(item.getSnippet().getThumbnails().getHigh().getUrl())
                 .build();
     }
 }

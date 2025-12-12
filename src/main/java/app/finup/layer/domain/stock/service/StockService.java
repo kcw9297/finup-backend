@@ -5,7 +5,7 @@ import app.finup.layer.domain.stock.dto.StockDto;
 import java.util.List;
 
 public interface StockService {
-    // 종목 상세페이지 시가총액 순위 가져오기
+    // 종목+탭 시가총액 순위 가져오기
     List<StockDto.MarketCapRow> getMarketCapRow();
 
     //List<StocksDto> getStocks();

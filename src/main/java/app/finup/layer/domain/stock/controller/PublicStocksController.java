@@ -64,7 +64,7 @@ public class PublicStocksController {
         return Api.ok(stockService.getStockNews(stockName, category));
     }
 
-    /*
+    /**
      * 종목 상세페이지 조회 API
      * [GET] stocks/detail/stock-ai/{code}
      * @param code 종목코드 // 문자열도 있음
