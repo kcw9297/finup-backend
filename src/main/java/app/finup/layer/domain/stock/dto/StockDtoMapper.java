@@ -3,6 +3,7 @@ package app.finup.layer.domain.stock.dto;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -74,28 +75,16 @@ public class StockDtoMapper {
                 .build();
     }
 
-    public static List<StockDto.YoutubeVideo> toYoutubeList(List<StockDto.YoutubeSearchResponse> responses) {
+    public static StockDto.YoutubeVideo toYoutube(String keyword, StockDto.YoutubeSearchResponse response) {
 
-        if (responses == null || responses.isEmpty()) {
-            return Collections.emptyList();
-        }
+        StockDto.YoutubeSearchResponse.Item item = response.getItems().get(0);
 
-        return responses.stream()
-                .map(response -> {
-                    if (response.getItems() == null || response.getItems().isEmpty()) {
-                        return null;
-                    }
-
-                    StockDto.YoutubeSearchResponse.Item item = response.getItems().get(0);
-
-                    return StockDto.YoutubeVideo.builder()
-                            .videoId(item.getId().getVideoId())
-                            .title(item.getSnippet().getTitle())
-                            .channelTitle(item.getSnippet().getChannelTitle())
-                            //.thumbnailUrl(item.getSnippet().getThumbnails())
-                            .build();
-                })
-                .filter(Objects::nonNull) // null 제거
-                .collect(Collectors.toList());
+        return StockDto.YoutubeVideo.builder()
+                .keyword(keyword)
+                .videoId(item.getId().getVideoId())
+                .title(StringEscapeUtils.unescapeHtml4(item.getSnippet().getTitle()))
+                .channelTitle(StringEscapeUtils.unescapeHtml4(item.getSnippet().getChannelTitle()))
+                .thumbnailUrl(item.getSnippet().getThumbnails().getHigh().getUrl())
+                .build();
     }
 }

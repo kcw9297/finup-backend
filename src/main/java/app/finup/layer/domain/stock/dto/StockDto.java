@@ -188,6 +188,7 @@ public class StockDto {
     @Builder
     public static class YoutubeVideo {
 
+        private String keyword;       // 키워드
         private String videoId;       // 비디오ID
         private String title;         // 제목
         private String channelTitle;  // 채널명

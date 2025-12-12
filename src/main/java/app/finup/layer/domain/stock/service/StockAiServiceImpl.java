@@ -4,12 +4,14 @@ import app.finup.infra.ai.AiManager;
 import app.finup.infra.ai.PromptTemplates;
 import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
+import app.finup.layer.domain.stock.dto.StockDtoMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,15 +49,19 @@ public class StockAiServiceImpl implements StockAiService {
             // 4) GPT JSON 요청
             Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
 
-            // 5) 유튜브 데이터 요청
-            List<StockDto.YoutubeVideo> youtube = getYoutubeVideo("주식 정보");
-            System.out.println("youtube :"+ youtube);
-            /*
+            // 5) keyword List 생성
+            List<String> keywordList = (List<String>) detailAi.get("youtubeKeywords");
+            System.out.println("키워드: "+keywordList);
+
+            // 6) 유튜브 데이터 요청
+            List<StockDto.YoutubeVideo> youtube = getYoutubeVideo(keywordList);
+            System.out.println("유튜브: "+youtube);
+
             return Map.of(
                     "detailAi", detailAi,
                     "youtube", youtube
-                    )*/
-            return detailAi;
+                    );
+            //return detailAi;
 
         } catch (Exception e) {
             log.error("AI 분석 생성 실패", e);
@@ -103,8 +109,15 @@ public class StockAiServiceImpl implements StockAiService {
         );
     }
 
-    private List<StockDto.YoutubeVideo> getYoutubeVideo(String keyword) {
-        return stockApiClient.fetchYoutubeVideo(keyword);
+    private List<StockDto.YoutubeVideo> getYoutubeVideo(List<String> keywordList) {
+        List<StockDto.YoutubeVideo> youtubeList = new ArrayList<>();
+
+        for (String keyword : keywordList) {
+            StockDto.YoutubeSearchResponse response = stockApiClient.fetchYoutubeVideo(keyword);
+            StockDto.YoutubeVideo youtube = StockDtoMapper.toYoutube(keyword, response);
+            youtubeList.add(youtube);
+        }
+        return youtubeList;
     }
 
 }
