@@ -17,16 +17,18 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class ExchangeRateApiClientImpl implements ExchangeRateApiClient {
+
     @Qualifier("keximClient")
     private final WebClient keximClient;
 
     @Value("${API_KEXIM_KEY}")
     private String apiKeximKey;
 
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter FMT =
+            DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Override
-    public List<ExchangeRateDto.Row> fetchRates(LocalDate searchDate) {
+    public List<ExchangeRateDto.ApiRow> fetchRates(LocalDate searchDate) {
         try {
             String json = keximClient.get()
                     .uri(uri -> uri
@@ -38,18 +40,20 @@ public class ExchangeRateApiClientImpl implements ExchangeRateApiClient {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
+
             return parseKeximJson(json);
-        }catch (Exception e){
+
+        } catch (Exception e) {
             log.error("KEXIM API 호출 실패: {}", e.getMessage());
             return List.of();
         }
     }
 
-    private List<ExchangeRateDto.Row> parseKeximJson(String json){
+    private List<ExchangeRateDto.ApiRow> parseKeximJson(String json) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            ExchangeRateDto.Row[] rows =
-                    mapper.readValue(json, ExchangeRateDto.Row[].class);
+            ExchangeRateDto.ApiRow[] rows =
+                    mapper.readValue(json, ExchangeRateDto.ApiRow[].class);
             return Arrays.asList(rows);
         } catch (Exception e) {
             log.error("JSON 파싱 실패: {}", e.getMessage());
