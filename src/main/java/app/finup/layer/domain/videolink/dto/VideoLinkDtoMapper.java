@@ -1,7 +1,6 @@
 package app.finup.layer.domain.videolink.dto;
 
 import app.finup.common.utils.FormatUtils;
-import app.finup.infra.youtube.dto.YouTube;
 import app.finup.layer.domain.videolink.entity.VideoLink;
 import lombok.*;
 
@@ -14,23 +13,20 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VideoLinkDtoMapper {
 
-   public static VideoLinkDto.Row toRow(VideoLink entity, YouTube.Detail video) {
+   public static VideoLinkDto.Row toRow(VideoLink entity) {
 
        return VideoLinkDto.Row.builder()
-
-               // 엔티티에 저장된 정보
                .videoLinkId(entity.getVideoLinkId())
                .videoId(entity.getVideoId())
                .videoUrl(entity.getVideoUrl())
-
-
-               // API에서 얻은 정보
-               .title(video.getTitle())
-               .duration(FormatUtils.formatDuration(video.getDuration()))
-               .thumbnailUrl(video.getThumbnailUrl())
-               .channelTitle(video.getChannelTitle())
-               .viewCount(video.getViewCount())
-               .likeCount(video.getLikeCount())
+               .title(entity.getTitle())
+               .duration(FormatUtils.formatDuration(entity.getDuration()))
+               .thumbnailUrl(entity.getThumbnailUrl())
+               .channelTitle(entity.getChannelTitle())
+               .publishedAt(entity.getPublishedAt())
+               .viewCount(entity.getViewCount())
+               .likeCount(entity.getLikeCount())
+               .tags(entity.getTags().toString())
                .build();
    }
 

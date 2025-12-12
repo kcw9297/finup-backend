@@ -27,6 +27,7 @@ public class VideoLinkScheduler {
      */
     @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
     public void syncVideoLinks() {
+        videoLinkService.sync();
         LogUtils.showInfo(this.getClass(), "학습 영상 동기화 수행 완료");
     }
 }

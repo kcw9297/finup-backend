@@ -2,6 +2,7 @@ package app.finup.layer.domain.videolink.dto;
 
 
 import app.finup.layer.base.dto.SearchRequest;
+import app.finup.layer.base.validation.annotation.YouTubeUrl;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -60,7 +61,7 @@ public final class VideoLinkDto {
     @NoArgsConstructor
     public static class Add {
 
-        // 사용자 입력 데이터 @YoutubeUrl 검증 애노테이션 추가 예정
+        @YouTubeUrl
         private String videoUrl;
     }
 
@@ -75,6 +76,8 @@ public final class VideoLinkDto {
     public static class Edit {
 
         private Long videoLinkId;
+
+        @YouTubeUrl
         private String videoUrl;
     }
 

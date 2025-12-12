@@ -2,8 +2,11 @@ package app.finup.layer.domain.videolink.repository;
 
 import app.finup.layer.domain.videolink.entity.VideoLink;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -17,4 +20,11 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
     boolean existsByVideoId(String videoId);
 
     List<VideoLink> findByLastSyncedAtBefore(LocalDateTime threshold);
+
+    @Modifying
+    @Query("""
+        DELETE FROM VideoLink vl
+        WHERE vl.videoId IN :videoIds
+    """)
+    void deleteByVideoIds(Collection<String> videoIds);
 }
