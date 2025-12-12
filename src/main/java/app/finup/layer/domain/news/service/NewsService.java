@@ -12,5 +12,4 @@ import java.util.Map;
  */
 public interface NewsService {
     List<NewsDto.Row> getNews(String category);
-    List<NewsDto.Row> getMainNews(String category);
 }

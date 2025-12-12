@@ -23,12 +23,6 @@ import java.util.*;
 @Transactional
 @RequiredArgsConstructor
 public class NewsServiceImpl implements NewsService {
-
-    private final NewsApiClient newsApiClient;
-    private final NewsRedisStorage newsRedisStorage;
-    private final NewsRemoveDuplicateService duplicateService;
-    private final NewsAiService newsAiService;
-    private final NewsContentExtractor extractor;
     private final NewsProvider newsProvider;
 
     /**
@@ -38,11 +32,6 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public List<NewsDto.Row> getNews(String category) {
         return newsProvider.getNews(category, 100);
-    }
-
-    @Override
-    public List<NewsDto.Row> getMainNews(String category) {
-        return newsProvider.getNews(category, 6);
     }
 
 
