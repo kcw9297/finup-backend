@@ -18,4 +18,11 @@ public class FinanceDictionaryDtoMapper {
                 .description(entity.getDescription())
                 .build();
     }
+
+    public static FinanceDictionary toEntity(FinanceDictionaryDto.Row row) {
+        return FinanceDictionary.builder()
+                .name(row.getName())
+                .description(row.getDescription())
+                .build();
+    }
 }

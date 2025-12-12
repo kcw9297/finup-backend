@@ -1,6 +1,7 @@
 package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.StockDto;
+import app.finup.layer.domain.stock.dto.YoutubeVideoDto;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
@@ -13,4 +14,5 @@ import java.util.List;
 public interface StockApiClient {
     List<StockDto.MarketCapRow> fetchMarketCapRow();
     JsonNode fetchDetail(String code);
+    List<YoutubeVideoDto.YoutubeVideo> fetchYoutubeVideo(String keyword);
 }

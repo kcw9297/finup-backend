@@ -2,7 +2,8 @@ package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.stock.api.AuthStockApiClient;
+import app.finup.layer.domain.stock.dto.StockDto;
+import app.finup.layer.domain.stock.service.StockAiService;
 import app.finup.layer.domain.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class PublicStocksController {
 
     private final StockService stockService;
+    private final StockAiService stockAiService;
 
     /**
      * 종목 리스트 페이지 시가총액 조회 API
@@ -62,4 +64,14 @@ public class PublicStocksController {
         return Api.ok(stockService.getStockNews(stockName, category));
     }
 
+    /*
+     * 종목 상세페이지 조회 API
+     * [GET] stocks/detail/stock-ai/{code}
+     * @param code 종목코드 // 문자열도 있음
+     */
+    @GetMapping("/detail/stock-ai/{code}")
+    public ResponseEntity<?> getStockAi(@PathVariable String code) {
+        StockDto.Detail detail = (stockService.getDetail(code));
+        return Api.ok(stockAiService.getStockAi(detail));
+    }
 }
