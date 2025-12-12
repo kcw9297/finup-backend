@@ -50,7 +50,7 @@ public class XmlToSqlConverter {
                 String desc = safe(i.getKsdFnceDictDescContent());
 
                 sb.append(String.format(
-                        "INSERT INTO finance_dictionary (name, description) VALUES ('%s', '%s');\n",
+                        "INSERT INTO words (name, description) VALUES ('%s', '%s');\n",
                         name, desc
                 ));
             }

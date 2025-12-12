@@ -1,12 +1,11 @@
 package app.finup.layer.domain.financeDictionary.entity;
 
-import app.finup.layer.base.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
-@Table(name = "finance_dictionary")
+@Table(name = "words")
 @DynamicUpdate
 @Getter
 @ToString

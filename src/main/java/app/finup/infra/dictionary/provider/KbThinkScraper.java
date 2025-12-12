@@ -141,8 +141,14 @@ public class KbThinkScraper {
                     By.cssSelector("div[class*='detail']")
             ));
 
-            WebElement content = driver.findElement(By.cssSelector("div.dictionary-view-comp__detail_desc"));
+            WebElement content = wait.until(
+                    ExpectedConditions.presenceOfElementLocated(
+                            By.cssSelector("div[class*='detail']")     // 핵심: 부분 매칭
+                    )
+            );
+
             return sanitize(content.getText());
+
         } catch (Exception e) {
             log.error("fetchDetail Error:", e);
             // log.debug("DETAIL PAGE SOURCE:\n{}", driver.getPageSource());
