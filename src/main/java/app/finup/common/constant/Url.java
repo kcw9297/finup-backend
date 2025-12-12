@@ -97,8 +97,12 @@ public class Url {
     public static final String ADMIN_DICTIONARY = ADMIN + DICTIONARY;
 
     /* home */
-    public static final String HOME = API + "/";
+    public static final String HOME = API + "/home";
     public static final String HOME_PUBLIC = PUBLIC + HOME;
+
+    /* exchange-rate */
+    public static final String EXCHANGE = "/exchange-rates";
+    public static final String HOME_EXCHANGE_PUBLIC = HOME_PUBLIC + EXCHANGE;
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */
