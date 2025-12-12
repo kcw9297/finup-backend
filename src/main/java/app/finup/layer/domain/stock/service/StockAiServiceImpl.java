@@ -46,10 +46,10 @@ public class StockAiServiceImpl implements StockAiService {
 
             // 4) GPT JSON 요청
             Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
-/*
+
             // 5) 유튜브 데이터 요청
             List<StockDto.YoutubeVideo> youtube = getYoutubeVideo("주식 정보");
-            System.out.println("youtube :"+ youtube);*/
+            System.out.println("youtube :"+ youtube);
             /*
             return Map.of(
                     "detailAi", detailAi,

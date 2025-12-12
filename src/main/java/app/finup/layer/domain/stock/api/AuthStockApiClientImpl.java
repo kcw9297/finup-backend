@@ -21,7 +21,7 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
     @Value("${api.kis.client.secret}")
     private String APP_SECRET;
 
-    //@Qualifier("kisAuthClient")
+    @Qualifier("kisAuthClient")
     private final WebClient kisAuthClient;
     private final AuthTokenStorage authTokenStorage;
 

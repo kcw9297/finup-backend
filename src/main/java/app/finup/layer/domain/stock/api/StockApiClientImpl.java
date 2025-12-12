@@ -19,7 +19,7 @@ import java.util.*;
 public class StockApiClientImpl implements StockApiClient {
 
     private final AuthStockApiClient authStockApiClient;
-    //@Qualifier("kisClient")
+    @Qualifier("kisClient")
     private final WebClient kisClient;
     @Qualifier("youTubeClient")
     private final WebClient youTubeClient;
