@@ -23,23 +23,23 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     @Override
     public List<ExchangeRateDto.Row> getLatestRates() {
+
         LocalDate searchDate = determineInitialSearchDate();
 
         for (int i = 0; i < MAX_FALLBACK_DAYS; i++) {
-
-            List<ExchangeRateDto.Row> rows = apiClient.fetchRates(searchDate);
-
-            if (isValid(rows)) {
-                return rows;
+            List<ExchangeRateDto.ApiRow> apiRows = apiClient.fetchRates(searchDate);
+            if (isValid(apiRows)) {
+                return apiRows.stream()
+                        .map(ExchangeRateDtoMapper::fromApi)
+                        .toList();
             }
-
             searchDate = searchDate.minusDays(1);
         }
-
-        throw new RuntimeException("환율 데이터 10일간 없음");
+        log.warn("환율 데이터 10일간 없음 → 빈 리스트 반환");
+        return List.of();
     }
 
-    /** 평일/주말/11시 이전 판단 */
+
     private LocalDate determineInitialSearchDate() {
 
         LocalDate today = LocalDate.now();
@@ -55,7 +55,7 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         return today;
     }
 
-    private boolean isValid(List<ExchangeRateDto.Row> rows) {
+    private boolean isValid(List<ExchangeRateDto.ApiRow> rows) {
         return rows != null
                 && !rows.isEmpty()
                 && rows.get(0).getDealBasR() != null
@@ -64,15 +64,21 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
 
     @Override
     public void updateRates() {
-        LocalDate searchDate = determineInitialSearchDate();
-        List<ExchangeRateDto.Row> apiRows = apiClient.fetchRates(searchDate);
 
-        for (ExchangeRateDto.Row dto : apiRows) {
-            String unit = dto.getCurUnit();
+        LocalDate searchDate = determineInitialSearchDate();
+        List<ExchangeRateDto.ApiRow> apiRows = apiClient.fetchRates(searchDate);
+
+        for (ExchangeRateDto.ApiRow apiRow : apiRows) {
+
+            String unit = apiRow.getCurUnit();
             if ("USD".equals(unit) || "JPY".equals(unit)) {
-                ExchangeRate entity = ExchangeRateDtoMapper.toEntity(dto);
+
+                ExchangeRate entity =
+                        ExchangeRateDtoMapper.toEntity(apiRow);
+
                 repository.save(entity);
-                log.info("환율 갱신: {} = {}", unit, dto.getDealBasR());
+
+                log.info("환율 갱신: {} = {}", unit, apiRow.getDealBasR());
             }
         }
     }

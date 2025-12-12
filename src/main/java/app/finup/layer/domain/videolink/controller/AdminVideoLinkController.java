@@ -24,10 +24,27 @@ public class AdminVideoLinkController {
 
     private final VideoLinkService videoLinkService;
 
+
+    /**
+     * 학습 영상 추가
+     * [POST] /video-links
+     * @param rq 영상 추가요청 DTO
+     */
+    @PostMapping
+    public ResponseEntity<?> add(@RequestBody VideoLinkDto.Add rq) {
+
+        // [1] 학습 영상 수정
+        videoLinkService.add(rq);
+
+        // [2] 성공 응답 반환
+        return Api.ok(AppStatus.VIDEO_LINK_OK_ADD);
+    }
+
+
     /**
      * 학습 영상 추가
      * [PUT] /video-links/{videoLinkId}
-     * @param rq 영상 추가요청 DTO
+     * @param rq 영상 갱신요청 DTO
      */
     @PutMapping("/{videoLinkId:[0-9]+}")
     public ResponseEntity<?> edit(@PathVariable Long videoLinkId,
@@ -35,10 +52,10 @@ public class AdminVideoLinkController {
 
         // [1] 학습 영상 수정
         rq.setVideoLinkId(videoLinkId);
-        videoLinkService.edit(rq);
+        VideoLinkDto.Row rp = videoLinkService.edit(rq);
 
-        // [2] 성공 응답 반환
-        return Api.ok(AppStatus.VIDEO_LINK_OK_EDIT);
+        // [2] 성공 응답 반환 (갱신 결과 전달)
+        return Api.ok(AppStatus.VIDEO_LINK_OK_EDIT, rp);
     }
 
 

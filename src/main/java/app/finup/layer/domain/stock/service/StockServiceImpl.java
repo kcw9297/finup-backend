@@ -6,6 +6,7 @@ import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
 import app.finup.layer.domain.stock.entity.Stock;
+import app.finup.layer.domain.stock.redis.StockStorage;
 import app.finup.layer.domain.stock.repository.StockRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +15,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * StockService 구현 클래스
@@ -34,13 +32,28 @@ public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final StockApiClient stockApiClient;
     private final NewsProvider newsProvider;
+    private final StockStorage stockStorage;
 
     // 종목 상세페이지 시가총액 순위 가져오기
     @Override
     public List<StockDto.MarketCapRow> getMarketCapRow() {
-        List<StockDto.MarketCapRow> marketCapRowList = stockApiClient.fetchMarketCapRow();
 
+        List<StockDto.MarketCapRow> marketCapRowList = stockStorage.getMarketCapRow();
+        if (marketCapRowList == null){
+            refreshMarketCapRow();
+            marketCapRowList = stockStorage.getMarketCapRow();
+            log.info("시가총액 리스트 갱신발급함");
+        }else{
+            log.info("시가총액 리스트 Redis에서 가져옴");
+        }
         return marketCapRowList;
+
+    }
+
+    @Override
+    public void refreshMarketCapRow(){
+        List<StockDto.MarketCapRow> marketCapRowList = stockApiClient.fetchMarketCapRow();
+        stockStorage.setMarketCapRow(marketCapRowList);
     }
 
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
@@ -82,6 +95,20 @@ public class StockServiceImpl implements StockService {
     // 종목 상세 페이지 데이터 가져오기
     @Override
     public StockDto.Detail getDetail(String code) {
+
+        StockDto.Detail detail = stockStorage.getDetail(code);
+        if (detail == null){
+            refreshDetail(code);
+            detail = stockStorage.getDetail(code);
+            log.info("종목 상세 정보 갱신발급함");
+        }else{
+            log.info("종목 상세 정보 Redis에서 가져옴");
+        }
+        return detail;
+    }
+
+    @Override
+    public void refreshDetail(String code){
         //System.out.println("요청 종목코드: [" + code + "]");
 
         //[1] 종목코드(String code)로 DB에서 한글 종목명 가져오기
@@ -113,13 +140,13 @@ public class StockServiceImpl implements StockService {
         //[3] dto 매핑하기
         StockDto.Detail detail = StockDtoMapper.toDetail(htsKorIsnm, jsonNode);
 
-        return detail;
+        stockStorage.setDetail(code, detail);
+
     }
 
     @Override
     public List<NewsDto.Row> getStockNews(String stockName, String category) {
         return newsProvider.getStockNews(stockName, category, 50);
     }
-
 }
 

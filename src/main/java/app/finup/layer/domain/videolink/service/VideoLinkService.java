@@ -34,8 +34,9 @@ public interface VideoLinkService {
     /**
      * 학습영상 링크 정보 변경 (정렬 순서를 바꾸지 않음)
      * @param rq 영상 추가요청 DTO
+     * @return 갱신된 결과 DTO (목록에서 직접 클릭하여 모달로 수정하므로, Row 반환)
      */
-    void edit(VideoLinkDto.Edit rq);
+    VideoLinkDto.Row edit(VideoLinkDto.Edit rq);
 
 
     /**

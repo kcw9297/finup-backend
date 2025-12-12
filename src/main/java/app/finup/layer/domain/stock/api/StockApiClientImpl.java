@@ -2,6 +2,7 @@ package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
+import app.finup.layer.domain.stock.redis.StockStorage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class StockApiClientImpl implements StockApiClient {
     @Qualifier("youTubeClient")
     private final WebClient youTubeClient;
     private final ObjectMapper objectMapper;
+    private final StockStorage stockStorage;
 
     @Value("${API_YOUTUBE_KEY}")
     private String API_YOUTUBE_KEY;
