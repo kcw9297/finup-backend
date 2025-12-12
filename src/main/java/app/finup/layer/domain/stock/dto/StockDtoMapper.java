@@ -1,6 +1,5 @@
 package app.finup.layer.domain.stock.dto;
 
-import app.finup.layer.domain.stock.entity.Stock;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

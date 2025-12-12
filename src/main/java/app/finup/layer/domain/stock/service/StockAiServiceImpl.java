@@ -4,7 +4,6 @@ import app.finup.infra.ai.AiManager;
 import app.finup.infra.ai.PromptTemplates;
 import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
-import app.finup.layer.domain.stock.dto.YoutubeVideoDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +102,7 @@ public class StockAiServiceImpl implements StockAiService {
         );
     }
 
-    private List<YoutubeVideoDto.YoutubeVideo> getYoutubeVideo(String keyword) {
+    private List<StockDto.YoutubeVideo> getYoutubeVideo(String keyword) {
         return stockApiClient.fetchYoutubeVideo(keyword);
     }
 
