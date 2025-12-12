@@ -59,11 +59,6 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void verifyJoinEmail(String email, String code) {
 
-        // [0] 이미 인증된 경우 방어
-        if (authRedisStorage.isVerified(email)) {
-            throw new BusinessException(AppStatus.AUTH_INVALID_REQUEST);
-        }
-
         // [1] Redis에서 저장된 코드 조회
         String savedCode = authRedisStorage.getEmailCode(email);
 

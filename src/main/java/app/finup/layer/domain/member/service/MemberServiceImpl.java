@@ -94,7 +94,7 @@ public class MemberServiceImpl implements MemberService {
         try {
             authRedisStorage.removeVerified(rq.getEmail());
         } catch (Exception e) {
-            log.warn("[MEMBER] removeVerified failed. email={}", rq.getEmail(), e);
+            log.warn("[MEMBER] Redis cleanup failed after join. email={}", rq.getEmail());
         }
 
         return newMemberJoinDto;
