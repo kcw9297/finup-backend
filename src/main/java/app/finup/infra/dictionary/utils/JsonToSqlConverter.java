@@ -60,7 +60,7 @@ public class JsonToSqlConverter {
                 desc = desc.replace("'", "''");
 
                 sb.append(String.format(
-                        "INSERT INTO finance_dictionary (name, description) VALUES ('%s', '%s');\n",
+                        "INSERT INTO words (name, description) VALUES ('%s', '%s');\n",
                         name, desc
                 ));
             }

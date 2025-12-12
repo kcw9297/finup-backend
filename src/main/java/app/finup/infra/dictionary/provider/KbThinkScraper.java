@@ -69,7 +69,7 @@ public class KbThinkScraper {
                             .equals("complete"));
 
             log.warn("=== AFTER PAGE LOAD ===");
-            log.warn(driver.getPageSource());   // 강제 출력
+            // log.warn(driver.getPageSource());   // 강제 출력
             log.warn("=== END ===");
 
             // [2] 실제 리스트가 생길 때까지 기다림 (검사 버튼 효과와 동일)
@@ -81,23 +81,31 @@ public class KbThinkScraper {
 
             for (WebElement item : items) {
 
-                String name = item.findElement(By.cssSelector(".dictionary-list-comp__list_title")).getText();
+                String name = item.findElement(By.cssSelector(".dictionary-list-comp__list__title")).getText();
 
                 String summary = "";
-                List<WebElement> enNames = item.findElements(By.cssSelector(".dictionary-list-comp__list_en"));
+                List<WebElement> enNames = item.findElements(By.cssSelector(".dictionary-list-comp__list__en"));
                 if (!enNames.isEmpty()) summary = enNames.get(0).getText();
 
-                String desc = item.findElement(By.cssSelector(".dictionary-list-comp__list_desc")).getText();
+                String desc = item.findElement(By.cssSelector(".dictionary-list-comp__list__desc")).getText();
+
+                // 상세 링크 가져오기
+                WebElement aTag = item.findElement(By.cssSelector("a[href]"));
+                String detailUrl = aTag.getDomAttribute("href");
+
+                if (detailUrl != null && detailUrl.startsWith("/")) {
+                    detailUrl = "https://kbthink.com" + detailUrl;
+                }
 
                 // KBThink는 detail 링크가 없을 수 있으므로 name을 key로 저장
-                termList.add(new TermSummary(name, summary + " " + desc, null));
+                termList.add(new TermSummary(name, summary + " " + desc, detailUrl));
             }
 
         } catch (Exception e) {
             log.error("fetchList Error:", e);
             try {
                 log.warn("=== PAGE SOURCE START ===");
-                log.warn(driver.getPageSource());
+//                log.warn(driver.getPageSource());
                 log.warn("=== PAGE SOURCE END ===");
             } catch (Exception ignore) {}
         } finally {
@@ -120,7 +128,7 @@ public class KbThinkScraper {
             // [1] 드라이버에 상세 페이지 전달
             driver.get(detailUrl);
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
             // [2] 페이지 로딩 완료
             wait.until(webDriver ->
                     ((JavascriptExecutor) webDriver)
@@ -129,14 +137,21 @@ public class KbThinkScraper {
 
             // [3] 실제 상세 설명이 렌더링될 때까지 기다림
             wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector("div.dictionary-view-comp__detail_desc")
+//                    By.cssSelector("div.dictionary-view-comp__detail_desc")
+                    By.cssSelector("div[class*='detail']")
             ));
 
-            WebElement content = driver.findElement(By.cssSelector("div.dictionary-view-comp__detail_desc"));
+            WebElement content = wait.until(
+                    ExpectedConditions.presenceOfElementLocated(
+                            By.cssSelector("div[class*='detail']")     // 핵심: 부분 매칭
+                    )
+            );
+
             return sanitize(content.getText());
+
         } catch (Exception e) {
             log.error("fetchDetail Error:", e);
-            log.debug("DETAIL PAGE SOURCE:\n{}", driver.getPageSource());
+            // log.debug("DETAIL PAGE SOURCE:\n{}", driver.getPageSource());
             return "";
         } finally {
             driver.quit();

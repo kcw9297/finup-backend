@@ -54,21 +54,20 @@ public class PromptTemplates {
         아래는 종목 데이터 필드들의 의미입니다. 분석 시 반드시 참고하세요.
         종목 데이터를 읽고 아래 JSON 형식으로 분석 결과를 생성하세요.      
         
-            만약 제공된 detail JSON 데이터가 비어 있거나 null 값만 포함하고 있다면,
-            아래 JSON 형식으로만 반환하고, 분석을 하지 마세요.
-            
-            {
-              "error": "데이터 전달받지 못함",
-              "summary": "",
-              "investmentPoint": "",
-              "riskFactors": "",
-              "valuationOpinion": "",
-              "foreignFlow": "",
-              "recommendYoutubeKeywords": [],
-              "keywords": [],
-              "description": ""
-            }
-            
+        만약 제공된 detail JSON 데이터가 비어 있거나 null 값만 포함하고 있다면,
+        아래 JSON 형식으로만 반환하고, 분석을 하지 마세요.
+        
+        {
+            "error": "데이터 전달받지 못함",
+            "summary": "",
+            "investmentPoint": "",   
+            "price": "",         
+            "valuation": "",
+            "flow": "",
+            "risk": "",
+            "youtubeKeywords": ["", "", "", ""],            
+            "description": ""        
+        }   
             추가 텍스트는 절대 포함하지 마세요.
         
         [필드 설명]
@@ -147,4 +146,47 @@ public class PromptTemplates {
         
         종목 데이터: {detail}            
         """;
+
+    public static final String CHART_ANALYSIS = """
+        당신은 초보 투자자에게 주식 차트를 쉽게 설명하는 금융 교육용 AI입니다.
+        당신의 목표는 사용자가 차트 흐름을 이해할 수 있도록 ‘명확하고 쉬운 설명’을 제공하는 것입니다.
+        매매 추천이나 가격 예측은 절대 하지 않습니다.
+        
+        [입력 데이터]
+        다음은 클라이언트가 전달한 차트 데이터입니다.
+        이 데이터는 이미 시간 순서대로 정렬되어 있으며, 총 {COUNT}개의 캔들로 구성됩니다.
+        
+        차트 주기(timeframe): {TIMEFRAME}
+        
+        캔들 데이터:
+        {CANDLES_JSON}
+        
+        [분석 지침]
+        1. timeframe에 따라 관점이 달라야 합니다.
+           - DAY  : 단기 흐름 중심 (최근 며칠의 변동)
+           - WEEK : 중기 추세 중심 (몇 주간의 방향성)
+           - MONTH: 장기 흐름 중심 (큰 방향과 추세 변화)
+        
+        2. 반드시 다음 항목을 포함해서 JSON으로 설명하세요.
+           - trend: 현재 전반적인 가격 흐름 (상승/하락/횡보 중심 설명)
+           - volatility: 최근 변동성 특징 (안정적/출렁임 여부 등)
+           - volumeAnalysis: 거래량과 가격의 관계 분석
+           - summary: 초보자에게 쉽게 설명하는 한 문단 요약
+           - timeframe: 입력값 그대로 반환
+        
+        3. 어려운 용어는 사용하지 마세요. 필요한 경우 짧게 풀어서 설명하세요.
+        4. 차트에서 실제로 보이는 정보만 기반으로 중립적으로 서술하세요.
+        5. JSON 외 단일 텍스트는 절대 출력하지 마세요.
+        
+        [출력 형식]
+        {
+          "trend": "...",
+          "volatility": "...",
+          "volumeAnalysis": "...",
+          "summary": "...",
+          "timeframe": "{TIMEFRAME}"
+        }
+        """;
+
+
 }
