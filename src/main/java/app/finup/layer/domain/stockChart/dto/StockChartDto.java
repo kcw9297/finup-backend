@@ -39,14 +39,7 @@ public class StockChartDto {
         private Double volumeMa20;
     }
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Ai{
-        private String symbol;
-        private String timeframe;
-        private List<CandleAi> candle;
-    }
+    //ai input용
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -59,10 +52,11 @@ public class StockChartDto {
         private long volume;
     }
 
+    //ai output용
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public class ChartAiResult {
+    public static class ChartAi {
 
         private String trend;          // 상승 / 하락 / 횡보
         private String volatility;     // 변동성 요약
