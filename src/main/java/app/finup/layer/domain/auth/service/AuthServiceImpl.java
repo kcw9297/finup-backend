@@ -25,6 +25,9 @@ public class AuthServiceImpl implements AuthService {
     // 회원가입 이메일 인증 코드 유효시간 (5분)
     private static final Duration JOIN_EMAIL_EXPIRATION = Duration.ofMinutes(5);
 
+    // 인증 완료 상태 유효시간 (10분)
+    private static final Duration JOIN_EMAIL_VERIFIED_TTL = Duration.ofMinutes(10);
+
     /**
      * 회원가입용 이메일 인증 코드 발송
      */
@@ -71,6 +74,9 @@ public class AuthServiceImpl implements AuthService {
 
         // 3. 성공 시 Redis에서 제거 (한 번만 사용)
         authRedisStorage.removeEmailCode(email);
+
+        // 4. 인증완료 마크 저장 (회원가입에서 검사할 근거)
+        authRedisStorage.markVerified(email, Duration.ofMinutes(10));
 
         log.info("[AUTH] 회원가입 이메일 인증 성공. email={}", email);
     }

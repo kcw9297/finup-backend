@@ -9,4 +9,11 @@ public interface AuthRedisStorage {
     String getEmailCode(String email);
 
     void removeEmailCode(String email);
+
+    boolean isVerified(String email);
+
+    void markVerified(String email, Duration ttl);
+
+    void removeVerified(String email);
+
 }
