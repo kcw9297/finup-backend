@@ -25,7 +25,6 @@ public class StockChartServiceImpl implements StockChartService {
     @Qualifier("kisClient")
     private final WebClient kisClient;
     private final AuthStockApiClient authStockApiClient;
-    private final StockChartAiService stockChartAiService;
 
     @Override
     public StockChartDto.Row inquireDaily(String code, CandleType candleType) {
