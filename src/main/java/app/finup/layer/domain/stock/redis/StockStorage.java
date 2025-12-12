@@ -1,9 +1,7 @@
 package app.finup.layer.domain.stock.redis;
 
 import app.finup.layer.domain.stock.dto.StockDto;
-
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * stock 관련 데이터 캐싱을 위한 저장 인터페이스
@@ -17,14 +15,14 @@ public interface StockStorage {
     List<StockDto.MarketCapRow> getMarketCapRow();
 
     // 종목 상세 페이지 종목 데이터
-    void setDetail(StockDto.Detail detail);
-    StockDto.Detail getDetail();
+    void setDetail(String code, StockDto.Detail detail);
+    StockDto.Detail getDetail(String code);
 
     //종목 상세 페이지 AI분석
-    void setDetailAi(Map<String, Object> detailAi);
-    Map<String, Object> getDetailAi();
+    void setDetailAi(String code, Map<String, Object> detailAi);
+    Map<String, Object> getDetailAi(String code);
 
     //종목 상세 페이지 추천영상
-    void setYoutube(List<StockDto.YoutubeVideo> youtube);
-    List<StockDto.YoutubeVideo> getYoutube(List<String> keywordList);
+    void setYoutube(String keyword, List<StockDto.YoutubeVideo> youtube);
+    List<StockDto.YoutubeVideo> getYoutube(String keyword);
 }
