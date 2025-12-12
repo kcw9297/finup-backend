@@ -19,13 +19,13 @@ import java.util.*;
 public class StockApiClientImpl implements StockApiClient {
 
     private final AuthStockApiClient authStockApiClient;
-    @Qualifier("kisClient")
+    //@Qualifier("kisClient")
     private final WebClient kisClient;
     @Qualifier("youTubeClient")
     private final WebClient youTubeClient;
     private final ObjectMapper objectMapper;
 
-    @Value("API_YOUTUBE_KEY")
+    @Value("${API_YOUTUBE_KEY}")
     private String API_YOUTUBE_KEY;
 
     /*api URI*/
@@ -164,7 +164,7 @@ public class StockApiClientImpl implements StockApiClient {
                         .queryParam("part", "snippet")
                         .queryParam("q", keyword)
                         .queryParam("type", "video")
-                        .queryParam("maxResults", 1)
+                        .queryParam("maxResults", 3)
                         .queryParam("key", API_YOUTUBE_KEY)
                         .build())
                 .retrieve()

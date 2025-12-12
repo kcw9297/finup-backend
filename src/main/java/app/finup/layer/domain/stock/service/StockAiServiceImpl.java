@@ -29,7 +29,7 @@ public class StockAiServiceImpl implements StockAiService {
     private final ObjectMapper objectMapper;
     private final StockApiClient stockApiClient;
 
-    //종목 분석 Ai 데이터 가져오기
+    //종목 분석 AI 데이터 가져오기(AI 정리, 추천 영상)
     @Override
     public Map<String, Object> getStockAi(StockDto.Detail detail) {
         try {
@@ -46,10 +46,11 @@ public class StockAiServiceImpl implements StockAiService {
 
             // 4) GPT JSON 요청
             Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
-    /*
+/*
             // 5) 유튜브 데이터 요청
-            List<YoutubeVideoDto.YoutubeVideo> youtube getYoutubeVideo(keyword);
-
+            List<StockDto.YoutubeVideo> youtube = getYoutubeVideo("주식 정보");
+            System.out.println("youtube :"+ youtube);*/
+            /*
             return Map.of(
                     "detailAi", detailAi,
                     "youtube", youtube

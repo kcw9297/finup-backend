@@ -4,6 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 /**
  * Stocks api 데이터 -> DTO 매퍼 클래스
  * @author lky
@@ -67,5 +72,30 @@ public class StockDtoMapper {
                 .mangIssuClsCode(output.path("mang_issu_cls_code").asText())
 
                 .build();
+    }
+
+    public static List<StockDto.YoutubeVideo> toYoutubeList(List<StockDto.YoutubeSearchResponse> responses) {
+
+        if (responses == null || responses.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return responses.stream()
+                .map(response -> {
+                    if (response.getItems() == null || response.getItems().isEmpty()) {
+                        return null;
+                    }
+
+                    StockDto.YoutubeSearchResponse.Item item = response.getItems().get(0);
+
+                    return StockDto.YoutubeVideo.builder()
+                            .videoId(item.getId().getVideoId())
+                            .title(item.getSnippet().getTitle())
+                            .channelTitle(item.getSnippet().getChannelTitle())
+                            //.thumbnailUrl(item.getSnippet().getThumbnails())
+                            .build();
+                })
+                .filter(Objects::nonNull) // null 제거
+                .collect(Collectors.toList());
     }
 }
