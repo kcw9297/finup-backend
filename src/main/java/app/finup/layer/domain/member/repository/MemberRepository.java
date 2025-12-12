@@ -20,4 +20,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         WHERE m.email = :email
     """)
     Optional<Member> findByEmailWithProfileImage(String email);
+    Optional<Member> findByEmail(String email);
+
+    boolean existsByEmail(String email);
 }
+

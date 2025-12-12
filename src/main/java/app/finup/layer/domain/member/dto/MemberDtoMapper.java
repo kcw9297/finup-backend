@@ -25,4 +25,9 @@ public class MemberDtoMapper {
                 .build();
     }
 
+    public static MemberJoinDto.JoinNember toMemberJoinDto(Member entity) {
+        return MemberJoinDto.JoinNember.builder()
+                .email(entity.getEmail())
+                .build();
+    }
 }
