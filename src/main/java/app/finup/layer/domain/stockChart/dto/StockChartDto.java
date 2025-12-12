@@ -38,4 +38,37 @@ public class StockChartDto {
         private Double volumeMa5;
         private Double volumeMa20;
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Ai{
+        private String symbol;
+        private String timeframe;
+        private List<CandleAi> candle;
+    }
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CandleAi{
+        private String date;
+        private int open;
+        private int high;
+        private int low;
+        private int close;
+        private long volume;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class ChartAiResult {
+
+        private String trend;          // 상승 / 하락 / 횡보
+        private String volatility;     // 변동성 요약
+        private String volumeAnalysis; // 거래량 해석
+        private String summary;        // 초보자용 한 문단 설명
+
+        private String timeframe;      // DAY / WEEK / MONTH
+    }
 }

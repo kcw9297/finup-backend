@@ -147,4 +147,7 @@ public class PromptTemplates {
         
         종목 데이터: {detail}            
         """;
+    public static final String CHART_ANALYSIS = """
+            
+            """;
 }
