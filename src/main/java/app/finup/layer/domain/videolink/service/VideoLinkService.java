@@ -1,9 +1,7 @@
 package app.finup.layer.domain.videolink.service;
 
+import app.finup.common.dto.Page;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
-import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
-
-import java.util.List;
 
 /**
  * 학습 영상 서비스 인터페이스
@@ -14,10 +12,10 @@ public interface VideoLinkService {
 
     /**
      * 특정 자원에 속하는 학습 영상 목록 조회
-     * @param ownerId 소유자 고유번호(PK)
-     * @param videoLinkOwner 소유자 정보 (HOME, STUDY, ...)
+     * @param rq 영상 검색요청 DTO
+     * @return 페이징된 영상 목록 DTO
      */
-    List<VideoLinkDto.Row> getList(Long ownerId, VideoLinkOwner videoLinkOwner);
+    Page<VideoLinkDto.Row> getPagedList(VideoLinkDto.Search rq);
 
 
     /**
@@ -28,10 +26,9 @@ public interface VideoLinkService {
 
 
     /**
-     * 학습영상 순서 재정렬(변경)
-     * @param rq 영상 재정렬 요청 DTO
+     * 학습영상 정보 동기화 (마지막 동기화 시점 기준으로 판단)
      */
-    void reorder(VideoLinkDto.Reorder rq);
+    void sync();
 
 
     /**
@@ -42,7 +39,7 @@ public interface VideoLinkService {
 
 
     /**
-     * 학습영상 삭재
+     * 학습영상 삭제
      * @param videoLinkId 학습영상 링크 번호
      */
     void remove(Long videoLinkId);

@@ -1,15 +1,15 @@
 package app.finup.layer.domain.videolink.entity;
 
+import app.finup.infra.jpa.converter.DurationConverter;
+import app.finup.infra.jpa.converter.StringListConverter;
 import app.finup.layer.base.entity.BaseEntity;
-import app.finup.layer.base.inter.Reorderable;
-import app.finup.layer.domain.study.entity.Study;
-import app.finup.layer.domain.member.entity.Member;
-import app.finup.layer.domain.videolink.enums.VideoLinkOwner;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 학습용 영상 링크 엔티티 클래스
@@ -25,18 +25,11 @@ import org.hibernate.annotations.OnDeleteAction;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class VideoLink extends BaseEntity implements Reorderable {
+public class VideoLink extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long videoLinkId;
-
-    @Column(updatable = false) // HOME이 소유주인 경우 null
-    private Long ownerId; // 소유주는 갱신 불가
-
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false, updatable = false)
-    private VideoLinkOwner videoLinkOwner; // 소유주는 갱신 불가
 
     @Column(nullable = false)
     private String videoUrl;
@@ -45,34 +38,79 @@ public class VideoLink extends BaseEntity implements Reorderable {
     private String videoId; // youtube video Id 등 영상 고유 번호
 
     @Column(nullable = false)
-    private Double displayOrder;  // 정렬 순서
+    private String title;
+
+    @Column(nullable = false)
+    private String thumbnailUrl;
+
+    @Column(nullable = false)
+    private String channelTitle;
+
+    @Convert(converter = DurationConverter.class) // 컨버터를 이용한 변환
+    @Column(nullable = false)
+    private Duration duration;
+
+    @Column(nullable = false)
+    private LocalDateTime publishedAt;
+
+    @Column(nullable = false)
+    private LocalDateTime lastSyncedAt; // 마지막 동기화 시간
+
+    @Column(nullable = false)
+    private Long viewCount;
+
+    @Column(nullable = false)
+    private Long likeCount;
+
+    @Convert(converter = StringListConverter.class)
+    @Column(columnDefinition = "json")
+    private List<String> tags; // JSON 문자열로 저장된 태그 정보
 
     @Builder
-    public VideoLink(Long ownerId, VideoLinkOwner videoLinkOwner, String videoUrl, String videoId, Double displayOrder) {
-        this.ownerId = ownerId;
-        this.videoLinkOwner = videoLinkOwner;
+    public VideoLink(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, Duration duration, LocalDateTime publishedAt, Long viewCount, Long likeCount, List<String> tags) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
-        this.displayOrder = displayOrder;
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
+        this.channelTitle = channelTitle;
+        this.duration = duration;
+        this.publishedAt = publishedAt;
+        this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.tags = tags;
+        setDefault();
+    }
+
+    // 초기값
+    private void setDefault() {
+        this.lastSyncedAt = LocalDateTime.now();
     }
 
     /* 엔티티 메소드 */
 
     /**
-     * 비디오 링크정보 갱신
+     * 비디오 링크 갱신
      * @param videoUrl 비디오 Full URL
      * @param videoId 비디오 아이디 (API 에서 얻어온 번호)
+     * @param title 유튜브 영상 제목
+     * @param thumbnailUrl 썸네일 이미지 주소
+     * @param channelTitle 유튜브 채널명
+     * @param duration 유튜브 영상 재생시간
+     * @param tags 비디오 태그 정보 (JSON 문자열로 DB에 저장)
      */
-    public void edit(String videoUrl, String videoId) {
+    public void edit(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, Duration duration, Long viewCount, Long likeCount, List<String> tags) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
+        this.channelTitle = channelTitle;
+        this.duration = duration;
+        this.lastSyncedAt = LocalDateTime.now();
+        this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.tags = tags;
     }
 
-    // 정렬 순서 변경
-    @Override
-    public void reorder(Double displayOrder) {
-        this.displayOrder = displayOrder;
-    }
 }
 
 

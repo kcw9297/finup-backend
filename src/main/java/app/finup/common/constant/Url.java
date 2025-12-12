@@ -95,6 +95,10 @@ public class Url {
     /* dictionary */
     public static final String DICTIONARY = API + "/dict";
     public static final String ADMIN_DICTIONARY = ADMIN + DICTIONARY;
+
+    /* home */
+    public static final String HOME = API + "/";
+    public static final String HOME_PUBLIC = PUBLIC + HOME;
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */
