@@ -59,23 +59,28 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public void verifyJoinEmail(String email, String code) {
 
-        // 1. Redis에서 저장된 코드 조회
+        // [0] 이미 인증된 경우 방어
+        if (authRedisStorage.isVerified(email)) {
+            throw new BusinessException(AppStatus.AUTH_INVALID_REQUEST);
+        }
+
+        // [1] Redis에서 저장된 코드 조회
         String savedCode = authRedisStorage.getEmailCode(email);
 
-        // 저장된 코드가 없으면 (TTL 만료 or 요청 없음)
+        // [1-1] 저장된 코드가 없으면 (TTL 만료 or 요청 없음)
         if (savedCode == null) {
             throw new BusinessException(AppStatus.AUTH_INVALID_REQUEST);
         }
 
-        // 2. 코드 일치 여부 확인
+        // [1-2] 코드 일치 여부 확인
         if (!savedCode.equals(code)) {
             throw new BusinessException(AppStatus.AUTH_INVALID_REQUEST);
         }
 
-        // 3. 성공 시 Redis에서 제거 (한 번만 사용)
+        // [2] 성공 시 Redis에서 제거 (한 번만 사용)
         authRedisStorage.removeEmailCode(email);
 
-        // 4. 인증완료 마크 저장 (회원가입에서 검사할 근거)
+        // [3] 인증완료 마크 저장 (회원가입에서 검사할 근거)
         authRedisStorage.markVerified(email, Duration.ofMinutes(10));
 
         log.info("[AUTH] 회원가입 이메일 인증 성공. email={}", email);
