@@ -24,14 +24,20 @@ public final class WordsDto {
     @Data
     @AllArgsConstructor
     public static class Search {
-        private String keyword;
         private Integer pageNum;
         private Integer pageSize;
+
+        private String keyword;
+        private String filter;
+        private String order;
+
 
         public Search() {
             this.keyword = "";
             this.pageNum = 0;
             this.pageSize = 20;
+            this.filter = "";
+            this.order = "latest";
         }
 
         public Integer getOffset() {

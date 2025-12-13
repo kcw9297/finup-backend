@@ -31,7 +31,7 @@ public class WordsController {
 
     /**
      * 단어 검색 API
-     * [GET] /api/dict/search
+     * [GET] /api/words/search
      * @param rq 게시글 검색 요청 DTO
      */
 

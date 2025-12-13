@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="app.finup.layer.domain.words.mapper.WordsMapper">
+    <select id="search" resultType="WordsRow">
+        SELECT
+        w.term_id     AS id,
+        w.name        AS `name`,
+        w.description AS `description`
+        FROM words w
+        WHERE 1 = 1
+        <if test="filter neq null and keyword neq null and keyword neq ''">
+            <choose>
+                <when test="filter eq 'name'">
+                    AND w.name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'description'">
+                    AND w.description LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'nameDescription'">
+                    AND (
+                    w.name LIKE CONCAT('%', #{keyword}, '%')
+                    OR w.description LIKE CONCAT('%', #{keyword}, '%')
+                    )
+                </when>
+            </choose>
+        </if>
+
+        ORDER BY
+        <trim suffixOverrides=",">
+            <choose>
+                <when test="order neq null and order neq ''">
+                    <choose>
+                        <when test="order eq 'latest'">
+                            w.term_id DESC,
+                        </when>
+                        <when test="order eq 'oldest'">
+                            w.term_id,
+                        </when>
+                        <otherwise>
+                            w.term_id DESC,
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    w.term_id DESC,
+                </otherwise>
+            </choose>
+        </trim>
+
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countBySearch" resultType="int">
+        SELECT COUNT(*)
+        FROM words w
+        WHERE 1 = 1
+        <if test="filter neq null and keyword neq null and keyword neq ''">
+            <choose>
+                <when test="filter eq 'name'">
+                    AND w.name LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'description'">
+                    AND w.description LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="filter eq 'nameDescription'">
+                    AND (
+                    w.name LIKE CONCAT('%', #{keyword}, '%')
+                    OR w.description LIKE CONCAT('%', #{keyword}, '%')
+                    )
+                </when>
+            </choose>
+        </if>
+    </select>
+</mapper>

@@ -9,12 +9,15 @@ import app.finup.infra.words.provider.WordsProvider;
 import app.finup.infra.words.provider.KbThinkScraper;
 import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.entity.Words;
+import app.finup.layer.domain.words.mapper.WordsMapper;
 import app.finup.layer.domain.words.repository.WordsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -24,7 +27,8 @@ import java.util.List;
 public class WordsServiceImpl implements WordsService {
 
     private final WordsProvider dictionaryProvider;
-    private final WordsRepository WordsRepository;
+    private final WordsRepository wordsRepository;
+    private final WordsMapper wordsMapper;
     private final KbThinkScraper kbThinkScraper;
 
     @Override
@@ -42,7 +46,7 @@ public class WordsServiceImpl implements WordsService {
 
         // [2] DB 저장 (Upsert) 객체 생성 후 저장
         for (WordsProviderDto.Row row : rows) {
-            WordsRepository.save(
+            wordsRepository.save(
                             Words.builder()
                                     .name(row.getName())
                                     .description(row.getDescription())
@@ -55,13 +59,27 @@ public class WordsServiceImpl implements WordsService {
     @Override
     @Transactional(readOnly = true)
     public Page<WordsDto.Row> search(WordsDto.Search rq) {
-        return null;
+
+        // 키워드 없을 때도 빈 페이지 반환
+        if (rq == null || !StringUtils.hasText(rq.getKeyword())) {
+            return Page.of(
+                    Collections.emptyList(),
+                    0,
+                    rq.getPageNum(),
+                    rq.getPageSize()
+            );
+        }
+
+        List<WordsDto.Row> rows = wordsMapper.search(rq);
+        Integer totalCount = wordsMapper.countBySearch(rq);
+
+        return Page.of(rows, totalCount, rq.getPageNum(), rq.getPageSize());
     }
 
     @Override
     @Transactional(readOnly = true)
     public Boolean isInitialized() {
-        return WordsRepository.count() > 0;
+        return wordsRepository.count() > 0;
     }
 
     @Override
@@ -81,10 +99,10 @@ public class WordsServiceImpl implements WordsService {
                 String detail = kbThinkScraper.fetchDetail(item.getDetailUrl());
 
                 // 중복 확인 후 저장
-                WordsRepository.findByName(item.getName())
+                wordsRepository.findByName(item.getName())
                         .ifPresentOrElse(
                                 entity -> entity.updateDescription(detail),
-                                () -> WordsRepository.save(
+                                () -> wordsRepository.save(
                                         Words.builder()
                                                 .name(item.getName())
                                                 .description(detail)
