@@ -1,4 +1,4 @@
-package app.finup.layer.domain.financeDictionary.dto;
+package app.finup.layer.domain.words.dto;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import lombok.*;
  */
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FinanceDictionaryDto {
+public final class WordsDto {
 
     @Data
     @AllArgsConstructor

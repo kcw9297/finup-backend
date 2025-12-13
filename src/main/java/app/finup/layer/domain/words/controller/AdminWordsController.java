@@ -1,9 +1,9 @@
-package app.finup.layer.domain.financeDictionary.controller;
+package app.finup.layer.domain.words.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.financeDictionary.service.FinanceDictionaryService;
+import app.finup.layer.domain.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(Url.ADMIN_DICTIONARY)
 @RequiredArgsConstructor
-public class AdminFinanceDictionaryController {
+public class AdminWordsController {
 
-    private final FinanceDictionaryService financeDictionaryService;
+    private final WordsService financeDictionaryService;
 
     /**
      * 금융 용어 초기 적재 (1회 전용)

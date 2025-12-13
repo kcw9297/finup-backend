@@ -1,11 +1,11 @@
-package app.finup.layer.domain.financeDictionary.controller;
+package app.finup.layer.domain.words.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.dto.Page;
 import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDto;
-import app.finup.layer.domain.financeDictionary.service.FinanceDictionaryService;
+import app.finup.layer.domain.words.dto.WordsDto;
+import app.finup.layer.domain.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(Url.DICTIONARY)
 @RequiredArgsConstructor
-public class FinanceDictionaryController {
+public class WordsController {
 
-    private final FinanceDictionaryService financeDictionaryService;
+    private final WordsService financeDictionaryService;
 
 
     /**
@@ -36,9 +36,9 @@ public class FinanceDictionaryController {
      */
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(FinanceDictionaryDto.Search rq) {
+    public ResponseEntity<?> search(WordsDto.Search rq) {
         // [1] 요청
-        Page<FinanceDictionaryDto.Row> rp = financeDictionaryService.search(rq);
+        Page<WordsDto.Row> rp = financeDictionaryService.search(rq);
         // [2] 페이징 응답 전달
         return Api.ok(rp.getRows(), Pagination.of(rp));
     }

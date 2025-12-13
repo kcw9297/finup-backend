@@ -1,4 +1,4 @@
-package app.finup.infra.dictionary.dto;
+package app.finup.infra.words.dto;
 
 
 import lombok.*;
@@ -10,7 +10,7 @@ import lombok.*;
  */
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DictionaryProviderDto {
+public class WordsProviderDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor

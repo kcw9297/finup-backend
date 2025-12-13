@@ -1,16 +1,15 @@
-package app.finup.layer.domain.financeDictionary.service;
+package app.finup.layer.domain.words.service;
 
 
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.ProviderException;
-import app.finup.infra.dictionary.dto.DictionaryProviderDto;
-import app.finup.infra.dictionary.provider.DictionaryProvider;
-import app.finup.infra.dictionary.provider.KbThinkScraper;
-import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDto;
-import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDtoMapper;
-import app.finup.layer.domain.financeDictionary.entity.FinanceDictionary;
-import app.finup.layer.domain.financeDictionary.repository.FinanceDictionaryRepository;
+import app.finup.infra.words.dto.WordsProviderDto;
+import app.finup.infra.words.provider.WordsProvider;
+import app.finup.infra.words.provider.KbThinkScraper;
+import app.finup.layer.domain.words.dto.WordsDto;
+import app.finup.layer.domain.words.entity.Words;
+import app.finup.layer.domain.words.repository.WordsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,10 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class FinanceDictionaryServiceImpl implements FinanceDictionaryService {
+public class WordsServiceImpl implements WordsService {
 
-    private final DictionaryProvider dictionaryProvider;
-    private final FinanceDictionaryRepository financeDictionaryRepository;
+    private final WordsProvider dictionaryProvider;
+    private final WordsRepository WordsRepository;
     private final KbThinkScraper kbThinkScraper;
 
     @Override
@@ -38,13 +37,13 @@ public class FinanceDictionaryServiceImpl implements FinanceDictionaryService {
 
 
         // [1] Provider 호출 → 외부 API에서 name + description 가져옴
-        List<DictionaryProviderDto.Row> rows = dictionaryProvider.fetchTerms();
+        List<WordsProviderDto.Row> rows = dictionaryProvider.fetchTerms();
         log.info("금융 용어 {}건 수집", rows.size());
 
         // [2] DB 저장 (Upsert) 객체 생성 후 저장
-        for (DictionaryProviderDto.Row row : rows) {
-            financeDictionaryRepository.save(
-                            FinanceDictionary.builder()
+        for (WordsProviderDto.Row row : rows) {
+            WordsRepository.save(
+                            Words.builder()
                                     .name(row.getName())
                                     .description(row.getDescription())
                                     .build()
@@ -55,14 +54,14 @@ public class FinanceDictionaryServiceImpl implements FinanceDictionaryService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<FinanceDictionaryDto.Row> search(FinanceDictionaryDto.Search rq) {
+    public Page<WordsDto.Row> search(WordsDto.Search rq) {
         return null;
     }
 
     @Override
     @Transactional(readOnly = true)
     public Boolean isInitialized() {
-        return financeDictionaryRepository.count() > 0;
+        return WordsRepository.count() > 0;
     }
 
     @Override
@@ -82,11 +81,11 @@ public class FinanceDictionaryServiceImpl implements FinanceDictionaryService {
                 String detail = kbThinkScraper.fetchDetail(item.getDetailUrl());
 
                 // 중복 확인 후 저장
-                financeDictionaryRepository.findByName(item.getName())
+                WordsRepository.findByName(item.getName())
                         .ifPresentOrElse(
                                 entity -> entity.updateDescription(detail),
-                                () -> financeDictionaryRepository.save(
-                                        FinanceDictionary.builder()
+                                () -> WordsRepository.save(
+                                        Words.builder()
                                                 .name(item.getName())
                                                 .description(detail)
                                                 .build()

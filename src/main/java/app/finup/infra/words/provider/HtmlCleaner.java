@@ -1,4 +1,4 @@
-package app.finup.infra.dictionary.provider;
+package app.finup.infra.words.provider;
 
 
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
-package app.finup.infra.dictionary.dto;
+package app.finup.infra.words.dto;
 
 
-import app.finup.infra.dictionary.utils.XmlAndJsonDtoUtil;
+import app.finup.infra.words.utils.XmlAndJsonDtoUtil;
 import lombok.Data;
 
 /**

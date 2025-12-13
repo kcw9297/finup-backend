@@ -1,4 +1,4 @@
-package app.finup.layer.domain.financeDictionary.entity;
+package app.finup.layer.domain.words.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class FinanceDictionary {
+public class Words {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +25,7 @@ public class FinanceDictionary {
     private String description;
 
     @Builder
-    public FinanceDictionary(String name, String description) {
+    public Words(String name, String description) {
         this.name = name;
         this.description = description;
     }

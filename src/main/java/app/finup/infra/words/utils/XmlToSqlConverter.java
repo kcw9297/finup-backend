@@ -1,4 +1,4 @@
-package app.finup.infra.dictionary.utils;
+package app.finup.infra.words.utils;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
-package app.finup.layer.domain.financeDictionary.service;
+package app.finup.layer.domain.words.service;
 
 import app.finup.common.dto.Page;
-import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDto;
+import app.finup.layer.domain.words.dto.WordsDto;
 
 /**
  * 금융 용어 사전 비즈니스 로직 인터페이스
@@ -9,7 +9,7 @@ import app.finup.layer.domain.financeDictionary.dto.FinanceDictionaryDto;
  * @since 2025-12-10
  */
 
-public interface FinanceDictionaryService {
+public interface WordsService {
 
     /**
     * 금융 용어 사전 초기 적재 및 갱신
@@ -21,7 +21,7 @@ public interface FinanceDictionaryService {
      * @param rq 검색 요청 DTO (filter, keyword, pageNum, pageSize 포함)
      * @return 페이징된 검색 결과(용어 목록) DTO 리스트
      */
-    Page<FinanceDictionaryDto.Row> search(FinanceDictionaryDto.Search rq);
+    Page<WordsDto.Row> search(WordsDto.Search rq);
 
 
     /**

@@ -1,6 +1,6 @@
-package app.finup.layer.domain.financeDictionary.dto;
+package app.finup.layer.domain.words.dto;
 
-import app.finup.layer.domain.financeDictionary.entity.FinanceDictionary;
+import app.finup.layer.domain.words.entity.Words;
 import lombok.*;
 
 /**
@@ -10,17 +10,17 @@ import lombok.*;
  */
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FinanceDictionaryDtoMapper {
-    public static FinanceDictionaryDto.Row toRow(FinanceDictionary entity) {
-        return FinanceDictionaryDto.Row.builder()
+public class WordsDtoMapper {
+    public static WordsDto.Row toRow(Words entity) {
+        return WordsDto.Row.builder()
                 .termId(entity.getTermId())
                 .name(entity.getName())
                 .description(entity.getDescription())
                 .build();
     }
 
-    public static FinanceDictionary toEntity(FinanceDictionaryDto.Row row) {
-        return FinanceDictionary.builder()
+    public static Words toEntity(WordsDto.Row row) {
+        return Words.builder()
                 .name(row.getName())
                 .description(row.getDescription())
                 .build();

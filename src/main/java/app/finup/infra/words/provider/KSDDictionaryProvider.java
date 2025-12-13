@@ -1,10 +1,10 @@
-package app.finup.infra.dictionary.provider;
+package app.finup.infra.words.provider;
 
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.ProviderException;
-import app.finup.infra.dictionary.dto.DictionaryProviderDto;
-import app.finup.infra.dictionary.dto.KsdApiResponse;
-import app.finup.infra.dictionary.utils.XmlAndJsonDtoUtil;
+import app.finup.infra.words.dto.WordsProviderDto;
+import app.finup.infra.words.dto.KsdApiResponse;
+import app.finup.infra.words.utils.XmlAndJsonDtoUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.*;
@@ -19,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class KSDDictionaryProvider implements DictionaryProvider {
+public class KSDDictionaryProvider implements WordsProvider {
 
     private final RestTemplate restTemplate;
     private final XmlMapper xmlMapper;
@@ -29,7 +29,7 @@ public class KSDDictionaryProvider implements DictionaryProvider {
     private String apiKey;
 
     @Override
-    public List<DictionaryProviderDto.Row> fetchTerms() {
+    public List<WordsProviderDto.Row> fetchTerms() {
         // [1] API 호출
         String rp = requestApi();
         log.info("★ KSD 응답 원문:\n{}", rp);
@@ -105,8 +105,8 @@ public class KSDDictionaryProvider implements DictionaryProvider {
     /**
      * [4] Item → 내부 Row DTO 변환 + HTML 정제
      */
-    private DictionaryProviderDto.Row convertToRow(XmlAndJsonDtoUtil.Item item) {
-        return DictionaryProviderDto.Row.builder()
+    private WordsProviderDto.Row convertToRow(XmlAndJsonDtoUtil.Item item) {
+        return WordsProviderDto.Row.builder()
                 .name(HtmlCleaner.escapeSql(HtmlCleaner.clean(item.getFnceDictNm())
                         )
                 )

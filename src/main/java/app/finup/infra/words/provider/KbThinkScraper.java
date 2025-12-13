@@ -1,11 +1,8 @@
-package app.finup.infra.dictionary.provider;
+package app.finup.infra.words.provider;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -16,7 +13,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +133,7 @@ public class KbThinkScraper {
 
             // [3] 실제 상세 설명이 렌더링될 때까지 기다림
             wait.until(ExpectedConditions.presenceOfElementLocated(
-//                    By.cssSelector("div.dictionary-view-comp__detail_desc")
+//                    By.cssSelector("div.words-view-comp__detail_desc")
                     By.cssSelector("div[class*='detail']")
             ));
 
