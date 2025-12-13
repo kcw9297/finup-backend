@@ -2,7 +2,9 @@ package app.finup.layer.domain.words.repository;
 
 import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.entity.Words;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;

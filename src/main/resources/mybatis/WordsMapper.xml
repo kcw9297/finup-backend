@@ -33,22 +33,35 @@
             <choose>
                 <when test="order neq null and order neq ''">
                     <choose>
-                        <when test="order eq 'latest'">
-                            w.term_id DESC,
+                        <!-- 가나다순 -->
+                        <when test="order eq 'name_asc'">
+                            w.name ASC,
                         </when>
-                        <when test="order eq 'oldest'">
-                            w.term_id,
+
+                        <!-- 가나다 역순 -->
+                        <when test="order eq 'name_desc'">
+                            w.name DESC,
                         </when>
+
+                        <!-- 용어 짧은 순 -->
+                        <when test="order eq 'name_length_asc'">
+                            LENGTH(w.name) ASC,
+                        </when>
+
+                        <!-- fallback -->
                         <otherwise>
-                            w.term_id DESC,
+                            w.name ASC,
                         </otherwise>
                     </choose>
                 </when>
+
+                <!-- order 파라미터 자체가 없을 때 -->
                 <otherwise>
-                    w.term_id DESC,
+                    w.name ASC,
                 </otherwise>
             </choose>
         </trim>
+
 
         LIMIT #{limit} OFFSET #{offset}
     </select>

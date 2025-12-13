@@ -2,6 +2,8 @@ package app.finup.layer.domain.words.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 /**
  * 용어사전 DTO 클래스
  * @author khj
@@ -35,9 +37,9 @@ public final class WordsDto {
         public Search() {
             this.keyword = "";
             this.pageNum = 0;
-            this.pageSize = 20;
+            this.pageSize = 10;
             this.filter = "";
-            this.order = "latest";
+            this.order = "name_asc";
         }
 
         public Integer getOffset() {
@@ -48,4 +50,12 @@ public final class WordsDto {
             return pageSize;
         }
     }
+
+    @Data
+    @AllArgsConstructor
+    public static class WordsHome {
+        private List<Row> todayWords;
+        private List<String> recentKeywords;
+    }
+
 }

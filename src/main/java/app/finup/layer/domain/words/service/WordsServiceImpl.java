@@ -8,17 +8,22 @@ import app.finup.infra.words.dto.WordsProviderDto;
 import app.finup.infra.words.provider.WordsProvider;
 import app.finup.infra.words.provider.KbThinkScraper;
 import app.finup.layer.domain.words.dto.WordsDto;
+import app.finup.layer.domain.words.dto.WordsDtoMapper;
 import app.finup.layer.domain.words.entity.Words;
 import app.finup.layer.domain.words.mapper.WordsMapper;
 import app.finup.layer.domain.words.repository.WordsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -30,6 +35,36 @@ public class WordsServiceImpl implements WordsService {
     private final WordsRepository wordsRepository;
     private final WordsMapper wordsMapper;
     private final KbThinkScraper kbThinkScraper;
+
+    /**
+     * 홈 - 오늘의 단어 (JPA + 랜덤 Offset)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<WordsDto.Row> getHomeWords() {
+
+        Long total = wordsRepository.count();
+        Integer size = 3;
+
+        if (total == 0) {
+            return Collections.emptyList();
+        }
+
+        Set<Long> randomIds = new HashSet<>();
+
+        while (randomIds.size() < size) {
+            Long randomId = ThreadLocalRandom.current()
+                    .nextLong(1, total + 1);
+            randomIds.add(randomId);
+        }
+
+        return wordsRepository.findAllById(randomIds)
+                .stream()
+                .map(WordsDtoMapper::toRow)
+                .toList();
+    }
+
+
 
     @Override
     public void refreshTerms() {
@@ -114,3 +149,4 @@ public class WordsServiceImpl implements WordsService {
         }
     }
 }
+

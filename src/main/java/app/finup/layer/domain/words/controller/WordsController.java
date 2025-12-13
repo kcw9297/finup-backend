@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * DB에 저장된 용어 사전 내역 관련 컨트롤러 클래스
  * @author khj
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class WordsController {
 
-    private final WordsService financeDictionaryService;
+    private final WordsService wordsService;
 
 
     /**
@@ -38,8 +40,18 @@ public class WordsController {
     @GetMapping("/search")
     public ResponseEntity<?> search(WordsDto.Search rq) {
         // [1] 요청
-        Page<WordsDto.Row> rp = financeDictionaryService.search(rq);
+        Page<WordsDto.Row> rp = wordsService.search(rq);
         // [2] 페이징 응답 전달
         return Api.ok(rp.getRows(), Pagination.of(rp));
+    }
+
+    /**
+     * 단어장 홈 관련 API
+     * [GET] /api/words/home
+     */
+
+    @GetMapping("/home")
+    public ResponseEntity<?> home() {
+        return Api.ok(wordsService.getHomeWords());
     }
 }

@@ -3,6 +3,8 @@ package app.finup.layer.domain.words.service;
 import app.finup.common.dto.Page;
 import app.finup.layer.domain.words.dto.WordsDto;
 
+import java.util.List;
+
 /**
  * 금융 용어 사전 비즈니스 로직 인터페이스
  * @author khj
@@ -23,6 +25,11 @@ public interface WordsService {
      */
     Page<WordsDto.Row> search(WordsDto.Search rq);
 
+    /**
+     * 단어장 홈 관련 서비스 메소드
+     * @return 페이징된 검색 결과(용어 목록) DTO 리스트
+     */
+    List<WordsDto.Row> getHomeWords();
 
     /**
      * 초기 적재 여부 확인
@@ -35,4 +42,6 @@ public interface WordsService {
     * KB Think 용어 사전 전체 크롤링
     */
     void crawlAllFromKbThink();
+
+
 }
