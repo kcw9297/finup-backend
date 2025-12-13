@@ -39,14 +39,14 @@ public class StockServiceImpl implements StockService {
     public List<StockDto.MarketCapRow> getMarketCapRow() {
 
         List<StockDto.MarketCapRow> marketCapRowList = stockStorage.getMarketCapRow();
-        if (marketCapRowList == null){
+        if (marketCapRowList.isEmpty()){
             refreshMarketCapRow();
             marketCapRowList = stockStorage.getMarketCapRow();
+            if(marketCapRowList.isEmpty()) return Collections.emptyList(); //redis 오류로 인한 null 방지
         }else{
             log.info("시가총액 리스트 Redis에서 가져옴");
         }
         return marketCapRowList;
-
     }
 
     @Override
