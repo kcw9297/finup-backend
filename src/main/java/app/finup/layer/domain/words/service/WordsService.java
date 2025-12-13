@@ -23,7 +23,7 @@ public interface WordsService {
      * @param rq 검색 요청 DTO (filter, keyword, pageNum, pageSize 포함)
      * @return 페이징된 검색 결과(용어 목록) DTO 리스트
      */
-    Page<WordsDto.Row> search(WordsDto.Search rq);
+    Page<WordsDto.Row> search(WordsDto.Search rq, Long memberId);
 
     /**
      * 단어장 홈 관련 서비스 메소드
@@ -43,5 +43,7 @@ public interface WordsService {
     */
     void crawlAllFromKbThink();
 
+    List<String> getRecent(Long memberId);
 
+    void clear(Long memberId);
 }

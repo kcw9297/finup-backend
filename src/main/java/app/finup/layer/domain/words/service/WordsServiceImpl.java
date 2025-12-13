@@ -7,6 +7,7 @@ import app.finup.common.exception.ProviderException;
 import app.finup.infra.words.dto.WordsProviderDto;
 import app.finup.infra.words.provider.WordsProvider;
 import app.finup.infra.words.provider.KbThinkScraper;
+import app.finup.infra.words.redis.RedisRecentSearchStorage;
 import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.dto.WordsDtoMapper;
 import app.finup.layer.domain.words.entity.Words;
@@ -35,6 +36,7 @@ public class WordsServiceImpl implements WordsService {
     private final WordsRepository wordsRepository;
     private final WordsMapper wordsMapper;
     private final KbThinkScraper kbThinkScraper;
+    private final RedisRecentSearchStorage redisRecentSearchStorage;
 
     /**
      * 홈 - 오늘의 단어 (JPA + 랜덤 Offset)
@@ -93,10 +95,21 @@ public class WordsServiceImpl implements WordsService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<WordsDto.Row> search(WordsDto.Search rq) {
+    public Page<WordsDto.Row> search(WordsDto.Search rq, Long memberId) {
+
+        log.info(
+                "[RECENT SEARCH] memberId={}, keyword={}",
+                memberId,
+                rq.getKeyword()
+        );
+
+        // [1] 최근 검색어 저장 (로그인 사용자만)
+        if (memberId != null && StringUtils.hasText(rq.getKeyword())) {
+            redisRecentSearchStorage.add(memberId, rq.getKeyword());
+        }
 
         // 키워드 없을 때도 빈 페이지 반환
-        if (rq == null || !StringUtils.hasText(rq.getKeyword())) {
+        if (!StringUtils.hasText(rq.getKeyword())) {
             return Page.of(
                     Collections.emptyList(),
                     0,
@@ -147,6 +160,17 @@ public class WordsServiceImpl implements WordsService {
             }
             page++;
         }
+    }
+
+    @Override
+    public List<String> getRecent(Long memberId) {
+
+        return redisRecentSearchStorage.getRecent(memberId, 10);
+    }
+
+    @Override
+    public void clear(Long memberId) {
+        redisRecentSearchStorage.clear(memberId);
     }
 }
 
