@@ -5,6 +5,7 @@ import app.finup.infra.ai.PromptTemplates;
 import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
+import app.finup.layer.domain.stock.redis.StockStorage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +30,53 @@ public class StockAiServiceImpl implements StockAiService {
     private final AiManager aiManager;
     private final ObjectMapper objectMapper;
     private final StockApiClient stockApiClient;
+    private final StockStorage stockStorage;
 
     //종목 분석 AI 데이터 가져오기(AI 정리, 추천 영상)
     @Override
-    public Map<String, Object> getStockAi(StockDto.Detail detail) {
+    public Map<String, Object> getStockAi(String code, StockDto.Detail detail) {
+        //1) 종목 AI 분석
+        Map<String, Object> detailAi = stockStorage.getDetailAi(code);
+        if (detailAi == null){
+            refreshDetailAi(code, detail);
+            detailAi = stockStorage.getDetailAi(code);
+        }else{
+            log.info("종목 AI분석 Redis에서 가져옴");
+        }
+        if (detailAi == null) {
+            return Map.of(
+                    "detailAi", Map.of("error", "AI 분석 실패"),
+                    "youtube", List.of()
+            );
+        }
+
+        //2) 유튜브 검색 키워드
+        String keyword = (String) detailAi.get("youtubeKeyword");
+        if (keyword == null || keyword.isBlank()) {
+            log.warn("youtubeKeyword 없음, 기본 키워드 사용");
+            keyword = detail.getHtsKorIsnm(); // 종목명
+        }
+
+        //3) 유튜브 추천 영상
+        List<StockDto.YoutubeVideo> youtube = stockStorage.getYoutube(keyword);
+        if (youtube == null) {
+            refreshYoutube(keyword);
+            youtube = stockStorage.getYoutube(keyword);
+        }else{
+            log.info("종목 추천영상 Redis에서 가져옴");
+        }
+
+        //4) 반환
+        return Map.of(
+                "detailAi", detailAi,
+                "youtube", youtube
+        );
+
+    }
+
+    //종목 AI분석 갱신하기
+    @Override
+    public void refreshDetailAi(String code, StockDto.Detail detail){
         try {
             // 1) Detail → 구조화된 Map(JSON 구조)
             Map<String, Object> structured = convertDetailToStructuredJson(detail);
@@ -48,24 +92,20 @@ public class StockAiServiceImpl implements StockAiService {
             // 4) GPT JSON 요청
             Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
 
-            // 5) keyword List 생성
-            List<String> keywordList = (List<String>) detailAi.get("youtubeKeywords");
-            System.out.println("키워드: "+keywordList);
-
-            // 6) 유튜브 데이터 요청
-            List<StockDto.YoutubeVideo> youtube = getYoutubeVideo(keywordList);
-            System.out.println("유튜브: "+youtube);
-
-            return Map.of(
-                    "detailAi", detailAi,
-                    "youtube", youtube
-                    );
-            //return detailAi;
+            log.info("종목 AI분석 갱신함");
+            stockStorage.setDetailAi(code, detailAi);
 
         } catch (Exception e) {
             log.error("AI 분석 생성 실패", e);
-            return Map.of("error", "AI 분석 실패");
         }
+    }
+
+    //종목 추천영상 갱신하기
+    @Override
+    public void refreshYoutube(String keyword){
+        List<StockDto.YoutubeVideo> youtube = getYoutubeVideo(keyword);
+        log.info("종목 추천영상 갱신함"+youtube);
+        stockStorage.setYoutube(keyword, youtube);
     }
 
     //Detail DTO Json 형식으로 변환
@@ -108,26 +148,11 @@ public class StockAiServiceImpl implements StockAiService {
         );
     }
 
-    private List<StockDto.YoutubeVideo> getYoutubeVideo(List<String> keywordList) {
-        List<StockDto.YoutubeVideo> youtubeList = new ArrayList<>();
-
-        for (String keyword : keywordList) {
-            StockDto.YoutubeSearchResponse response = stockApiClient.fetchYoutubeVideo(keyword);
-            StockDto.YoutubeVideo youtube = StockDtoMapper.toYoutube(keyword, response);
-            youtubeList.add(youtube);
-        }
+    private List<StockDto.YoutubeVideo> getYoutubeVideo(String keyword) {
+        StockDto.YoutubeSearchResponse response = stockApiClient.fetchYoutubeVideo(keyword);
+        if (response == null || response.getItems() == null) return List.of();
+        List<StockDto.YoutubeVideo> youtubeList = StockDtoMapper.toYoutubeList(keyword, response);
         return youtubeList;
     }
 
-
-/*
-    @Override
-    public StockDto.YoutubeSearchResponse getYoutube(String keyword){
-        return null;
-    }
-
-    @Override
-    public void refreshYoutubeVideo(String keyword){
-
-    }*/
 }

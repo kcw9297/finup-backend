@@ -72,6 +72,6 @@ public class PublicStocksController {
     @GetMapping("/detail/stock-ai/{code}")
     public ResponseEntity<?> getStockAi(@PathVariable String code) {
         StockDto.Detail detail = (stockService.getDetail(code));
-        return Api.ok(stockAiService.getStockAi(detail));
+        return Api.ok(stockAiService.getStockAi(code, detail));
     }
 }

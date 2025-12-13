@@ -160,13 +160,14 @@ public class StockApiClientImpl implements StockApiClient {
     //AI분석 키워드를 바탕으로 추천 유튜브 영상 가져오기
     @Override
     public StockDto.YoutubeSearchResponse fetchYoutubeVideo(String keyword){
+        //return null;
         return  youTubeClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/search")
                         .queryParam("part", "snippet")
                         .queryParam("q", keyword)
                         .queryParam("type", "video")
-                        .queryParam("maxResults", 1)
+                        .queryParam("maxResults", 4)
                         .queryParam("key", API_YOUTUBE_KEY)
                         .build())
                 .retrieve()

@@ -75,10 +75,17 @@ public class StockDtoMapper {
                 .build();
     }
 
-    public static StockDto.YoutubeVideo toYoutube(String keyword, StockDto.YoutubeSearchResponse response) {
+    public static List<StockDto.YoutubeVideo> toYoutubeList(String keyword, StockDto.YoutubeSearchResponse response) {
+        if (response == null || response.getItems() == null) {
+            return List.of();
+        }
+        return response.getItems().stream()
+                .limit(4)
+                .map(item -> toYoutube(keyword, item))
+                .toList();
+    }
 
-        StockDto.YoutubeSearchResponse.Item item = response.getItems().get(0);
-
+    public static StockDto.YoutubeVideo toYoutube(String keyword, StockDto.YoutubeSearchResponse.Item item) {
         return StockDto.YoutubeVideo.builder()
                 .keyword(keyword)
                 .videoId(item.getId().getVideoId())

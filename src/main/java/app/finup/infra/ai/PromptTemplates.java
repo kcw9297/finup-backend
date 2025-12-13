@@ -65,7 +65,7 @@ public class PromptTemplates {
             "valuation": "",
             "flow": "",
             "risk": "",
-            "youtubeKeywords": ["", "", "", ""],            
+            "youtubeKeyword": "",            
             "description": ""        
         }   
             추가 텍스트는 절대 포함하지 마세요.
@@ -123,7 +123,7 @@ public class PromptTemplates {
             "valuation": "PER, PBR, EPS, BPS 기반의 밸류에이션 의견",
             "flow": "외국인/프로그램 매매 흐름 설명",
             "risk": "리스크 요인 2~3개",
-            "youtubeKeywords": ["키워드1", "키워드2", "키워드3", "키워드4"],            
+            "youtubeKeyword": "시청자가 유튜브에서 검색할 만한 키워드 1개",            
             "description": "1~2줄 문단"        
         }            
        
@@ -135,7 +135,7 @@ public class PromptTemplates {
                - 리스크 상태(유의/과열/정리/관리종목 등)
                를 균형 있게 설명할 것.
             
-            2. description: 시청자가 유튜브에서 검색할 만한 키워드(youtubeKeywords) 4개를 포함한 1~2줄 설명 문단 작성.
+            2. description: 시청자가 유튜브에서 검색할 만한 키워드(youtubeKeyword)를 포함한 1~2줄 설명 문단 작성.
                - 실제 존재하는 영상이나 제목, URL을 생성하면 안 됨.
                - 오직 “검색 키워드”만 제시하고 왜 도움이 되는지 설명할 것.           
         
