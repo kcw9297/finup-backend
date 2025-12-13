@@ -93,8 +93,8 @@ public class Url {
     public static final String LEVEL_PUBLIC = PUBLIC + LEVEL;
 
     /* words */
-    public static final String DICTIONARY = API + "/dict";
-    public static final String ADMIN_DICTIONARY = ADMIN + DICTIONARY;
+    public static final String WORDS = API + "/words";
+    public static final String ADMIN_WORDS = ADMIN + WORDS;
 
     /* home */
     public static final String HOME = API + "/home";

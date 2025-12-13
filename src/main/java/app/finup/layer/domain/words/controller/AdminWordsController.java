@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping(Url.ADMIN_DICTIONARY)
+@RequestMapping(Url.ADMIN_WORDS)
 @RequiredArgsConstructor
 public class AdminWordsController {
 
