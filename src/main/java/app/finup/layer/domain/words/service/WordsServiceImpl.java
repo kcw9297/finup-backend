@@ -3,6 +3,7 @@ package app.finup.layer.domain.words.service;
 
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
+import app.finup.common.exception.BusinessException;
 import app.finup.common.exception.ProviderException;
 import app.finup.infra.words.dto.WordsProviderDto;
 import app.finup.infra.words.provider.WordsProvider;
@@ -178,5 +179,15 @@ public class WordsServiceImpl implements WordsService {
         redisRecentSearchStorage.remove(memberId, keyword);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public WordsDto.Row getDetail(Long termId) {
+
+        return wordsRepository.findById(termId)
+                .map(WordsDtoMapper::toRow)
+                .orElseThrow(() ->
+                        new BusinessException(AppStatus.WORDS_NOT_FOUND)
+                );
+    }
 }
 

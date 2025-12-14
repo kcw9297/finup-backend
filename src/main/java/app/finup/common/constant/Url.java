@@ -96,6 +96,8 @@ public class Url {
     public static final String WORDS = API + "/words";
     public static final String ADMIN_WORDS = ADMIN + WORDS;
 
+    /* memberWordbook */
+    public static final String MEMBER_WORDBOOK = MEMBER + "/wordbook";
     /* home */
     public static final String HOME = API + "/home";
     public static final String HOME_PUBLIC = PUBLIC + HOME;

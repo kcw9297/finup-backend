@@ -45,6 +45,12 @@ public interface WordsService {
 
 
     /**
+     * 단어 상세 조회
+     * @param termId 단어 번호
+     * @return 단어 상세 정보
+     */
+    WordsDto.Row getDetail(Long termId);
+    /**
      * Redis 최근 단어 추가 메소드
      */
     List<String> getRecent(Long memberId);
