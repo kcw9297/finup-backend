@@ -52,6 +52,8 @@ public class RedisRecentSearchStorageImpl implements RedisRecentSearchStorage {
 
     }
 
+
+
     @Override
     public List<String> getRecent(Long memberId, Integer limit) {
         String key = createKey(memberId);
@@ -61,6 +63,13 @@ public class RedisRecentSearchStorageImpl implements RedisRecentSearchStorage {
                 .reverseRange(key, 0, limit - 1)
                 .stream()
                 .toList();
+    }
+
+
+    @Override
+    public void remove(Long memberId, String keyword) {
+        String key = createKey(memberId);
+        srt.opsForZSet().remove(key, keyword);
     }
 
     @Override

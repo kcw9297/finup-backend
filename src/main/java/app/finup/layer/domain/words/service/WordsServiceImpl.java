@@ -172,5 +172,11 @@ public class WordsServiceImpl implements WordsService {
     public void clear(Long memberId) {
         redisRecentSearchStorage.clear(memberId);
     }
+
+    @Override
+    public void removeRecent(Long memberId, String keyword) {
+        redisRecentSearchStorage.remove(memberId, keyword);
+    }
+
 }
 

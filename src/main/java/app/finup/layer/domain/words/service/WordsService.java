@@ -43,7 +43,19 @@ public interface WordsService {
     */
     void crawlAllFromKbThink();
 
+
+    /**
+     * Redis 최근 단어 추가 메소드
+     */
     List<String> getRecent(Long memberId);
 
+    /**
+     * Redis 최근 단어 기록 delete 메소드
+     */
     void clear(Long memberId);
+
+    /**
+     * Redis 최근 검색 단어 삭제 메소드
+     */
+    void removeRecent(Long memberId, String keyword);
 }

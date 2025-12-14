@@ -9,4 +9,6 @@ public interface RedisRecentSearchStorage {
     List<String> getRecent(Long memberId, Integer limit);
 
     void clear(Long memberId);
+
+    void remove(Long memberId, String keyword);
 }
