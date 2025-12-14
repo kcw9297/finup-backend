@@ -52,6 +52,11 @@ public class WordsController {
         return Api.ok(rp.getRows(), Pagination.of(rp));
     }
 
+    /**
+     * 접속 회원 최근 단어 조회 API
+     * [GET] /api/words/recent-searches
+     * @param user 해당 회원
+     */
     @GetMapping("/recent-searches")
     public ResponseEntity<?> getRecentSearches(@AuthenticationPrincipal CustomUserDetails user) {
 
@@ -90,6 +95,7 @@ public class WordsController {
      * [GET] /api/words/detail/{termId}
      * @param termId 단어 번호
      */
+
     @GetMapping("/detail/{termId:[0-9]+}")
     public ResponseEntity<?> getDetail(@PathVariable Long termId) {
 

@@ -98,6 +98,7 @@ public class Url {
 
     /* memberWordbook */
     public static final String MEMBER_WORDBOOK = MEMBER + "/wordbook";
+    public static final String MEMBER_WORD_VIEW = MEMBER_WORDBOOK + "/view";
     /* home */
     public static final String HOME = API + "/home";
     public static final String HOME_PUBLIC = PUBLIC + HOME;
