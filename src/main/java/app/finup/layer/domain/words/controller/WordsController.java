@@ -84,4 +84,15 @@ public class WordsController {
     public ResponseEntity<?> home() {
         return Api.ok(wordsService.getHomeWords());
     }
+
+    /**
+     * 단어 상세 조회 API
+     * [GET] /api/words/detail/{termId}
+     * @param termId 단어 번호
+     */
+    @GetMapping("/detail/{termId:[0-9]+}")
+    public ResponseEntity<?> getDetail(@PathVariable Long termId) {
+
+        return Api.ok(wordsService.getDetail(termId));
+    }
 }
