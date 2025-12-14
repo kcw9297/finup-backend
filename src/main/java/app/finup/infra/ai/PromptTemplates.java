@@ -2,7 +2,7 @@ package app.finup.infra.ai;
 
 public class PromptTemplates {
     //뉴스 AI 분석
-    public static final String NEWS_ANALYSIS = """
+    public static final String NEWS_ANALYSIS_DEEP = """
         당신은 '초보자도 이해할 수 있게 뉴스를 설명하는' 금융 전문 AI 분석가입니다.
         기사 전체를 읽고 아래 3가지 항목을 JSON으로만 출력하세요.
         
@@ -45,6 +45,43 @@ public class PromptTemplates {
         - key 이름(term, definition)은 절대 변경 금지
         
         기사 전문:
+        {ARTICLE}
+        """;
+
+    public static final String NEWS_SUMMARY_LIGHT = """
+        당신은 초보자도 이해할 수 있게 뉴스를 설명하는 AI입니다.
+        아래에는 기사 전체가 아니라 네이버 뉴스 API의 description(발췌)만 제공됩니다.
+        
+        ### 반드시 지킬 규칙
+        - description에 명시된 내용만 바탕으로 작성할 것
+        - description에 없는 사실, 인물, 기관, 수치, 원인/결과를 절대 추가하지 말 것
+        - 추정이나 단정이 필요하면 하지 말고 일반적인 표현으로 처리할 것
+        - '전체 기사를 읽은 것처럼' 말하지 말 것
+        
+        출력은 반드시 JSON만 출력하세요.
+        
+        ### 출력 형식
+        {
+          "summary": "...",
+          "keywords": [
+            { "term": "...", "definition": "..." }
+          ]
+        }
+        
+        ### 작성 규칙
+        1) summary
+        - 2~3줄 요약
+        - description에 나온 핵심 주제만 정리
+        - 초보자도 이해할 수 있는 쉬운 문장 사용
+        
+        2) keywords
+        - summary 내용을 기준으로
+        - 초보자가 알면 좋은 '주식·경제·제도·시장' 개념이 명확히 드러날 때만 추출
+        - 최대 1~3개
+        - 개념이 애매하거나 없으면 빈 배열 []로 출력
+        - 기업명, 인명, 기관명, 지명은 절대 포함하지 말 것
+        
+        description:
         {ARTICLE}
         """;
 

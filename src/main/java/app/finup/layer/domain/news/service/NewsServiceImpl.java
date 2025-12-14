@@ -31,7 +31,7 @@ public class NewsServiceImpl implements NewsService {
      */
     @Override
     public List<NewsDto.Row> getNews(String category) {
-        return newsProvider.getNews(category, 100);
+        return newsProvider.getNews(category, 50);
     }
 
 

@@ -2,6 +2,10 @@ package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
+import app.finup.layer.domain.news.api.NewsApiClient;
+import app.finup.layer.domain.news.dto.NewsDto;
+import app.finup.layer.domain.news.service.NewsRemoveDuplicateService;
+import app.finup.layer.domain.news.service.StockNewsAiService;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.service.StockAiService;
 import app.finup.layer.domain.stock.service.StockService;
@@ -9,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 종목+ 리스트 REST API 클래스
@@ -24,6 +30,9 @@ public class PublicStocksController {
 
     private final StockService stockService;
     private final StockAiService stockAiService;
+    private final StockNewsAiService stockNewsAiService;
+    private final NewsApiClient newsApiClient;
+    private final NewsRemoveDuplicateService newsRemoveDuplicateService;
 
     /**
      * 종목 리스트 페이지 시가총액 조회 API
@@ -71,6 +80,11 @@ public class PublicStocksController {
     @GetMapping("/news")
     public ResponseEntity<?> getNews(String category, String stockName) {
         return Api.ok(stockService.getStockNews(stockName, category));
+    }
+
+    @PostMapping("/news/ai")
+    public ResponseEntity<?> getStockNewsAi(@RequestBody NewsDto.AiRequest arq ) {
+        return Api.ok(stockNewsAiService.analyzeLightCached(arq.getLink(), arq.getDescription()));
     }
 
     /**

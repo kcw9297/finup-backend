@@ -2,6 +2,7 @@ package app.finup.layer.domain.stock.service;
 
 import app.finup.infra.news.provider.NewsProvider;
 import app.finup.layer.domain.news.dto.NewsDto;
+import app.finup.layer.domain.news.service.StockNewsAiService;
 import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
@@ -33,6 +34,7 @@ public class StockServiceImpl implements StockService {
     private final StockApiClient stockApiClient;
     private final NewsProvider newsProvider;
     private final StockStorage stockStorage;
+    private final StockNewsAiService stockNewsAiService;
 
     // 종목+ 시가총액 순위 가져오기
     @Override
@@ -172,7 +174,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<NewsDto.Row> getStockNews(String stockName, String category) {
-        return newsProvider.getStockNews(stockName, category, 50);
+        return newsProvider.getStockNews(stockName, category, 30);
     }
 }
 
