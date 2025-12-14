@@ -1,14 +1,15 @@
 package app.finup.layer.domain.stock.redis;
 
 import app.finup.layer.domain.stock.dto.StockDto;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -16,45 +17,69 @@ import java.util.Map;
 public class StockStorageImpl implements StockStorage {
 
     @Qualifier("redisTemplate")
-    private final RedisTemplate<String, Object> srt;
+    private final RedisTemplate<String, Object> rt;
+    private final ObjectMapper objectMapper;
+
+    /* redis key */
+    private static final String DETAIL_KEY = "stock:detail:";
+    private static final String DETAIL_AI_KEY = "stock:detail-ai:";
+    private static final String YOUTUBE_KEY = "stock:youtube:";
 
     @Override
     public void setMarketCapRow(List<StockDto.MarketCapRow> marketCapRowList) {
-        srt.opsForValue().set("marketCapRowList", marketCapRowList, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set("marketCapRowList", marketCapRowList, Duration.ofHours(24).plusMinutes(30));
+    }
+
+    @Override
+    public List<StockDto.TradingValueRow> getTradingValueRow() {
+        Object value = rt.opsForValue().get("tradingValueRowList");
+        if (value == null) return Collections.emptyList();
+        return objectMapper.convertValue(value, new TypeReference<List<StockDto.TradingValueRow>>(){});
+    }
+
+    @Override
+    public void setTradingValueRow(List<StockDto.TradingValueRow> tradingValueRowList) {
+        rt.opsForValue().set("tradingValueRowList", tradingValueRowList, Duration.ofHours(24).plusMinutes(30));
     }
 
     @Override
     public List<StockDto.MarketCapRow> getMarketCapRow() {
-        return (List<StockDto.MarketCapRow>) srt.opsForValue().get("marketCapRowList");
+        //return (List<StockDto.MarketCapRow>) rt.opsForValue().get("marketCapRowList");
+
+        Object value = rt.opsForValue().get("marketCapRowList");
+        if (value == null) return Collections.emptyList();
+        return objectMapper.convertValue(value, new TypeReference<List<StockDto.MarketCapRow>>(){});
     }
 
     @Override
     public void setDetail(String code, StockDto.Detail detail) {
-        srt.opsForValue().set(code, detail, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(DETAIL_KEY+code, detail, Duration.ofHours(24).plusMinutes(30));
     }
 
     @Override
     public StockDto.Detail getDetail(String code) {
-        return (StockDto.Detail) srt.opsForValue().get(code);
+        Object object  = rt.opsForValue().get(DETAIL_KEY+code);
+        if (object == null) return null;
+        return objectMapper.convertValue(object, StockDto.Detail.class);
     }
 
     @Override
     public void setDetailAi(String code, Map<String, Object> detailAi) {
-        srt.opsForValue().set(code, detailAi, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(DETAIL_AI_KEY+code, detailAi, Duration.ofHours(24).plusMinutes(30));
     }
 
     @Override
     public Map<String, Object> getDetailAi(String code) {
-        return ( Map<String, Object>) srt.opsForValue().get(code);
+        return ( Map<String, Object>) rt.opsForValue().get(DETAIL_AI_KEY+code);
     }
 
     @Override
     public void setYoutube(String keyword, List<StockDto.YoutubeVideo> youtube) {
-        srt.opsForValue().set(keyword, youtube, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(YOUTUBE_KEY+keyword, youtube, Duration.ofHours(24).plusMinutes(30));
     }
 
     @Override
     public List<StockDto.YoutubeVideo> getYoutube(String keyword) {
-        return (List<StockDto.YoutubeVideo>) srt.opsForValue().get(keyword);
+        return (List<StockDto.YoutubeVideo>) rt.opsForValue().get(YOUTUBE_KEY+keyword);
     }
 }

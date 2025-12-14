@@ -34,42 +34,68 @@ public class StockServiceImpl implements StockService {
     private final NewsProvider newsProvider;
     private final StockStorage stockStorage;
 
-    // 종목 상세페이지 시가총액 순위 가져오기
+    // 종목+ 시가총액 순위 가져오기
     @Override
     public List<StockDto.MarketCapRow> getMarketCapRow() {
 
         List<StockDto.MarketCapRow> marketCapRowList = stockStorage.getMarketCapRow();
-        if (marketCapRowList == null){
+        if (marketCapRowList.isEmpty()){
             refreshMarketCapRow();
             marketCapRowList = stockStorage.getMarketCapRow();
-            log.info("시가총액 리스트 갱신발급함");
+            if(marketCapRowList.isEmpty()) return Collections.emptyList(); //redis 오류로 인한 null 방지
         }else{
             log.info("시가총액 리스트 Redis에서 가져옴");
         }
         return marketCapRowList;
-
     }
 
     @Override
     public void refreshMarketCapRow(){
         List<StockDto.MarketCapRow> marketCapRowList = stockApiClient.fetchMarketCapRow();
         stockStorage.setMarketCapRow(marketCapRowList);
+        log.info("시가총액 리스트 갱신발급함");
+    }
+
+    // 종목+ 거래대금 순위 가져오기
+    @Override
+    public List<StockDto.TradingValueRow> getTradingValueRow() {
+
+        List<StockDto.TradingValueRow> tradingValueRowList = stockStorage.getTradingValueRow();
+        if (tradingValueRowList.isEmpty()){
+            refreshTradingValueRow();
+            tradingValueRowList = stockStorage.getTradingValueRow();
+            if(tradingValueRowList.isEmpty()) return Collections.emptyList(); //redis 오류로 인한 null 방지
+        }else{
+            log.info("거래대금 리스트 Redis에서 가져옴");
+        }
+        return tradingValueRowList;
+    }
+
+    @Override
+    public void refreshTradingValueRow(){
+        List<StockDto.TradingValueRow> tradingValueRowList = stockApiClient.fetchTradingValueRow();
+        stockStorage.setTradingValueRow(tradingValueRowList);
+        log.info("거래대금 리스트 갱신발급함");
     }
 
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
     @Override
-    public void importKospi() throws Exception {
+    public void importStockName() throws Exception {
         /*
         * 개발 중이라면 프로젝트 안 폴더에 두고 상대경로로 테스트
         * 운영/배포용이라면 외부 경로 + 환경변수로 관리하는 것이 안전
         * */
-        String path = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
+        String KOSPI = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
+        String KOSDAQ = "src/main/java/app/finup/layer/domain/stock/test/kosdaq_code.xlsx";
         //String path = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx";
         //String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
 
+        saveStock(KOSPI);
+        saveStock(KOSDAQ);
+    }
+    private void saveStock(String path) throws Exception {
         FileInputStream fis = new FileInputStream(path);
-        //InputStream is = getClass().getClassLoader().getResourceAsStream("test/kospi_code.xlsx");
         if(fis==null){
             throw new IllegalArgumentException("파일을 찾을 수 없습니다.");
         }
@@ -100,7 +126,6 @@ public class StockServiceImpl implements StockService {
         if (detail == null){
             refreshDetail(code);
             detail = stockStorage.getDetail(code);
-            log.info("종목 상세 정보 갱신발급함");
         }else{
             log.info("종목 상세 정보 Redis에서 가져옴");
         }
@@ -114,15 +139,13 @@ public class StockServiceImpl implements StockService {
         //[1] 종목코드(String code)로 DB에서 한글 종목명 가져오기
         Stock stock;
         try {
-            Optional<Stock> optional = stockRepository.findByMkscShrnIscd(code);
-            if (optional.isPresent()) {
-                stock = optional.get();
-            } else {
-                importKospi();
-                stock = stockRepository.findByMkscShrnIscd(code)
-                        .orElseThrow(() -> new RuntimeException("종목 없음!"));
+            if (!stockRepository.existsByMkscShrnIscd(code)) {
+                if (stockRepository.count() == 0) importStockName();
             }
+            stock = stockRepository.findByMkscShrnIscd(code)
+                    .orElseThrow(() -> new RuntimeException("종목 없음: " + code));
         } catch (Exception e) {
+            log.error("종목 상세 refresh 실패 - code={}", code, e);
             throw new RuntimeException("종목 정보 조회/갱신 실패", e);
         }
         String htsKorIsnm = stock.getHtsKorIsnm();
@@ -140,7 +163,10 @@ public class StockServiceImpl implements StockService {
         //[3] dto 매핑하기
         StockDto.Detail detail = StockDtoMapper.toDetail(htsKorIsnm, jsonNode);
 
+        //[4] Redis 저장하기
         stockStorage.setDetail(code, detail);
+
+        log.info("종목 상세 정보 갱신발급함 code={}", code);
 
     }
 

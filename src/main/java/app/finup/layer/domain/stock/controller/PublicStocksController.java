@@ -35,13 +35,22 @@ public class PublicStocksController {
     }
 
     /**
-     * 종목명 종목코드 kis 마스터 파일 읽어 DB 저장
-     * [GET] stocks/import/kospi
+     * 종목 리스트 페이지 거래대금 조회 API
+     * [GET] stocks/trading-value-ranking
      */
-    @GetMapping("/import/kospi")
-    public ResponseEntity<?> importKospi() throws Exception {
-        stockService.importKospi();
-        return Api.ok("kospi 파일 읽어 DB 저장");
+    @GetMapping("/trading-value-ranking")
+    public ResponseEntity<?> getTradingValueRanking() {
+        return Api.ok(stockService.getTradingValueRow());
+    }
+
+    /**
+     * 종목명 종목코드 kis 마스터 파일 읽어 DB 저장
+     * [GET] stocks/import/stockName
+     */
+    @GetMapping("/import/stock-name")
+    public ResponseEntity<?> importStockName() throws Exception {
+        stockService.importStockName();
+        return Api.ok("kospi kosdaq 파일 읽어 DB 저장");
     }
 
     /**
@@ -72,6 +81,6 @@ public class PublicStocksController {
     @GetMapping("/detail/stock-ai/{code}")
     public ResponseEntity<?> getStockAi(@PathVariable String code) {
         StockDto.Detail detail = (stockService.getDetail(code));
-        return Api.ok(stockAiService.getStockAi(detail));
+        return Api.ok(stockAiService.getStockAi(code, detail));
     }
 }
