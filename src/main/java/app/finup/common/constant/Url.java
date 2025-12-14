@@ -106,6 +106,10 @@ public class Url {
     /* exchange-rate */
     public static final String EXCHANGE = "/exchange-rates";
     public static final String HOME_EXCHANGE_PUBLIC = HOME_PUBLIC + EXCHANGE;
+
+    /* index-market */
+    public static final String MARKET = "/index-market";
+    public static final String HOME_MARKET_PUBLIC = HOME_PUBLIC + MARKET;
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */
