@@ -58,7 +58,7 @@ public enum AppStatus {
 
     /* 회원 Member */
     MEMBER_NOT_FOUND(400, "회원 정보가 존재하지 않습니다.", "MEMBER_NOT_FOUND"),
-
+    MEMBER_DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.", "MEMBER_DUPLICATE_NICKNAME"),
     /* 단계 학습 Study */
     STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),
     STUDY_OK_ADD(200, "단계학습 정보를 추가했습니다.", "STUDY_OK_ADD"),

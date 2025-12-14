@@ -68,4 +68,28 @@ public final class MemberDto {
         }
 
     }
+    /**
+     * 닉네임 수정 요청에 사용
+     * [PATCH] /members/{memberId}/nickname
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class EditNickname {
+        private String nickname;
+    }
+    /**
+     * 비밀번호 수정 요청에 사용
+     * [PATCH] /members/{memberId}/password
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class EditPassword {
+        private String currentPassword;
+        private String newPassword;
+    }
+
 }
