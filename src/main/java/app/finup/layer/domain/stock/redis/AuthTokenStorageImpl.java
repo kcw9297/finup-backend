@@ -2,6 +2,7 @@ package app.finup.layer.domain.stock.redis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthTokenStorageImpl implements AuthTokenStorage {
 
+    @Qualifier("stringRedisTemplate")
     private final StringRedisTemplate srt;
 
     @Override

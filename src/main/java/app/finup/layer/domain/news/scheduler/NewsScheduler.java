@@ -1,24 +1,46 @@
 package app.finup.layer.domain.news.scheduler;
 
 import app.finup.infra.news.provider.NewsProvider;
+import app.finup.layer.domain.news.dto.NewsDto;
+import app.finup.layer.domain.news.redis.NewsRedisStorage;
 import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.util.List;
+
+
 @Slf4j
 @Component
+@Profile("prod") //잠깐 비활성화
 @RequiredArgsConstructor
 public class NewsScheduler {
-    private final NewsService newsService;
     private final NewsProvider newsProvider;
+    private final NewsRedisStorage newsRedisStorage;
+    private static final Duration TTL_NEWS = Duration.ofMinutes(2);
 
-    @Scheduled(fixedRate = 1000 * 60 * 30)
+    @Scheduled(fixedRate = 1000 * 60 * 3, initialDelay = 1000 * 60 * 3)
     public void updateNewsCache(){
-        newsProvider.getNews("date", 100);
-        newsProvider.getNews("sim", 100);
+        refresh("date", 10);
+        refresh("sim", 10);
         log.info("[SCHEDULER] 뉴스 캐시 갱신 완료");
+    }
+
+    private void refresh(String category, int limit) {
+        String key = "NEWS:CATEGOTY:" + category + ":" + limit;
+
+        List<NewsDto.Row> fresh = newsProvider.fetchNews(category, limit);
+
+        if (fresh != null && !fresh.isEmpty()) {
+            newsRedisStorage.saveNews(key, fresh, TTL_NEWS);
+            log.info("[SCHEDULER] SAVE {}", key);
+        } else {
+            log.warn("[SCHEDULER] SKIP SAVE (empty) {}", key);
+        }
     }
 }
 

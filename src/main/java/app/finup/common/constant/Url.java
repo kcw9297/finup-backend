@@ -92,10 +92,13 @@ public class Url {
     public static final String LEVEL_ADMIN = ADMIN + LEVEL;
     public static final String LEVEL_PUBLIC = PUBLIC + LEVEL;
 
-    /* dictionary */
-    public static final String DICTIONARY = API + "/dict";
-    public static final String ADMIN_DICTIONARY = ADMIN + DICTIONARY;
+    /* words */
+    public static final String WORDS = API + "/words";
+    public static final String ADMIN_WORDS = ADMIN + WORDS;
 
+    /* memberWordbook */
+    public static final String MEMBER_WORDBOOK = MEMBER + "/wordbook";
+    public static final String MEMBER_WORD_VIEW = MEMBER_WORDBOOK + "/view";
     /* home */
     public static final String HOME = API + "/home";
     public static final String HOME_PUBLIC = PUBLIC + HOME;
@@ -103,6 +106,10 @@ public class Url {
     /* exchange-rate */
     public static final String EXCHANGE = "/exchange-rates";
     public static final String HOME_EXCHANGE_PUBLIC = HOME_PUBLIC + EXCHANGE;
+
+    /* index-market */
+    public static final String MARKET = "/index-market";
+    public static final String HOME_MARKET_PUBLIC = HOME_PUBLIC + MARKET;
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */

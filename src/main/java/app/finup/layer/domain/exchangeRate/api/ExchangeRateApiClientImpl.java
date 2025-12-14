@@ -17,20 +17,25 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class ExchangeRateApiClientImpl implements ExchangeRateApiClient {
+    // 한국수출입은행 API 전용 WebClient
     @Qualifier("keximClient")
     private final WebClient keximClient;
 
+    // 수출입은행 인증 키
     @Value("${API_KEXIM_KEY}")
-    private String apiKeximKey;
+    private String keximKey;
 
-    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
+    // API 요청용 날짜 포맷 (yyyyMMdd)
+    private static final DateTimeFormatter FMT =
+            DateTimeFormatter.ofPattern("yyyyMMdd");
 
+    // 특정 날짜의 환율 목록 조회
     @Override
-    public List<ExchangeRateDto.Row> fetchRates(LocalDate searchDate) {
+    public List<ExchangeRateDto.ApiRow> fetchRates(LocalDate searchDate) {
         try {
             String json = keximClient.get()
                     .uri(uri -> uri
-                            .queryParam("authkey", apiKeximKey)
+                            .queryParam("authkey", keximKey)
                             .queryParam("searchdate", searchDate.format(FMT))
                             .queryParam("data", "AP01")
                             .build()
@@ -38,18 +43,20 @@ public class ExchangeRateApiClientImpl implements ExchangeRateApiClient {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
+            // JSON → DTO 변환
             return parseKeximJson(json);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("KEXIM API 호출 실패: {}", e.getMessage());
             return List.of();
         }
     }
 
-    private List<ExchangeRateDto.Row> parseKeximJson(String json){
+    // 수출입은행 API JSON 응답 파싱
+    private List<ExchangeRateDto.ApiRow> parseKeximJson(String json) {
         try {
             ObjectMapper mapper = new ObjectMapper();
-            ExchangeRateDto.Row[] rows =
-                    mapper.readValue(json, ExchangeRateDto.Row[].class);
+            ExchangeRateDto.ApiRow[] rows =
+                    mapper.readValue(json, ExchangeRateDto.ApiRow[].class);
             return Arrays.asList(rows);
         } catch (Exception e) {
             log.error("JSON 파싱 실패: {}", e.getMessage());

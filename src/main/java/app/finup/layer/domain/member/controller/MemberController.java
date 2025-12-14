@@ -5,7 +5,6 @@ import app.finup.common.dto.Page;
 import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.member.dto.MemberDto;
-import app.finup.layer.domain.member.dto.MemberJoinDto;
 import app.finup.layer.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -59,10 +57,6 @@ public class MemberController {
         // [2] 페이징 응답 전달
         return Api.ok(rows);
     }
-    /**
-     * 회원가입
-     * [POST]
-     */
 
     @PostMapping
     public ResponseEntity<?> join(@Valid @RequestBody MemberJoinDto.JoinNember rq) {

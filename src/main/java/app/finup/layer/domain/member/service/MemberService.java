@@ -57,4 +57,5 @@ public interface MemberService {
      */
     void editProfileImage(Long memberId, MultipartFile file);
 
+    MemberDto.Join join(MemberDto.Join rq);
 }

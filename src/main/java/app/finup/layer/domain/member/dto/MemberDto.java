@@ -1,7 +1,11 @@
 package app.finup.layer.domain.member.dto;
 
+import app.finup.layer.base.validation.annotation.Password;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.layer.domain.member.enums.MemberSocial;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.Objects;
@@ -70,7 +74,6 @@ public final class MemberDto {
     }
     /**
      * 닉네임 수정 요청에 사용
-     * [PATCH] /members/{memberId}/nickname
      */
     @Data
     @AllArgsConstructor
@@ -81,7 +84,6 @@ public final class MemberDto {
     }
     /**
      * 비밀번호 수정 요청에 사용
-     * [PATCH] /members/{memberId}/password
      */
     @Data
     @AllArgsConstructor
@@ -92,4 +94,18 @@ public final class MemberDto {
         private String newPassword;
     }
 
+  
+  
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Join {
+      
+        @Email
+        private String email;
+
+        @Password
+        private String password;
+    }
 }
