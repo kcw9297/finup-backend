@@ -21,12 +21,12 @@ import java.util.List;
 public class NewsScheduler {
     private final NewsProvider newsProvider;
     private final NewsRedisStorage newsRedisStorage;
-    private static final Duration TTL_NEWS = Duration.ofMinutes(5);
+    private static final Duration TTL_NEWS = Duration.ofMinutes(30);
 
-    @Scheduled(fixedRate = 1000 * 60 * 3, initialDelay = 1000 * 60 * 3)
+    @Scheduled(fixedRate = 1000 * 60 * 15)
     public void updateNewsCache(){
-        refresh("date", 10);
-        refresh("sim", 10);
+        refresh("date", 50);
+        refresh("sim", 50);
         log.info("[SCHEDULER] 뉴스 캐시 갱신 완료");
     }
 

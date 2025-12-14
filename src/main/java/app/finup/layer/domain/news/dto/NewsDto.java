@@ -52,4 +52,12 @@ public final class NewsDto {
         private String summary;
         private List<Map<String,String>> keywords;
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AiRequest {
+        private String link;
+        private String description;
+    }
 }

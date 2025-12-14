@@ -2,6 +2,8 @@ package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
+import app.finup.layer.domain.news.dto.NewsDto;
+import app.finup.layer.domain.news.service.StockNewsAiService;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.service.StockAiService;
 import app.finup.layer.domain.stock.service.StockService;
@@ -24,6 +26,7 @@ public class PublicStocksController {
 
     private final StockService stockService;
     private final StockAiService stockAiService;
+    private final StockNewsAiService stockNewsAiService;
 
     /**
      * 종목 리스트 페이지 시가총액 조회 API
@@ -62,6 +65,11 @@ public class PublicStocksController {
     @GetMapping("/news")
     public ResponseEntity<?> getNews(String category, String stockName) {
         return Api.ok(stockService.getStockNews(stockName, category));
+    }
+
+    @PostMapping("/news/ai")
+    public ResponseEntity<?> getStockNewsAi(@RequestBody NewsDto.AiRequest arq ) {
+        return Api.ok(stockNewsAiService.analyzeLightCached(arq.getLink(), arq.getDescription()));
     }
 
     /**
