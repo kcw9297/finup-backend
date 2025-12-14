@@ -140,7 +140,7 @@ public class StockServiceImpl implements StockService {
         //[4] Redis 저장하기
         stockStorage.setDetail(code, detail);
 
-        log.info("종목 상세 정보 갱신발급함");
+        log.info("종목 상세 정보 갱신발급함 code={}", code);
 
     }
 

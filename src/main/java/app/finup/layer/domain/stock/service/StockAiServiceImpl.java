@@ -92,7 +92,7 @@ public class StockAiServiceImpl implements StockAiService {
             // 4) GPT JSON 요청
             Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
 
-            log.info("종목 AI분석 갱신함");
+            log.info("종목 AI분석 갱신함 code={}", code);
             stockStorage.setDetailAi(code, detailAi);
 
         } catch (Exception e) {

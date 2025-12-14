@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriBuilder;
+import reactor.util.retry.Retry;
+import java.time.Duration;
 import java.util.*;
 
 @Slf4j
@@ -142,6 +145,10 @@ public class StockApiClientImpl implements StockApiClient {
                 .header("custtype", "P")
                 .retrieve()
                 .bodyToMono(String.class)
+                .retryWhen(
+                        Retry.backoff(3, Duration.ofMillis(300))
+                                .filter(e -> e instanceof WebClientResponseException)
+                )
                 .block();
     }
 

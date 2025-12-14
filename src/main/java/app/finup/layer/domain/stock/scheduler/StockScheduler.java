@@ -68,7 +68,7 @@ public class StockScheduler {
         log.info("[SCHEDULER] 종목 상세 종목 AI 분석 스케쥴러 실행");
         List<StockDto.MarketCapRow> list = stockService.getMarketCapRow();
         if (list.isEmpty()) {
-            log.warn("[SCHEDULER AI] 종목 리스트 비어있음");
+            log.warn("[SCHEDULER] 종목 리스트 비어있음");
             return;
         }
         for (StockDto.MarketCapRow row : list) {
@@ -76,7 +76,7 @@ public class StockScheduler {
             try {
                 StockDto.Detail detail = stockStorage.getDetail(code);
                 if (detail == null) {
-                    log.warn("[SCHEDULER AI] detail 데이터 없음 – skip code={}", code);
+                    log.warn("[SCHEDULER] detail 데이터 없음 – skip code={}", code);
                     continue;
                 }
                 stockAiService.refreshDetailAi(code, detail);

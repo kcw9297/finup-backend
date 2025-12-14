@@ -1,6 +1,7 @@
 package app.finup.layer.domain.stock.redis;
 
 import app.finup.layer.domain.stock.dto.StockDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,11 @@ public class StockStorageImpl implements StockStorage {
 
     @Override
     public List<StockDto.MarketCapRow> getMarketCapRow() {
-        return (List<StockDto.MarketCapRow>) rt.opsForValue().get("marketCapRowList");
+        //return (List<StockDto.MarketCapRow>) rt.opsForValue().get("marketCapRowList");
+
+        Object value = rt.opsForValue().get("marketCapRowList");
+        if (value == null) return Collections.emptyList();
+        return objectMapper.convertValue(value, new TypeReference<List<StockDto.MarketCapRow>>(){});
     }
 
     @Override
