@@ -32,6 +32,20 @@ public class StockDtoMapper {
                 .build();
     }
 
+    public static StockDto.TradingValueRow toTradingValueRow(JsonNode output) {
+        return StockDto.TradingValueRow.builder()
+                .htsKorIsnm(output.path("hts_kor_isnm").asText())
+                .mkscShrnIscd(output.path("mksc_shrn_iscd").asText())
+                .dataRank(output.path("data_rank").asText())
+                .stckPrpr(output.path("stck_prpr").asText())
+                .prdyVrssSign(output.path("prdy_vrss_sign").asText())
+                .prdyVrss(output.path("prdy_vrss").asText())
+                .prdyCtrt(output.path("prdy_ctrt").asText())
+                .acmlTrPbmn(output.path("acml_tr_pbmn").asText())
+                .avrgVol(output.path("avrg_vol").asText())
+                .build();
+    }
+
     public static StockDto.Detail toDetail(String htsKorIsnm, JsonNode output){
         return StockDto.Detail.builder()
                 /* 종목 기본 정보 */

@@ -28,7 +28,6 @@ public class StockApiClientImpl implements StockApiClient {
     @Qualifier("youTubeClient")
     private final WebClient youTubeClient;
     private final ObjectMapper objectMapper;
-    private final StockStorage stockStorage;
 
     @Value("${API_YOUTUBE_KEY}")
     private String API_YOUTUBE_KEY;
@@ -36,10 +35,13 @@ public class StockApiClientImpl implements StockApiClient {
     /*api URI*/
     //종목 리스트 시가총액 순위
     public static final String MARKET_CAP = "/uapi/domestic-stock/v1/ranking/market-cap";
+    //종목 리스트 거래량 순위
+    public static final String TRADING_VALUE = "/uapi/domestic-stock/v1/quotations/volume-rank";
+
     //종목 상세 페이지 데이터
     public static final String DETAIL = "/uapi/domestic-stock/v1/quotations/inquire-price";
 
-    // 종목 상세페이지 시가총액 순위 가져오기
+    // 종목+ 시가총액 순위 가져오기
     @Override
     public List<StockDto.MarketCapRow> fetchMarketCapRow() {
         List<StockDto.MarketCapRow> list = new ArrayList<>();
@@ -76,6 +78,47 @@ public class StockApiClientImpl implements StockApiClient {
         }
         return list;
     }
+
+    // 종목+ 거래대금 순위 가져오기
+    @Override
+    public List<StockDto.TradingValueRow> fetchTradingValueRow() {
+        List<StockDto.TradingValueRow> list = new ArrayList<>();
+
+        //[1] api 호출
+        String path = TRADING_VALUE;
+        String trId = "FHPST01710000";
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("FID_COND_MRKT_DIV_CODE", "J");
+        params.put("FID_COND_SCR_DIV_CODE", "20171");
+        params.put("FID_INPUT_ISCD", "0000");
+        params.put("FID_DIV_CLS_CODE", "0");
+        params.put("FID_BLNG_CLS_CODE", "3");
+        params.put("FID_TRGT_CLS_CODE", "111111111");
+        params.put("FID_TRGT_EXLS_CLS_CODE", "0000000000");
+        params.put("FID_INPUT_PRICE_1", null);
+        params.put("FID_INPUT_PRICE_2", null);
+        params.put("FID_VOL_CNT", null);
+        params.put("FID_INPUT_DATE_1", null);
+
+        String json = callApi(path, trId, params);
+        System.out.println("거래대금 api json 결과:" + json);
+
+        //[2] json데이터 DTO parsing하기
+        try {
+            JsonNode jsonNode = objectMapper.readTree(json);
+            JsonNode outputs = jsonNode.path("output");
+
+            for (JsonNode output : outputs) {
+                list.add(StockDtoMapper.toTradingValueRow(output));
+            }
+        } catch (Exception e) {
+            log.error("상세 정보 파싱 실패: {}", e.getMessage());
+            return null;
+        }
+        return list;
+    }
+
     private String callMarketCapApi() {
         //WebClient webClient = webClientConfig.kisClient();
         String accessToken = authStockApiClient.getToken();

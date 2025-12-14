@@ -35,6 +35,15 @@ public class PublicStocksController {
     }
 
     /**
+     * 종목 리스트 페이지 거래대금 조회 API
+     * [GET] stocks/trading-value-ranking
+     */
+    @GetMapping("/trading-value-ranking")
+    public ResponseEntity<?> getTradingValueRanking() {
+        return Api.ok(stockService.getTradingValueRow());
+    }
+
+    /**
      * 종목명 종목코드 kis 마스터 파일 읽어 DB 저장
      * [GET] stocks/import/kospi
      */

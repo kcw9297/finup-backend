@@ -14,6 +14,10 @@ public interface StockStorage {
     void setMarketCapRow(List<StockDto.MarketCapRow> marketCapRowList);
     List<StockDto.MarketCapRow> getMarketCapRow();
 
+    // 종목+탭 거래대금 순위
+    void setTradingValueRow(List<StockDto.TradingValueRow> tradingValueRowList);
+    List<StockDto.TradingValueRow> getTradingValueRow();
+
     // 종목 상세 페이지 종목 데이터
     void setDetail(String code, StockDto.Detail detail);
     StockDto.Detail getDetail(String code);

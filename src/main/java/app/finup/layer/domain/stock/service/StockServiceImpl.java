@@ -34,7 +34,7 @@ public class StockServiceImpl implements StockService {
     private final NewsProvider newsProvider;
     private final StockStorage stockStorage;
 
-    // 종목 상세페이지 시가총액 순위 가져오기
+    // 종목+ 시가총액 순위 가져오기
     @Override
     public List<StockDto.MarketCapRow> getMarketCapRow() {
 
@@ -54,6 +54,28 @@ public class StockServiceImpl implements StockService {
         List<StockDto.MarketCapRow> marketCapRowList = stockApiClient.fetchMarketCapRow();
         stockStorage.setMarketCapRow(marketCapRowList);
         log.info("시가총액 리스트 갱신발급함");
+    }
+
+    // 종목+ 거래대금 순위 가져오기
+    @Override
+    public List<StockDto.TradingValueRow> getTradingValueRow() {
+
+        List<StockDto.TradingValueRow> tradingValueRowList = stockStorage.getTradingValueRow();
+        if (tradingValueRowList.isEmpty()){
+            refreshTradingValueRow();
+            tradingValueRowList = stockStorage.getTradingValueRow();
+            if(tradingValueRowList.isEmpty()) return Collections.emptyList(); //redis 오류로 인한 null 방지
+        }else{
+            log.info("거래대금 리스트 Redis에서 가져옴");
+        }
+        return tradingValueRowList;
+    }
+
+    @Override
+    public void refreshTradingValueRow(){
+        List<StockDto.TradingValueRow> tradingValueRowList = stockApiClient.fetchTradingValueRow();
+        stockStorage.setTradingValueRow(tradingValueRowList);
+        log.info("거래대금 리스트 갱신발급함");
     }
 
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장

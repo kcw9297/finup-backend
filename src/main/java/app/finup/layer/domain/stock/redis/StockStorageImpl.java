@@ -31,6 +31,18 @@ public class StockStorageImpl implements StockStorage {
     }
 
     @Override
+    public List<StockDto.TradingValueRow> getTradingValueRow() {
+        Object value = rt.opsForValue().get("tradingValueRowList");
+        if (value == null) return Collections.emptyList();
+        return objectMapper.convertValue(value, new TypeReference<List<StockDto.TradingValueRow>>(){});
+    }
+
+    @Override
+    public void setTradingValueRow(List<StockDto.TradingValueRow> tradingValueRowList) {
+        rt.opsForValue().set("tradingValueRowList", tradingValueRowList, Duration.ofHours(24).plusMinutes(30));
+    }
+
+    @Override
     public List<StockDto.MarketCapRow> getMarketCapRow() {
         //return (List<StockDto.MarketCapRow>) rt.opsForValue().get("marketCapRowList");
 

@@ -37,6 +37,16 @@ public class StockScheduler {
     }
 
     /**
+     * 종목+ 거래대금 리스트
+     * 화수목금토 새벽 3시 10분 갱신
+     */
+    @Scheduled(cron = "0 10 3 * * TUE,WED,THU,FRI,SAT")
+    public void refreshTradingValueRow(){
+        log.info("[SCHEDULER] 종목+ 거래대금 리스트 스케쥴러 실행");
+        stockService.refreshTradingValueRow();
+    }
+
+    /**
      * 종목 상세 페이지 종목 데이터
      * 화수목금토 새벽 3시 30분 갱신
      */
