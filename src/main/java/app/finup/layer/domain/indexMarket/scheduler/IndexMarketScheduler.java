@@ -12,11 +12,9 @@ import org.springframework.stereotype.Component;
 public class IndexMarketScheduler {
     private final IndexMarketService indexMarketService;
 
-    // 장 마감 이후 지수 스냅샷 저장용 스케줄러
-    @Scheduled(cron = "0 10 16 ? * MON-FRI")
+    // 자동 갱신
+    @Scheduled(cron = "0 */10 15-18 ? * MON-FRI")
     public void updateMarketIndex() {
-        log.info("지수 자동 갱신 시작");
         indexMarketService.updateIndexes();
-        log.info("지수 자동 갱신 완료");
     }
 }
