@@ -17,9 +17,10 @@ public class ExchangeRateDto {
     @NoArgsConstructor
     @Builder
     public static class Row {
-        private String curUnit;     // USD
-        private String curNm;       // 미국 달러
-        private String dealBasR;    // 1469.5
+        private String curUnit;     // 영어 이름
+        private String curNm;       // 한국 이름
+        private double today;       // 오늘 환율
+        private double yesterday;  // 어제 환율
         private String updatedAt;   // 서버 기준 시간
     }
 
