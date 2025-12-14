@@ -15,13 +15,15 @@ public final class IndexMarketDtoMapper {
         double rate = 0.0;
 
         if (apiRow.getClpr() != null) {
-            closePrice = Double.parseDouble(apiRow.getClpr().replace(",", ""));
+            try {
+                closePrice = Double.parseDouble(apiRow.getClpr().replace(",", ""));
+            } catch (NumberFormatException e) {
+                closePrice = 0.0;
+            }
         }
-
         if (apiRow.getVs() != null) {
             diff = Double.parseDouble(apiRow.getVs());
         }
-
         if (apiRow.getFltRt() != null) {
             rate = Double.parseDouble(apiRow.getFltRt());
         }

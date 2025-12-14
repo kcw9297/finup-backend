@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class IndexMarketScheduler {
     private final IndexMarketService indexMarketService;
 
-    // 평일 장 마감 이후 지수(KOSPI/KOSDAQ) 자동 갱신
+    // 장 마감 이후 지수 스냅샷 저장용 스케줄러
     @Scheduled(cron = "0 10 16 ? * MON-FRI")
     public void updateMarketIndex() {
         log.info("지수 자동 갱신 시작");
