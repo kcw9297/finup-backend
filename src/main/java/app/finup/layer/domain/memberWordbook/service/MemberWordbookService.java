@@ -24,5 +24,12 @@ public interface MemberWordbookService {
     /**
      * 단어장에서 단어 삭제
      */
-    void remove(MemberWordbookDto.Remove rq);
+    void remove(Long termId);
+
+
+    /**
+     * 단어 스크랩 여부 판단
+     */
+
+    boolean isAdded(Long termId);
 }

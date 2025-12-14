@@ -45,6 +45,13 @@ public class MemberWordbookServiceImpl implements MemberWordbookService {
     }
 
     @Override
+    public boolean isAdded(Long termId) {
+        Long memberId = SecurityUtil.getLoginMemberId();
+
+        return memberWordbookRepository.exists(memberId, termId);
+    }
+
+    @Override
     public void add(MemberWordbookDto.Add rq) {
         // [1] 로그인 회원 조회
         Member member = getLoginMember();
@@ -69,12 +76,12 @@ public class MemberWordbookServiceImpl implements MemberWordbookService {
     }
 
     @Override
-    public void remove(MemberWordbookDto.Remove rq) {
+    public void remove(Long termId) {
         // [1] 로그인 회원 조회
         Member member = getLoginMember();
 
         // [2] 단어 조회
-        Words word = wordsRepository.findById(rq.getTermId())
+        Words word = wordsRepository.findById(termId)
                 .orElseThrow(() -> new BusinessException(AppStatus.WORD_NOT_FOUND));
 
         // [3] 단어장 삭제

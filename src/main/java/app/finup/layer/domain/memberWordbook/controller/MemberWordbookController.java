@@ -46,11 +46,21 @@ public class MemberWordbookController {
 
     /**
      * 단어장에서 단어 삭제
-     * [DELETE] /api/members/wordbook
+     * [DELETE] /api/members/wordbook/{termId}
      */
-    @DeleteMapping
-    public ResponseEntity<?> remove(@RequestBody MemberWordbookDto.Remove rq) {
-        memberWordbookService.remove(rq);
+    @DeleteMapping(("/{termId:[0-9]+}"))
+    public ResponseEntity<?> remove(@PathVariable Long termId) {
+        memberWordbookService.remove(termId);
         return Api.ok();
     }
+
+    /**
+     * 특정 단어가 내 단어장에 있는지 여부 조회
+     * [GET] /api/members/wordbook/{wordId}
+     */
+    @GetMapping("/{termId:[0-9]+}")
+    public ResponseEntity<?> isAdded(@PathVariable Long termId) {
+        return Api.ok(memberWordbookService.isAdded(termId));
+    }
+
 }

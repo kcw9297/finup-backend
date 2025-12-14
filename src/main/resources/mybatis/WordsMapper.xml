@@ -6,7 +6,7 @@
 <mapper namespace="app.finup.layer.domain.words.mapper.WordsMapper">
     <select id="search" resultType="WordsRow">
         SELECT
-        w.term_id     AS id,
+        w.term_id     AS termId,
         w.name        AS `name`,
         w.description AS `description`
         FROM words w
