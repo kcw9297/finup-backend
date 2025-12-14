@@ -50,16 +50,29 @@ public class StockScheduler {
      * 종목 상세 페이지 종목 데이터
      * 화수목금토 새벽 3시 30분 갱신
      */
-    @Scheduled(cron = "0 30 3 * * TUE,WED,THU,FRI,SAT")
+    //@Scheduled(cron = "0 30 3 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 22 * * *")
     public void refreshDetail(){
         log.info("[SCHEDULER] 종목 상세 종목 데이터 스케쥴러 실행");
-        List<StockDto.MarketCapRow> list = stockService.getMarketCapRow();
-        if (list.isEmpty()) {
+        List<StockDto.MarketCapRow> marketCapList = stockService.getMarketCapRow();
+        List<StockDto.TradingValueRow> tradingValueList = stockService.getTradingValueRow();
+
+        if (marketCapList.isEmpty() && tradingValueList.isEmpty()) {
             log.warn("[SCHEDULER] 종목 리스트 비어있음");
             return;
         }
-        for (StockDto.MarketCapRow row : list) {
-            String code = row.getMkscShrnIscd();
+
+        Set<String> codes = new HashSet<>();
+
+        for (StockDto.MarketCapRow row : marketCapList) {
+            codes.add(row.getMkscShrnIscd());
+        }
+
+        for (StockDto.TradingValueRow row : tradingValueList) {
+            codes.add(row.getMkscShrnIscd());
+        }
+
+        for (String code : codes) {
             try {
                 stockService.refreshDetail(code);
                 Thread.sleep(200);

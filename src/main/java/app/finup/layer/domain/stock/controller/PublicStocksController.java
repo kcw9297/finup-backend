@@ -45,12 +45,12 @@ public class PublicStocksController {
 
     /**
      * 종목명 종목코드 kis 마스터 파일 읽어 DB 저장
-     * [GET] stocks/import/kospi
+     * [GET] stocks/import/stockName
      */
-    @GetMapping("/import/kospi")
-    public ResponseEntity<?> importKospi() throws Exception {
-        stockService.importKospi();
-        return Api.ok("kospi 파일 읽어 DB 저장");
+    @GetMapping("/import/stock-name")
+    public ResponseEntity<?> importStockName() throws Exception {
+        stockService.importStockName();
+        return Api.ok("kospi kosdaq 파일 읽어 DB 저장");
     }
 
     /**

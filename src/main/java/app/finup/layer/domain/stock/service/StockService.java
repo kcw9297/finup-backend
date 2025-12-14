@@ -16,7 +16,7 @@ public interface StockService {
     void refreshTradingValueRow();
 
     //List<StocksDto> getStocks();
-    void importKospi() throws Exception;
+    void importStockName() throws Exception;
     StockDto.Detail getDetail(String code);
     void refreshDetail(String code);
 
