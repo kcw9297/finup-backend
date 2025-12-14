@@ -4,6 +4,7 @@ import app.finup.common.constant.Const;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
+import app.finup.common.utils.FormatUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.infra.youtube.dto.YouTube;
 import app.finup.infra.youtube.provider.YouTubeProvider;
@@ -50,6 +51,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
         Integer count = videoLinkMapper.countForSearch(rq);
 
         // [2] 페이징 객체 매핑 및 반환
+        rows.forEach(row -> row.setDuration(FormatUtils.formatDuration(row.getDuration()))); // mybatis에서 문자열로 제공됨
         return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
     }
 
@@ -148,12 +150,18 @@ public class VideoLinkServiceImpl implements VideoLinkService {
                 .findById(rq.getVideoLinkId())
                 .orElseThrow(() -> new BusinessException(AppStatus.VIDEO_LINK_NOT_FOUND));
 
+        // 이미 존재하는 경우, 수정 불가
+        String videoUrl = rq.getVideoUrl();
+        String videoId = YouTubeUtils.parseVideoId(videoUrl);
+        if (Objects.equals(videoLink.getVideoId(), videoId))
+            throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS);
+
         // [2] 정보 수정을 위한, 영상 정보 조회
-        YouTube.Detail video = youTubeProvider.getVideo(videoLink.getVideoId());
+        YouTube.Detail video = youTubeProvider.getVideo(videoId);
 
         // [3] 영상 정보 기반 수정
         videoLink.edit(
-                rq.getVideoUrl(), video.getVideoId(), video.getTitle(), video.getThumbnailUrl(), video.getChannelTitle(),
+                videoUrl, videoId, video.getTitle(), video.getThumbnailUrl(), video.getChannelTitle(),
                 video.getDuration(), video.getViewCount(), video.getLikeCount(), video.getTags()
         );
 

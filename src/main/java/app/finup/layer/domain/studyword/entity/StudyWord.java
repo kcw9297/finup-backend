@@ -26,7 +26,7 @@ public class StudyWord extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long studyWordId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true) // 중복 불가
     private String name;
 
     @Column(nullable = false)

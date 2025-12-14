@@ -46,4 +46,12 @@ public interface StudyProgressRepository extends JpaRepository<StudyProgress, Lo
     """)
     void deleteByStudyId(Long studyId);
 
+
+    @Modifying
+    @Query("""
+        DELETE FROM StudyProgress sp
+        WHERE sp.study.studyId = :studyId AND sp.member.memberId = :memberId
+    """)
+    void deleteByStudyIdAndMemberId(Long studyId, Long memberId);
+
 }
