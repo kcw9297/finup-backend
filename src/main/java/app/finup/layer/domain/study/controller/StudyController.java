@@ -58,9 +58,9 @@ public class StudyController {
 
     /**
      * 학습 시작 (현재 학습의 학습 진도를 생성)
-     * [POST] /{studyId}/progress/proceed
+     * [POST] /{studyId}/progress
      */
-    @PostMapping("/{studyId:[0-9]+}/progress/start")
+    @PostMapping("/{studyId:[0-9]+}/progress")
     public ResponseEntity<?> startStudyProgress(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                 @PathVariable Long studyId) {
 
@@ -78,12 +78,29 @@ public class StudyController {
      * [PATCH] /{studyId}/progress/complete
      */
     @PatchMapping("/{studyId:[0-9]+}/progress/complete")
-    public ResponseEntity<?> proceedStudyProgress(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                  @PathVariable Long studyId) {
+    public ResponseEntity<?> completeStudyProgress(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                   @PathVariable Long studyId) {
 
         // [1] 갱신 수행
         Long memberId = userDetails.getMemberId();
         studyProgressService.complete(studyId, memberId);
+
+        // [2] 성공 응답 반환
+        return Api.ok();
+    }
+
+
+    /**
+     * 현재 학습의 진도 초기화 (진도 정보 삭제)
+     * [DELETE] /{studyId}/progress
+     */
+    @DeleteMapping("/{studyId:[0-9]+}/progress")
+    public ResponseEntity<?> initializeStudyProgress(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                     @PathVariable Long studyId) {
+
+        // [1] 갱신 수행
+        Long memberId = userDetails.getMemberId();
+        studyProgressService.initialize(studyId, memberId);
 
         // [2] 성공 응답 반환
         return Api.ok();
