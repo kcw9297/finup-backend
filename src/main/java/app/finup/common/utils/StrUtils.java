@@ -69,6 +69,17 @@ public final class StrUtils {
     }
 
 
+    public static String decodeToUTF8(String text) {
+
+        try {
+            return UriUtils.decode(text, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            log.error("UTF8 인코딩 실패. 오류 : {}", e.getMessage());
+            throw new UtilsException(AppStatus.UTILS_LOGIC_FAILED, e);
+        }
+    }
+
+
     public static String createRandomNumString(int length) {
 
         // [1] 숫자 format, 랜덤 수 범위 계산

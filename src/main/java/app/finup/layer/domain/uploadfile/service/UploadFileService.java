@@ -5,6 +5,10 @@ import app.finup.layer.domain.uploadfile.dto.UploadFileDto;
 import java.util.Collection;
 import java.util.List;
 
+import app.finup.layer.domain.uploadfile.entity.UploadFile;
+import org.springframework.web.multipart.MultipartFile;
+
+
 
 /**
  * 파일 핵심 비즈니스 로직 처리
@@ -33,4 +37,7 @@ public interface UploadFileService {
      * @param uploadFileIds 삭제 대상 파일번호 리스트
      */
     void removeAll(Collection<Long> uploadFileIds);
+
+    UploadFile upload(MultipartFile file);
+
 }

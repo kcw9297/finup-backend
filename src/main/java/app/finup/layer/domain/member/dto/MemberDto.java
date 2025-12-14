@@ -72,12 +72,36 @@ public final class MemberDto {
         }
 
     }
+    /**
+     * 닉네임 수정 요청에 사용
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class EditNickname {
+        private String nickname;
+    }
+    /**
+     * 비밀번호 수정 요청에 사용
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class EditPassword {
+        private String currentPassword;
+        private String newPassword;
+    }
 
+  
+  
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class Join {
+      
         @Email
         private String email;
 

@@ -21,26 +21,30 @@ import java.util.List;
 public class NewsScheduler {
     private final NewsProvider newsProvider;
     private final NewsRedisStorage newsRedisStorage;
-    private static final Duration TTL_NEWS = Duration.ofMinutes(2);
+    private static final Duration TTL_NEWS = Duration.ofMinutes(30);
 
-    @Scheduled(fixedRate = 1000 * 60 * 3, initialDelay = 1000 * 60 * 3)
+    @Scheduled(fixedRate = 1000 * 60 * 15)
     public void updateNewsCache(){
-        refresh("date", 10);
-        refresh("sim", 10);
+        refresh("date", 50);
+        refresh("sim", 50);
         log.info("[SCHEDULER] 뉴스 캐시 갱신 완료");
     }
 
     private void refresh(String category, int limit) {
-        String key = "NEWS:CATEGOTY:" + category + ":" + limit;
+        String key = "NEWS:CATEGORY:" + category + ":" + limit;
 
         List<NewsDto.Row> fresh = newsProvider.fetchNews(category, limit);
 
-        if (fresh != null && !fresh.isEmpty()) {
+        if(isComplete(fresh)){
             newsRedisStorage.saveNews(key, fresh, TTL_NEWS);
             log.info("[SCHEDULER] SAVE {}", key);
-        } else {
-            log.warn("[SCHEDULER] SKIP SAVE (empty) {}", key);
+        }else{
+            log.warn("[SCHEDULER] SKIP SAVE (incomplete) {}", key);
         }
+    }
+
+    private boolean isComplete(List<NewsDto.Row> list) {
+        return list != null && list.size() >= 5;
     }
 }
 

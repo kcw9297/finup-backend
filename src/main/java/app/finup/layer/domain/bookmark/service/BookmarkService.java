@@ -29,8 +29,10 @@ public interface BookmarkService {
 
     /**
      * 북마크 해제
+     * @param memberId 삭제를 요청하는 회원번호
      * @param targetId 대상 고유번호
      * @param bookmarkTarget 대상 정보 (NEWS, STUDY, ...)
      */
-    void remove(Long targetId, BookmarkTarget bookmarkTarget);
+    void remove(Long memberId, Long targetId, BookmarkTarget bookmarkTarget);
+
 }

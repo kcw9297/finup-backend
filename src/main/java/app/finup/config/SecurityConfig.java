@@ -1,6 +1,7 @@
 package app.finup.config;
 
 import app.finup.common.constant.Url;
+import app.finup.common.utils.EnvUtils;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.layer.domain.member.repository.MemberRepository;
 import app.finup.security.filter.CsrfVerificationFilter;
@@ -11,6 +12,7 @@ import app.finup.security.service.NormalUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,6 +43,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final Environment env;
     private final MemberRepository memberRepository;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CsrfVerificationFilter csrfVerificationFilter;
@@ -57,7 +60,7 @@ public class SecurityConfig {
                 .csrf(customer -> customer
                         .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT, "/**") // 일반&소셜 로그인, 로그아웃
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
+                        .csrfTokenRepository(csrfTokenRepository()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
                 )
 
                 // ▶ 필터 설정 - 커스텀 필터 추가
@@ -104,6 +107,19 @@ public class SecurityConfig {
 
         // [3] 설정 저장
         return http.build();
+    }
+
+
+    @Bean // CSRF 쿠키를 관리하는 Repository
+    public CookieCsrfTokenRepository csrfTokenRepository() {
+        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+        repository.setCookieCustomizer(cookie -> {
+            cookie.maxAge(86400);  // 24시간 (초 단위)
+            cookie.sameSite("Lax"); // SameSite 속성
+            cookie.secure(EnvUtils.isProd(env));
+            cookie.path("/");
+        });
+        return repository;
     }
 
     @Bean

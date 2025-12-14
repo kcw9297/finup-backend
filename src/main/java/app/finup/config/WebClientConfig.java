@@ -29,6 +29,9 @@ public class WebClientConfig {
     @Value("${API_KEXIM_ENDPOINT}")
     private String keximEndpoint;
 
+    @Value("${API_OPENPORTAL_ENDPOINT}")
+    private String openPortalEndpoint;
+
     // 필요 상수
     @Value("${api.naver-news.client.id}")
     private String naverClientId;
@@ -49,7 +52,10 @@ public class WebClientConfig {
     private String dataPortalSecret;
 
     @Value("${API_KEXIM_KEY}")
-    private String KEXIM_KEY;
+    private String keximKey;
+
+    @Value("${API_OPENPORTAL_KEY}")
+    private String openPortalKey;
 
 
     @Bean(name = "youTubeClient") // 유튜브 API 사용을 위한 Client
@@ -99,6 +105,13 @@ public class WebClientConfig {
     public WebClient keximClient() {
         return WebClient.builder()
                 .baseUrl(keximEndpoint)
+                .build();
+    }
+
+    @Bean(name="openPortalClient")
+    public WebClient openPortalClient() {
+        return WebClient.builder()
+                .baseUrl(openPortalEndpoint)
                 .build();
     }
 }

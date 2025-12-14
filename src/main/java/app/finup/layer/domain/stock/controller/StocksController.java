@@ -1,11 +1,12 @@
 package app.finup.layer.domain.stock.controller;
 
 import app.finup.common.constant.Url;
+import app.finup.common.utils.Api;
+import app.finup.layer.domain.news.dto.NewsDto;
+import app.finup.layer.domain.news.service.StockNewsAiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 종목+ 리스트 REST API 클래스
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Url.STOCKS)
 @RequiredArgsConstructor
 public class StocksController {
+    private final StockNewsAiService stockNewsAiService;
 
     //private final StocksService stocksService;
 
@@ -29,4 +31,6 @@ public class StocksController {
         //[1]요청
     return null;
     }
+
+
 }

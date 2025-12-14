@@ -1,7 +1,6 @@
 package app.finup.layer.domain.exchangeRate.dto;
 
 import app.finup.layer.domain.exchangeRate.entity.ExchangeRate;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -14,7 +13,6 @@ public final class ExchangeRateDtoMapper {
         if (apiRow.getDealBasR() != null) {
             dealBasR = Double.parseDouble(apiRow.getDealBasR().replace(",", ""));
         }
-
         return ExchangeRate.builder()
                 .currency(apiRow.getCurUnit())
                 .dealBasR(dealBasR)
@@ -24,20 +22,13 @@ public final class ExchangeRateDtoMapper {
 
     // Entity → 내부 API 응답 DTO(Row) 변환
     public static ExchangeRateDto.Row toRow(ExchangeRate entity) {
+        double today = entity.getDealBasR();
         return ExchangeRateDto.Row.builder()
                 .curUnit(entity.getCurrency())
-                .dealBasR(String.valueOf(entity.getDealBasR()))
+                .curNm(null)
+                .today(today)
+                .yesterday(today)
                 .updatedAt(entity.getUpdatedAt().toString())
-                .build();
-    }
-
-    // 외부 API DTO → 응답 DTO
-    public static ExchangeRateDto.Row fromApi(ExchangeRateDto.ApiRow apiRow) {
-        return ExchangeRateDto.Row.builder()
-                .curUnit(apiRow.getCurUnit())
-                .curNm(apiRow.getCurNm())
-                .dealBasR(apiRow.getDealBasR())
-                .updatedAt(LocalDateTime.now().toString())
                 .build();
     }
 }

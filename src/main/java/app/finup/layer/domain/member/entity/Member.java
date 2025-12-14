@@ -128,4 +128,28 @@ public class Member extends BaseEntity {
                 .role(MemberRole.ADMIN)
                 .build();
     }
+
+    /**
+     * 닉네임 변경
+     * @param nickname
+     */
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    /**
+     * 비밀번호 변경
+     * @param encodedPassword
+     */
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
+
+    /**
+     * 프로필 이미지 변경
+     * @param profileImage
+     */
+    public void changeProfileImage(UploadFile profileImage) {
+        this.profileImage = profileImage;
+    }
 }

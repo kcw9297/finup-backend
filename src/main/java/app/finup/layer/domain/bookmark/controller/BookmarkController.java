@@ -14,7 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 북마크 공개용 REST API 클래스
+ * 북마크 REST API 클래스
  * @author kcw
  * @since 2025-12-07
  */
@@ -29,9 +29,9 @@ public class BookmarkController {
 
     /**
      * 현재 로그인 회원의 북마크 목록 조회
-     * [GET] /bookmarks
+     * [GET] /bookmarks/my
      */
-    @GetMapping
+    @GetMapping("/my")
     public ResponseEntity<?> getMyList(@AuthenticationPrincipal CustomUserDetails userDetails) {
 
         Long memberId = userDetails.getMemberId();
@@ -49,6 +49,7 @@ public class BookmarkController {
                                  @RequestBody BookmarkDto.Add rq) {
 
         // [1] 북마크 등록
+        rq.setMemberId(userDetails.getMemberId());
         bookmarkService.add(rq);
 
         // [2] 성공 응답 반환
@@ -61,11 +62,13 @@ public class BookmarkController {
      * [DELETE] /bookmarks
      */
     @DeleteMapping
-    public ResponseEntity<?> remove(@RequestParam Long targetId,
+    public ResponseEntity<?> remove(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                    @RequestParam Long targetId,
                                     @RequestParam BookmarkTarget bookmarkTarget) {
 
         // [1] 북마크 삭제
-        bookmarkService.remove(targetId, bookmarkTarget);
+        Long memberId = userDetails.getMemberId();
+        bookmarkService.remove(memberId, targetId, bookmarkTarget);
 
         // [2] 성공 응답 반환
         return Api.ok();

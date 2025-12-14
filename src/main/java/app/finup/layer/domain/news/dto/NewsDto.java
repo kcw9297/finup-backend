@@ -22,13 +22,14 @@ public final class NewsDto {
         private static final long serialVersionUID = 1L;
 
         private String title;
-        private String summary;
+        private String description;
         private String thumbnail;
         private String publisher;
         private String link;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime publishedAt;
-        private Ai ai;
+        private Ai ai; //Deep AI분석
+        private Summary summary; //Light AI분석
     }
     @Data
     @AllArgsConstructor
@@ -40,5 +41,23 @@ public final class NewsDto {
         private String summary;
         private List<Map<String,String>> keywords;
         private String insight;
+    }
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Summary implements Serializable{
+        @Serial
+        private static final long serialVersionUID = 1L;
+
+        private String summary;
+        private List<Map<String,String>> keywords;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AiRequest {
+        private String link;
+        private String description;
     }
 }

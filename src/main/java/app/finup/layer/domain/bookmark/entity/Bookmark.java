@@ -16,7 +16,12 @@ import org.hibernate.annotations.OnDeleteAction;
  */
 
 @Entity
-@Table(name = "bookmark")
+@Table(
+        name = "bookmark",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"member_id", "target_id", "bookmark_target"})
+        }
+)
 @DynamicUpdate
 @Getter
 @ToString(callSuper = true)

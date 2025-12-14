@@ -37,6 +37,9 @@ public final class YouTubeUtils {
     public static final String PATTERN_VIDEO_ID =
             "(?:youtube\\.com/watch\\?v=|youtu\\.be/|youtube\\.com/embed/)([a-zA-Z0-9_-]{11})";
 
+    public static final String PATTERN_VIDEO_URL =
+            "^(https?://)?(www\\.|m\\.)?(youtube\\.com/(watch\\?v=|embed/)|youtu\\.be/)[a-zA-Z0-9_-]{11}.*$";
+
 
     /**
      * URL 내 videoId 추출

@@ -9,7 +9,7 @@
     <select id="search" resultType="VideoLinkRow">
         SELECT vl.video_link_id, vl.video_url, vl.video_id, vl.title,
                vl.thumbnail_url, vl.channel_title, vl.duration,
-               vl.published_at, vl.last_synced_at, vl.video_count, vl.like_count, vl.tags
+               vl.published_at, vl.last_synced_at, vl.view_count, vl.like_count, vl.tags
         FROM video_link vl
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
         <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">

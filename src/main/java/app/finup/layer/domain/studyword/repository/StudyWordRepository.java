@@ -21,4 +21,6 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
         WHERE sw.studyWordId = :studyWordId
     """)
     Optional<StudyWord> findWithImageById(Long studyWordId);
+
+    boolean existsByName(String name);
 }
