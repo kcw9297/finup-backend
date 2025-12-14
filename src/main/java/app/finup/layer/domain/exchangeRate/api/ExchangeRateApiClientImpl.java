@@ -23,7 +23,7 @@ public class ExchangeRateApiClientImpl implements ExchangeRateApiClient {
 
     // 수출입은행 인증 키
     @Value("${API_KEXIM_KEY}")
-    private String apiKeximKey;
+    private String keximKey;
 
     // API 요청용 날짜 포맷 (yyyyMMdd)
     private static final DateTimeFormatter FMT =
@@ -35,7 +35,7 @@ public class ExchangeRateApiClientImpl implements ExchangeRateApiClient {
         try {
             String json = keximClient.get()
                     .uri(uri -> uri
-                            .queryParam("authkey", apiKeximKey)
+                            .queryParam("authkey", keximKey)
                             .queryParam("searchdate", searchDate.format(FMT))
                             .queryParam("data", "AP01")
                             .build()

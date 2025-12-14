@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 /**
  * 홈페이지 환율 DTO 클래스
  * @author phj
  * @since 2025-12-11
  */
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExchangeRateDto {
     @Data
@@ -24,7 +25,7 @@ public class ExchangeRateDto {
         private String updatedAt;   // 서버 기준 시간
     }
 
-    // KEXIM API 전용 DTO
+    // 한국수출입은행 API 전용 DTO
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Data
     @AllArgsConstructor

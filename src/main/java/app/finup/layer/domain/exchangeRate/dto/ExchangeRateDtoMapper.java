@@ -1,7 +1,6 @@
 package app.finup.layer.domain.exchangeRate.dto;
 
 import app.finup.layer.domain.exchangeRate.entity.ExchangeRate;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
 
 import java.time.LocalDateTime;
