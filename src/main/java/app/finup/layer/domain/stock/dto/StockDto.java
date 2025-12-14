@@ -235,4 +235,5 @@ public class StockDto {
             private String url;
         }
     }
+
 }

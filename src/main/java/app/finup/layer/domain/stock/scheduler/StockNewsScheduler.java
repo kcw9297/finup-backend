@@ -21,13 +21,17 @@ public class StockNewsScheduler {
     private final NewsRedisStorage newsRedisStorage;
     private static final Duration TTL_STOCK = Duration.ofMinutes(30);
 
-    @Scheduled(fixedRate = 3 * 60 * 1000)
+    @Scheduled(fixedRate = 15 * 60 * 1000)
     public void updateStockNews() {
-        List<String> stocks = List.of("삼성전자", "SK하이닉스");
+        List<String> stocks = List.of(
+                "삼성전자",
+                "SK하이닉스",
+                "현대차",
+                "LG에너지솔루션");
 
         for (String stockName : stocks){
-            refresh(stockName, "date", 10);
-            refresh(stockName,"sim", 10);
+            refresh(stockName, "date", 30);
+            //refresh(stockName,"sim", 30);
         }
 
         log.info("[STOCK_SCHEDULER] 갱신 완료 ({} 종목)", stocks.size());

@@ -148,7 +148,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<NewsDto.Row> getStockNews(String stockName, String category) {
-        return newsProvider.getStockNews(stockName, category, 10);
+        return newsProvider.getStockNews(stockName, category, 30);
     }
 }
 
