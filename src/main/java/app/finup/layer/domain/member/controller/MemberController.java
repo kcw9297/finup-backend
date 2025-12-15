@@ -59,11 +59,7 @@ public class MemberController {
         return Api.ok(rows);
     }
 
-    @PostMapping
-    public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
-        MemberDto.Join rp = memberService.join(rq);
-        return Api.ok(rp);
-    }
+
     /**
      * 회원 닉네임 수정 API
      * [PATCH] /members/{memberId}/nickname
