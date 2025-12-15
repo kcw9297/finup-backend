@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Profile("prod") //잠깐 비활성화
+//@Profile("prod") //잠깐 비활성화
 @RequiredArgsConstructor
 public class NewsScheduler {
     private final NewsProvider newsProvider;
