@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AiManagerImpl implements AiManager {
     private  final OpenAiChatModel openAiChatModel;
+    private final OpenAiEmbeddingModel embeddingModel;
     private final ObjectMapper objectMapper;
 
     public Map<String, Object> runJsonPrompt(String prompt) {
@@ -30,6 +32,12 @@ public class AiManagerImpl implements AiManager {
             );
         }
     }
+
+    @Override
+    public float[] embed(String text) {
+        return embeddingModel.embed(text);
+    }
+
     private String extractJson(String text) {
         int start = text.indexOf("{");
         int end = text.lastIndexOf("}");

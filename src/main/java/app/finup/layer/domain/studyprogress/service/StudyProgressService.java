@@ -28,6 +28,14 @@ public interface StudyProgressService {
 
 
     /**
+     * 학습 진도를 "진행 중" 상태로 변경
+     * @param studyId 단계학습번호
+     * @param memberId 회원번호
+     */
+    void progress(Long studyId, Long memberId);
+
+
+    /**
      * 학습 진도를 "학습 완료" 상태로 변경
      * @param studyId 단계학습번호
      * @param memberId 회원번호

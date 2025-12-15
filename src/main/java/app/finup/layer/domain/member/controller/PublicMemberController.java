@@ -29,7 +29,7 @@ public class PublicMemberController {
      * [POST] /public/api/members/join
      */
 
-    @PostMapping("/join")
+    @PostMapping
     public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
         MemberDto.Join rp = memberService.join(rq);
         return Api.ok(rp);

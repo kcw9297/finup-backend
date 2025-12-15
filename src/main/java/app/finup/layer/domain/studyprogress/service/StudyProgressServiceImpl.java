@@ -84,6 +84,24 @@ public class StudyProgressServiceImpl implements StudyProgressService {
 
 
     @Override
+    public void progress(Long studyId, Long memberId) {
+
+        // [1] entity 조회
+        StudyProgress studyProgress =
+                studyProgressRepository
+                        .findByStudyIdAndMemberId(studyId, memberId)
+                        .orElse(null);
+
+        // [2] 만약 엔티티가 존재하지 않는 경우, 새롭게 생성 (단계 학습을 최초 열람한 경우)
+        if (Objects.isNull(studyProgress))
+            studyProgressRepository.save(createNewProgress(studyId, memberId, StudyStatus.IN_PROGRESS));
+
+            // [3] 이미 존재하는 경우, 상태만 새롭게 생신
+        else studyProgress.progress();
+    }
+
+
+    @Override
     public void complete(Long studyId, Long memberId) {
 
         // [1] entity 조회
