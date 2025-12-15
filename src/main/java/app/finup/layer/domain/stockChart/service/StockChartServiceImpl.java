@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -44,6 +47,10 @@ public class StockChartServiceImpl implements StockChartService {
                     .header("custtype", "P")
                     .retrieve()
                     .bodyToMono(String.class)
+                    .retryWhen(
+                            Retry.backoff(3, Duration.ofMillis(300))
+                                    .filter(e -> e instanceof WebClientResponseException)
+                    )
                     .block();
             log.info("RAW JSON: {}", json);
             //이중 json처리
