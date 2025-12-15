@@ -3,7 +3,7 @@ package app.finup.layer.domain.member.service;
 
 import app.finup.common.dto.Page;
 import app.finup.layer.domain.member.dto.MemberDto;
-import app.finup.layer.domain.member.dto.MemberJoinDto;
+import app.finup.layer.domain.member.dto.MemberDto.Join;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -28,13 +28,6 @@ public interface MemberService {
      * @return 회원 리스트
      */
     List<MemberDto.Row> getMemberList();
-
-    /**
-     * 회원가입
-     *
-     * @return 가입한 회원 정보
-     */
-    MemberJoinDto.JoinNember join(MemberJoinDto.JoinNember rq);
 
     /**
      * 회원 닉네임 수정
