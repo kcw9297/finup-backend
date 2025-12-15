@@ -59,23 +59,8 @@ public class MemberController {
         // [2] 페이징 응답 전달
         return Api.ok(rows);
     }
-    /**
-     * 회원가입
-     * [POST] api/members
-     */
 
-
-    @PostMapping
-    public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
-
-        log.info("[JOIN][REQUEST] email={}", rq.getEmail());
-
-        MemberDto.Join rp = memberService.join(rq);
-
-        log.info("[JOIN][RESPONSE] email={}", rp != null ? rp.getEmail() : null);
-
-        return Api.ok(rp);
-    }
+  
     /**
      * 회원 닉네임 수정 API
      * [PATCH] /members/{memberId}/nickname
