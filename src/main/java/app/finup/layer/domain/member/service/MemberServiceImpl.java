@@ -210,23 +210,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberDto.Row getMe() {
+    public MemberDto.Row getDetail(Long memberId) {
+        // [1] 회원 조회 (존재 여부 검증 포함)
+        Member member = getMember(memberId);
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new BusinessException(AppStatus.UNAUTHORIZED);
-        }
-
-        Object principal = auth.getPrincipal();
-        if (!(principal instanceof CustomUserDetails userDetails)) {
-            throw new BusinessException(AppStatus.UNAUTHORIZED);
-        }
-
-        Member member = getMember(userDetails.getMemberId());
-
+        // [2] Entity → DTO 변환
         MemberDto.Row row = MemberDtoMapper.toRow(member);
 
+        // [3] 프로필 이미지 URL 보정
         if (member.getProfileImageFile() != null) {
             row.setProfileImageUrl(
                     uploadFileManager.getFullUrl(

@@ -35,7 +35,7 @@ public interface MemberService {
      */
     MemberDto.Row join(MemberDto.Join rq);
 
-    MemberDto.Row getMe();
+    MemberDto.Row getDetail(Long memberId);
     /**
      * 회원 닉네임 수정
      * @param

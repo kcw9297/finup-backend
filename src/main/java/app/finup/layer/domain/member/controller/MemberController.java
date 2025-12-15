@@ -6,10 +6,12 @@ import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.service.MemberService;
+import app.finup.security.dto.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,12 +65,13 @@ public class MemberController {
 
     /**
      *현재 로그인한 회원 정보 조회
-     * [GET]
+     * [GET] /api/members/me/detail
      * @return 로그인한 회원 정보
      */
-    @GetMapping("/me")
-    public ResponseEntity<?> getMe() {
-        return Api.ok(memberService.getMe());
+    @GetMapping("/me/detail")
+    public ResponseEntity<?> getDetail(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long memberId = userDetails.getMemberId();
+        return Api.ok(memberService.getDetail(memberId));
     }
 
     /**
@@ -91,69 +94,52 @@ public class MemberController {
   
     /**
      * 회원 닉네임 수정 API
-     * [PATCH] /members/{memberId}/nickname
-     * @param memberId 회원 번호
+     * [PATCH] /members/me/nickname
+     * @param userDetails 회원 정보
      * @param rq 닉네임 수정 요청 DTO
      */
-    @PatchMapping("/{memberId:[0-9]+}/nickname")
-    public ResponseEntity<?> editNickname(@PathVariable Long memberId,
+    @PatchMapping("/me/nickname")
+    public ResponseEntity<?> editNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
                                           @RequestBody MemberDto.EditNickname rq) {
-        rq.setMemberId(memberId);
-
-        log.info("[EDIT_NICKNAME][REQUEST] memberId={}", memberId);
-
+        rq.setMemberId(userDetails.getMemberId());
         // [1] 수정 요청
         memberService.editNickname(rq);
 
-
-        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}", memberId);
+        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}", userDetails.getMemberId());
 
         // [2] 성공 응답
         return Api.ok();
     }
     /**
      * 회원 비밀번호 수정 API
-     * [PATCH] /members/{memberId}/password
-     * @param memberId 회원 번호
+     * [PATCH] /members/me/password
+     * @param userDetails 회원 정보
      * @param rq 비밀번호 수정 요청 DTO
      */
-    @PatchMapping("/{memberId:[0-9]+}/password")
-    public ResponseEntity<?> editPassword(@PathVariable Long memberId,
+    @PatchMapping("/me/password")
+    public ResponseEntity<?> editPassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                           @RequestBody MemberDto.EditPassword rq) {
-        rq.setMemberId(memberId);
-
-        log.info("[EDIT_PASSWORD][REQUEST] memberId={}", memberId);
+        rq.setMemberId(userDetails.getMemberId());
 
         // [1] 수정 요청
         memberService.editPassword(rq);
-
-        log.info("[EDIT_PASSWORD][SUCCESS] memberId={}", memberId);
-
 
         // [2] 성공 응답
         return Api.ok();
     }
     /**
      * 회원 프로필 이미지 수정 API
-     * [PATCH] /members/{memberId}/profile-image
-     * @param memberId 회원 번호
+     * [POST] /members/me/profile-image
+     * @param userDetails 유저 정보
      * @param file 업로드 이미지 파일
      */
-    @PatchMapping("/{memberId:[0-9]+}/profile-image")
-    public ResponseEntity<?> editProfileImage(@PathVariable Long memberId,
+    @PostMapping("/me/profile-image")
+    public ResponseEntity<?> editProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                               @RequestParam("file") MultipartFile file) {
 
-        log.info("[PROFILE_IMAGE][REQUEST] memberId={}, fileNull={}, filename={}, size={}, contentType={}",
-                memberId,
-                (file == null),
-                (file != null ? file.getOriginalFilename() : null),
-                (file != null ? file.getSize() : null),
-                (file != null ? file.getContentType() : null)
-        );
+        memberService.editProfileImage(userDetails.getMemberId(), file);
 
-        memberService.editProfileImage(memberId, file);
-
-        log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", memberId);
+        log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", userDetails.getMemberId());
         return Api.ok();
     }
 
