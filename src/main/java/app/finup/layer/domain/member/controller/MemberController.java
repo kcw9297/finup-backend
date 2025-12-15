@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -57,8 +59,23 @@ public class MemberController {
         // [2] 페이징 응답 전달
         return Api.ok(rows);
     }
+    /**
+     * 회원가입
+     * [POST] api/members
+     */
 
 
+    @PostMapping
+    public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
+
+        log.info("[JOIN][REQUEST] email={}", rq.getEmail());
+
+        MemberDto.Join rp = memberService.join(rq);
+
+        log.info("[JOIN][RESPONSE] email={}", rp != null ? rp.getEmail() : null);
+
+        return Api.ok(rp);
+    }
     /**
      * 회원 닉네임 수정 API
      * [PATCH] /members/{memberId}/nickname
@@ -68,9 +85,15 @@ public class MemberController {
     @PatchMapping("/{memberId:[0-9]+}/nickname")
     public ResponseEntity<?> editNickname(@PathVariable Long memberId,
                                           @RequestBody MemberDto.EditNickname rq) {
+        rq.setMemberId(memberId);
+
+        log.info("[EDIT_NICKNAME][REQUEST] memberId={}", memberId);
 
         // [1] 수정 요청
-        memberService.editNickname(memberId, rq);
+        memberService.editNickname(rq);
+
+
+        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}", memberId);
 
         // [2] 성공 응답
         return Api.ok();
@@ -84,9 +107,15 @@ public class MemberController {
     @PatchMapping("/{memberId:[0-9]+}/password")
     public ResponseEntity<?> editPassword(@PathVariable Long memberId,
                                           @RequestBody MemberDto.EditPassword rq) {
+        rq.setMemberId(memberId);
+
+        log.info("[EDIT_PASSWORD][REQUEST] memberId={}", memberId);
 
         // [1] 수정 요청
-        memberService.editPassword(memberId, rq);
+        memberService.editPassword(rq);
+
+        log.info("[EDIT_PASSWORD][SUCCESS] memberId={}", memberId);
+
 
         // [2] 성공 응답
         return Api.ok();
@@ -101,7 +130,16 @@ public class MemberController {
     public ResponseEntity<?> editProfileImage(@PathVariable Long memberId,
                                               @RequestParam("file") MultipartFile file) {
 
+        log.info("[EDIT_PROFILE_IMAGE][REQUEST] memberId={}, fileName={}, size={}",
+                memberId,
+                file != null ? file.getOriginalFilename() : null,
+                file != null ? file.getSize() : null
+        );
+
         memberService.editProfileImage(memberId, file);
+
+        log.info("[EDIT_PROFILE_IMAGE][SUCCESS] memberId={}", memberId);
+
         return Api.ok();
     }
 

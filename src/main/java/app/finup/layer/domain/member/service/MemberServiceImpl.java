@@ -47,7 +47,6 @@ public class MemberServiceImpl implements MemberService {
 
         return Page.of(rp, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }
-
     @Override
     @Transactional(readOnly = true)
     public List<MemberDto.Row> getMemberList() {
@@ -55,7 +54,6 @@ public class MemberServiceImpl implements MemberService {
                 .map(MemberDtoMapper::toRow)
                 .toList();
     }
-
     //  회원가입
     @Override
     @Transactional
@@ -118,11 +116,13 @@ public class MemberServiceImpl implements MemberService {
     }
     /**
      * 닉네임 수정
-     * @param memberId 회원 번호
+     * @param
      * @param rq 닉네임 수정 요청 DTO
      */
     @Override
-    public void editNickname(Long memberId, MemberDto.EditNickname rq) {
+    public void editNickname(MemberDto.EditNickname rq) {
+
+        Long memberId = rq.getMemberId();
 
         // [1] 회원 조회
         Member member = getMember(memberId);
@@ -138,11 +138,13 @@ public class MemberServiceImpl implements MemberService {
     }
     /**
      * 비밀번호 수정
-     * @param memberId 회원 번호
+     * @param
      * @param rq 비밀번호 수정 요청 DTO
      */
     @Override
-    public void editPassword(Long memberId, MemberDto.EditPassword rq) {
+    public void editPassword(MemberDto.EditPassword rq) {
+
+        Long memberId = rq.getMemberId();
 
         // [1] 회원 조회
         Member member = getMember(memberId);
