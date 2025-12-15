@@ -6,7 +6,6 @@ import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.dto.MemberDto.Join;
 import org.springframework.web.multipart.MultipartFile;
 
-
 import java.util.List;
 
 /**
@@ -30,6 +29,12 @@ public interface MemberService {
     List<MemberDto.Row> getMemberList();
 
     /**
+     * 회원가입
+     * @return 가입한 회원 정보
+     */
+    MemberDto.Join join(MemberDto.Join rq);
+
+    /**
      * 회원 닉네임 수정
      * @param memberId 회원 번호
      * @param rq 닉네임 수정 요청 DTO
@@ -50,5 +55,4 @@ public interface MemberService {
      */
     void editProfileImage(Long memberId, MultipartFile file);
 
-    MemberDto.Join join(MemberDto.Join rq);
 }
