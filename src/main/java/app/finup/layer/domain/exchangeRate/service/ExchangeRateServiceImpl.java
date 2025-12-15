@@ -20,51 +20,60 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     private final ExchangeRateApiClient apiClient;
     private final ExchangeRateRepository repository;
 
-    // 최신 환율
+    /// 최신 환율 조회 (최대 10일 fallback)
     @Override
     public List<ExchangeRateDto.Row> getLatestRates() {
+        // 기준 날짜 계산 (주말 / 11시 이전 보정)
+        LocalDate baseDate = determineInitialSearchDate();
 
-        // 기준 날짜 계산 (주말, 11시 이전 보정)
-        LocalDate todayDate = determineInitialSearchDate();
-        LocalDate yesterdayDate = todayDate.minusDays(1);
+        // 최대 10일 전까지 fallback 시도
+        for (int i = 0; i < 10; i++) {
 
-        // 오늘 / 어제 환율 조회
-        List<ExchangeRateDto.ApiRow> todayRows = apiClient.fetchRates(todayDate);
-        List<ExchangeRateDto.ApiRow> yesterdayRows = apiClient.fetchRates(yesterdayDate);
+            LocalDate todayDate = baseDate.minusDays(i);
+            LocalDate yesterdayDate = todayDate.minusDays(1);
 
-        if (!isValid(todayRows)) {
-            log.warn("오늘 환율 데이터 없음");
-            return List.of();
+            // 오늘 / 어제 환율 API 호출
+            List<ExchangeRateDto.ApiRow> todayRows = apiClient.fetchRates(todayDate);
+            List<ExchangeRateDto.ApiRow> yesterdayRows = apiClient.fetchRates(yesterdayDate);
+
+            // 오늘 환율이 유효하면 처리
+            if (isValid(todayRows)) {
+                // 어제 환율을 통화코드 기준 Map으로 변환
+                Map<String, Double> yesterdayMap = yesterdayRows.stream()
+                        .filter(r -> isTargetCurrency(r.getCurUnit()))
+                        .filter(r -> r.getDealBasR() != null)
+                        .collect(Collectors.toMap(
+                                ExchangeRateDto.ApiRow::getCurUnit,
+                                r -> parseRate(r.getDealBasR()),
+                                (a, b) -> a
+                        ));
+                String updatedAt = LocalDateTime.now().toString();
+
+                // 오늘 환율 + 어제 환율 → 응답 DTO 생성
+                return todayRows.stream()
+                        .filter(r -> isTargetCurrency(r.getCurUnit()))
+                        .filter(r -> r.getDealBasR() != null)
+                        .map(r -> {
+                            double today = parseRate(r.getDealBasR());
+                            double yesterday = yesterdayMap.getOrDefault(
+                                    r.getCurUnit(), today
+                            );
+
+                            return ExchangeRateDto.Row.builder()
+                                    .curUnit(r.getCurUnit())
+                                    .curNm(r.getCurNm())
+                                    .today(today)
+                                    .yesterday(yesterday)
+                                    .updatedAt(updatedAt)
+                                    .build();
+                        })
+                        .toList();
+            }
+            log.info("환율 fallback 시도 실패: {}", todayDate);
         }
-
-        // 어제 환율을 통화코드 기준 Map으로 변환
-        Map<String, Double> yesterdayMap = yesterdayRows.stream()
-                .filter(r -> isTargetCurrency(r.getCurUnit()))
-                .filter(r -> r.getDealBasR() != null)
-                .collect(Collectors.toMap(
-                        ExchangeRateDto.ApiRow::getCurUnit,
-                        r -> parseRate(r.getDealBasR()),
-                        (a, b) -> a
-                ));
-        String updatedAt = LocalDateTime.now().toString();
-
-        // 오늘 환율 + 어제 환율 → 응답 DTO 생성
-        return todayRows.stream()
-                .filter(r -> isTargetCurrency(r.getCurUnit()))
-                .filter(r -> r.getDealBasR() != null)
-                .map(r -> {
-                    double today = parseRate(r.getDealBasR());
-                    double yesterday = yesterdayMap.getOrDefault(r.getCurUnit(), today);
-
-                    return ExchangeRateDto.Row.builder()
-                            .curUnit(r.getCurUnit())
-                            .curNm(r.getCurNm())
-                            .today(today)
-                            .yesterday(yesterday)
-                            .updatedAt(updatedAt)
-                            .build();
-                })
-                .toList();
+        // 10일간 데이터 없을 경우
+        log.warn("환율 데이터 10일간 없음 → 빈 리스트 반환");
+        return List.of();
     }
 
     // 환율 조회 기준 날짜 계산

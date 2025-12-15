@@ -6,6 +6,7 @@ import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

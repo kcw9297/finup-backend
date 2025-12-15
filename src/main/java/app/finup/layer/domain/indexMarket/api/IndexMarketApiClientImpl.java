@@ -38,9 +38,12 @@ public class IndexMarketApiClientImpl implements IndexMarketApiClient {
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
+
+            log.info("지수 API raw json [{}][{}]: {}", indexName, baseDate, json);
+
             return parseOpenPortalJson(json);
         } catch (Exception e) {
-            log.error("지수 API 호출 실패 ({} / {}): {}", indexName, baseDate, e.getMessage());
+            log.error("지수 API 호출 실패 ({})", indexName, e);
             return null;
         }
     }

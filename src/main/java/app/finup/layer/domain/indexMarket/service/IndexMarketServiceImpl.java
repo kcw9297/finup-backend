@@ -21,95 +21,115 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class IndexMarketServiceImpl implements IndexMarketService {
-    private final IndexMarketApiClient indexMarketApiClient;
-    private final IndexMarketRepository indexMarketRepository;
+    private final IndexMarketApiClient apiClient;
+    private final IndexMarketRepository repository;
     private static final DateTimeFormatter FMT = DateTimeFormatter.BASIC_ISO_DATE;
 
-    /**
-     * 홈 화면용 지수 조회
-     * - DB에 저장된 최신 / 이전 지수 비교
-     * - 외부 API 호출 없음
-     */
+    // 홈 화면용 지수 조회
     @Override
     public List<IndexMarketDto.Row> getLatestIndexes() {
         return List.of("코스피", "코스닥").stream()
-                .map(this::buildRowFromDb)
+                .map(indexName ->
+                        repository.findTopByIndexNameOrderByUpdatedAtDesc(indexName)
+                                .map(IndexMarketDtoMapper::toRow)
+                                .orElse(null)
+                )
                 .filter(Objects::nonNull)
                 .toList();
     }
 
-    // 단일 지수 Row 생성 (DB 기준)
-    private IndexMarketDto.Row buildRowFromDb(String indexName) {
-        IndexMarket today = indexMarketRepository
-                .findTopByIndexNameOrderByUpdatedAtDesc(indexName)
-                .orElse(null);
-        if (today == null) {
-            log.warn("지수 데이터 없음 (today): {}", indexName);
-            return null;
-        }
-        IndexMarket yesterday = indexMarketRepository
-                .findFirstByIndexNameAndUpdatedAtLessThanOrderByUpdatedAtDesc(indexName,today.getUpdatedAt())
-                .orElse(null);
-        if (yesterday == null) {
-            log.warn("지수 데이터 없음 (yesterday): {}", indexName);
-            return null;
-        }
-        double rate = ((today.getClosePrice() - yesterday.getClosePrice()) / yesterday.getClosePrice()) * 100;
-
-        return IndexMarketDto.Row.builder()
-                .idxNm(indexName)
-                .today(today.getClosePrice())
-                .rate(rate)
-                .updatedAt(today.getUpdatedAt())
-                .build();
-    }
-
-    // 장 마감 이후 지수 API 호출
+    // 지수 자동 갱신
     @Override
     public void updateIndexes() {
-        String baseDate = resolveBaseDate();
         for (String indexName : List.of("코스피", "코스닥")) {
-            try {
-                IndexMarketDto.ApiRow apiRow = indexMarketApiClient.fetchIndex(indexName, baseDate);
-                if (apiRow == null) {
-                    log.warn("지수 API 응답 없음: {}", indexName);
-                    continue;
-                }
-                IndexMarket entity = IndexMarketDtoMapper.toEntity(apiRow);
-                indexMarketRepository.save(entity);
-            } catch (Exception e) {
-                log.error("지수 저장 실패 ({}): {}", indexName, e.getMessage());
-            }
+            updateIndexIfNeeded(indexName);
         }
     }
 
-    // 장 마감 기준 지수 조회 날짜 계산
-    private String resolveBaseDate() {
-        LocalDate today = LocalDate.now();
-        LocalTime now = LocalTime.now();
-        LocalDate baseDate = today;
+    // 단일 지수 갱신
+    private void updateIndexIfNeeded(String indexName) {
+        // 오늘 날짜 기준으로 이미 갱신된 지수인지 확인
+        boolean alreadyUpdated =
+                repository.findTopByIndexNameOrderByUpdatedAtDesc(indexName)
+                        .map(entity ->
+                                entity.getUpdatedAt()
+                                        .toLocalDate()
+                                        .equals(LocalDate.now()))
+                        .orElse(false);
 
-        // 주말 보정
-        if (today.getDayOfWeek() == DayOfWeek.SATURDAY) {
-            baseDate = today.minusDays(1);
-        } else if (today.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            baseDate = today.minusDays(2);
+        if (alreadyUpdated) {
+            log.info("이미 갱신된 지수 → skip: {}", indexName);
+            return;
         }
 
-        // 장 마감 이전이면 전 거래일
-        if (now.isBefore(LocalTime.of(15, 30))) {
-            baseDate = previousWeekday(baseDate.minusDays(1));
+        // 최신 거래일 + 전 거래일 데이터 확보 (fallback 포함)
+        IndexDataPair pair = fetchLatestPair(indexName);
+
+        if (pair == null) {
+            log.warn("지수 데이터 확보 실패: {}", indexName);
+            return;
         }
-        return baseDate.format(FMT);
+
+        // 등락 계산
+        double diff = pair.today - pair.yesterday;
+        double rate = (diff / pair.yesterday) * 100;
+
+        // DB 저장
+        repository.save(IndexMarket.builder()
+                .indexName(indexName)
+                .closePrice(pair.today)
+                .diff(diff)
+                .rate(rate)
+                .updatedAt(LocalDateTime.now())
+                .build());
+
+        log.info("지수 저장 완료: {}", indexName);
     }
 
-    // 직전 평일 계산
-    private LocalDate previousWeekday(LocalDate date) {
-        LocalDate d = date;
-        while (d.getDayOfWeek() == DayOfWeek.SATURDAY
-                || d.getDayOfWeek() == DayOfWeek.SUNDAY) {
-            d = d.minusDays(1);
+    // 최신 거래일 / 전 거래일 지수 조회
+    private IndexDataPair fetchLatestPair(String indexName) {
+        // 기준일(오늘부터) 데이터 탐색
+        LocalDate baseDate = LocalDate.now();
+        IndexMarketDto.ApiRow todayRow = null;
+
+        for (int i = 0; i < 7; i++) {
+            todayRow = apiClient.fetchIndex(indexName, baseDate.format(FMT));
+            if (todayRow != null) break;
+            baseDate = baseDate.minusDays(1);
         }
-        return d;
+        if (todayRow == null) return null;
+
+        // 전 거래일 데이터 탐색
+        LocalDate prevDate = baseDate.minusDays(1);
+        IndexMarketDto.ApiRow prevRow = null;
+
+        for (int i = 0; i < 7; i++) {
+            prevRow = apiClient.fetchIndex(indexName, prevDate.format(FMT));
+            if (prevRow != null) break;
+            prevDate = prevDate.minusDays(1);
+        }
+        if (prevRow == null) return null;
+
+        // 가격 파싱 후 반환
+        return new IndexDataPair(
+                parse(todayRow.getClpr()),
+                parse(prevRow.getClpr())
+        );
+    }
+
+    // 숫자 문자열 파싱 보조 메서드
+    private double parse(String value) {
+        return Double.parseDouble(value.replace(",", ""));
+    }
+
+    // 내부 전용 DTO
+    private static class IndexDataPair {
+        final double today;
+        final double yesterday;
+
+        IndexDataPair(double today, double yesterday) {
+            this.today = today;
+            this.yesterday = yesterday;
+        }
     }
 }
