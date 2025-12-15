@@ -12,4 +12,5 @@ import java.util.Map;
  */
 public interface NewsService {
     List<NewsDto.Row> getNews(String category);
+    List<NewsDto.Row> getLatestNews(String category, int limit);
 }
