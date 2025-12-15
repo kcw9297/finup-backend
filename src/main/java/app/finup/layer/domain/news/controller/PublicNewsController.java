@@ -31,12 +31,10 @@ public class PublicNewsController {
 
     }
 
-    @GetMapping("/news/latest")
+    @GetMapping("/latest")
     public ResponseEntity<?> getLatestNews(@RequestParam(defaultValue = "date") String category,
                                            @RequestParam(defaultValue = "10") int limit)
     {
         return Api.ok(newsService.getLatestNews(category, limit));
     }
-
-
 }
