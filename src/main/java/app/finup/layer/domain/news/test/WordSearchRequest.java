@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class VectorSearchRequest {
-    private String article;
+public class WordSearchRequest {
+    private String text;   // 기사 본문 or 문장
+    private Integer topK;
 }
