@@ -6,12 +6,12 @@ import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.service.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 
 import java.util.List;
 
@@ -58,11 +58,7 @@ public class MemberController {
         return Api.ok(rows);
     }
 
-    @PostMapping
-    public ResponseEntity<?> join(@Valid @RequestBody MemberJoinDto.JoinNember rq) {
-        MemberJoinDto.JoinNember rp = memberService.join(rq);
-        return Api.ok(rp);
-    }
+
     /**
      * 회원 닉네임 수정 API
      * [PATCH] /members/{memberId}/nickname

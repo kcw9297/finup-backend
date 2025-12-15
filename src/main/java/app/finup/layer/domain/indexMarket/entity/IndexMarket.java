@@ -42,4 +42,11 @@ public class IndexMarket {
         this.rate = rate;
         this.updatedAt = updatedAt;
     }
+
+    public void update(double closePrice, double diff, double rate) {
+        this.closePrice = closePrice;
+        this.diff = diff;
+        this.rate = rate;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
