@@ -4,6 +4,8 @@ import app.finup.common.utils.FormatUtils;
 import app.finup.layer.domain.videolink.entity.VideoLink;
 import lombok.*;
 
+import java.util.Objects;
+
 /**
  * 학습용 비디오 링크 Entity -> DTO 매핑 지원 클래스
  * @author kcw
@@ -26,7 +28,7 @@ public final class VideoLinkDtoMapper {
                .publishedAt(entity.getPublishedAt())
                .viewCount(entity.getViewCount())
                .likeCount(entity.getLikeCount())
-               .tags(entity.getTags().toString())
+               .tags(Objects.isNull(entity.getTags()) ? null : entity.getTags().toString())
                .build();
    }
 

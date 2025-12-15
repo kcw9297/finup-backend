@@ -99,6 +99,10 @@ public class Url {
     /* memberWordbook */
     public static final String MEMBER_WORDBOOK = MEMBER + "/wordbook";
     public static final String MEMBER_WORD_VIEW = MEMBER_WORDBOOK + "/view";
+
+    /* word quiz */
+    public static final String WORD_QUIZ = API + "/word-quizzes";
+
     /* home */
     public static final String HOME = API + "/home";
     public static final String HOME_PUBLIC = PUBLIC + HOME;
