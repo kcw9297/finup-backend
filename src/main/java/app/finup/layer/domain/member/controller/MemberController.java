@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -59,8 +60,8 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<?> join(@Valid @RequestBody MemberJoinDto.JoinNember rq) {
-        MemberJoinDto.JoinNember rp = memberService.join(rq);
+    public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
+        MemberDto.Join rp = memberService.join(rq);
         return Api.ok(rp);
     }
     /**
