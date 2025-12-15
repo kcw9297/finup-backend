@@ -34,5 +34,14 @@ public class NewsServiceImpl implements NewsService {
         return newsProvider.getNews(category, 50);
     }
 
+    @Override
+    public List<NewsDto.Row> getLatestNews(String category, int limit) {
+        List<NewsDto.Row> list = newsProvider.getNews("date", 50);
+        if(list == null || list.isEmpty()){
+            return List.of();
+        }
+        int toIndex = Math.min(limit, list.size());
+        return list.subList(0, toIndex);
+    }
 
 }
