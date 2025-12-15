@@ -9,7 +9,7 @@
         n.notice_id      AS noticeId,
         n.title          AS title,
         n.content        AS content,
-        n.member_id      AS adminId,
+        n.view_count     AS viewCount,
         n.cdate          AS cdate,
         n.udate          AS udate
     </sql>
@@ -30,13 +30,9 @@
                 <when test="filter == 'content'">
                     AND n.content LIKE CONCAT('%', #{keyword}, '%')
                 </when>
-                <when test="filter == 'admin'">
-                    AND n.member_id = #{keyword}
+                <when test="filter == 'titleContent'">
+                    AND (n.title LIKE CONCAT('%', #{keyword}, '%') OR n.content LIKE CONCAT('%', #{keyword}, '%'))
                 </when>
-                <otherwise>
-                    AND (n.title LIKE CONCAT('%', #{keyword}, '%')
-                    OR n.content LIKE CONCAT('%', #{keyword}, '%'))
-                </otherwise>
             </choose>
         </if>
         <!-- 정렬 -->
@@ -81,14 +77,24 @@
                 <when test="filter == 'content'">
                     AND n.content LIKE CONCAT('%', #{keyword}, '%')
                 </when>
-                <when test="filter == 'admin'">
-                    AND n.member_id = #{keyword}
+                <when test="filter == 'titleContent'">
+                    AND (n.title LIKE CONCAT('%', #{keyword}, '%') OR n.content LIKE CONCAT('%', #{keyword}, '%'))
                 </when>
-                <otherwise>
-                    AND (n.title LIKE CONCAT('%', #{keyword}, '%')
-                    OR n.content LIKE CONCAT('%', #{keyword}, '%'))
-                </otherwise>
             </choose>
         </if>
     </select>
+
+    <update id="updateBulkViewCount">
+        UPDATE notice
+        SET view_count = view_count +
+            CASE id
+                <foreach collection="list" item="item">
+                    WHEN #{item.noticeId} THEN #{item.increment}
+                </foreach>
+            END
+        WHERE id IN
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.noticeId}
+        </foreach>
+    </update>
 </mapper>

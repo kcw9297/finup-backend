@@ -43,9 +43,9 @@ public class ExchangeRate {
         this.updatedAt = updatedAt;
     }
 
-    public void update(double newRate, LocalDate rateDate) {
-        this.yesterdayRate = this.todayRate;
-        this.todayRate = newRate;
+    public void update(double todayRate, double yesterdayRate, LocalDate rateDate) {
+        this.todayRate = todayRate;
+        this.yesterdayRate = yesterdayRate;
         this.rateDate = rateDate;
         this.updatedAt = LocalDateTime.now();
     }
