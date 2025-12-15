@@ -84,17 +84,17 @@
         </if>
     </select>
 
-    <update id="updateBulkViewCount">
+    <update id="updateViewCount">
         UPDATE notice
         SET view_count = view_count +
-            CASE id
-                <foreach collection="list" item="item">
-                    WHEN #{item.noticeId} THEN #{item.increment}
+            CASE notice_id
+                <foreach collection="increments" index="noticeId" item="increment">
+                    WHEN #{noticeId} THEN #{increment}
                 </foreach>
             END
-        WHERE id IN
-        <foreach collection="list" item="item" open="(" separator="," close=")">
-            #{item.noticeId}
+        WHERE notice_id IN
+        <foreach collection="increments" index="noticeId" item="increment" open="(" separator="," close=")">
+            #{noticeId}
         </foreach>
     </update>
 </mapper>

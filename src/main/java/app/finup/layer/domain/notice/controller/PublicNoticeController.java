@@ -13,17 +13,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
- * 관리자 공지사항 컨트롤러 클래스
- * @author khj
- * @since 2025-12-01
+ * 공개용 공지사항 컨트롤러 클래스
+ * @author kcw
+ * @since 2025-12-15
  */
 
 @Slf4j
 @RestController
-@RequestMapping(Url.NOTICE)
+@RequestMapping(Url.NOTICE_PUBLIC)
 @RequiredArgsConstructor
-public class NoticeController {
+public class PublicNoticeController {
 
     private final NoticeService noticeService;
 
@@ -42,6 +44,17 @@ public class NoticeController {
         return Api.ok(rp.getRows(), Pagination.of(rp));
     }
 
+
+    /**
+     * 페이지 홈에 게시할 공지사항 목록
+     * [GET] /notices/home
+     */
+    @GetMapping("/home")
+    public ResponseEntity<?> getHomeList() {
+        return Api.ok(noticeService.getHomeList());
+    }
+
+
     /**
      * 공지사항 상세 조회
      * [GET] /notices/{noticeId}
@@ -56,5 +69,6 @@ public class NoticeController {
         // [2] 데이터 반환
         return Api.ok(detail);
     }
+
 
 }

@@ -15,4 +15,11 @@ import java.util.List;
 
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
 
+    @Query("""
+        SELECT n
+        FROM Notice n
+        ORDER BY n.cdate DESC
+        LIMIT :lim
+    """)
+    List<Notice> findLatestN(Integer lim);
 }

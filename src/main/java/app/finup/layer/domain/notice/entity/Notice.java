@@ -54,13 +54,5 @@ public class Notice extends BaseEntity {
         this.content = content;
     }
 
-    /**
-     * 조회수 업데이트
-     * @param viewCount 증가되는 조회수
-     */
-    public void watch(Long viewCount) {
-        this.viewCount += viewCount;
-    }
-
 
 }
