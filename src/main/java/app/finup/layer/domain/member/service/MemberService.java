@@ -3,8 +3,8 @@ package app.finup.layer.domain.member.service;
 
 import app.finup.common.dto.Page;
 import app.finup.layer.domain.member.dto.MemberDto;
-import app.finup.layer.domain.member.dto.MemberDto.Join;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.List;
 
@@ -30,6 +30,7 @@ public interface MemberService {
 
     /**
      * 회원가입
+     *
      * @return 가입한 회원 정보
      */
     MemberDto.Join join(MemberDto.Join rq);
