@@ -59,7 +59,7 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [1] 이미 중복단어가 존재하면 예외 반환
         if (studyWordRepository.existsByName(rq.getName()))
-            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST);
+            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
         // [2] 엔티티 생성
         StudyWord studyWord = StudyWord.builder()
@@ -108,7 +108,7 @@ public class StudyWordServiceImpl implements StudyWordService {
         // [2] 만약 "단어명"을 변경하는 경우 중복 검증
         if (!Objects.equals(studyWord.getName(), rq.getName()) &&
                 studyWordRepository.existsByName(rq.getName()))
-            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST);
+            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
         // [3] 단어명 갱신 수행
         studyWord.edit(rq.getName(), rq.getMeaning());

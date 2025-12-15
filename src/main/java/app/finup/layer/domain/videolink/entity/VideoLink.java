@@ -34,7 +34,7 @@ public class VideoLink extends BaseEntity {
     @Column(nullable = false)
     private String videoUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String videoId; // youtube video Id 등 영상 고유 번호
 
     @Column(nullable = false)
