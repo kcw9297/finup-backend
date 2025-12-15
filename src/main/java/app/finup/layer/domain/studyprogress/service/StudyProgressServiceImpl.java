@@ -99,4 +99,10 @@ public class StudyProgressServiceImpl implements StudyProgressService {
         // [3] 이미 존재하는 경우, 상태만 새롭게 생신
         else studyProgress.complete();
     }
+
+
+    @Override
+    public void initialize(Long studyId, Long memberId) {
+        studyProgressRepository.deleteByStudyIdAndMemberId(studyId, memberId);
+    }
 }

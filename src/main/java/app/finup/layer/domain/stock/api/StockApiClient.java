@@ -12,6 +12,7 @@ import java.util.List;
  */
 public interface StockApiClient {
     List<StockDto.MarketCapRow> fetchMarketCapRow();
+    List<StockDto.TradingValueRow> fetchTradingValueRow();
     JsonNode fetchDetail(String code);
     StockDto.YoutubeSearchResponse fetchYoutubeVideo(String keyword);
 }

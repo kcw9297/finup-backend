@@ -2,8 +2,6 @@ package app.finup.layer.domain.studyprogress.dto;
 
 import lombok.*;
 
-import java.util.Objects;
-
 /**
  * StudyProgress(학습 진도) DTO 클래스
  * @author kcw
@@ -22,7 +20,7 @@ public final class StudyProgressDto {
     @NoArgsConstructor
     public static class Row {
 
-        private Long memberStudyId;
+        private Long studyProgressId;
         private Long studyId;
         private String studyStatus;
     }

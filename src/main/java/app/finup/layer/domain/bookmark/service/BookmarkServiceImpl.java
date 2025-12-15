@@ -64,7 +64,7 @@ public class BookmarkServiceImpl implements BookmarkService {
 
 
     @Override
-    public void remove(Long targetId, BookmarkTarget bookmarkTarget) {
-        bookmarkRepository.deleteByTargetIdAndBookmarkTarget(targetId, bookmarkTarget);
+    public void remove(Long memberId, Long targetId, BookmarkTarget bookmarkTarget) {
+        bookmarkRepository.deleteBy(memberId, targetId, bookmarkTarget);
     }
 }

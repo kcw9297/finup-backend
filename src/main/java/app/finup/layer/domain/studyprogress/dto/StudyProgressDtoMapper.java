@@ -15,9 +15,9 @@ public final class StudyProgressDtoMapper {
     public static StudyProgressDto.Row toRow(StudyProgress entity) {
 
         return StudyProgressDto.Row.builder()
-                .memberStudyId(entity.getMemberStudyId())
+                .studyProgressId(entity.getStudyProgressId())
                 .studyId(entity.getStudy().getStudyId())
-                .studyStatus(entity.getStudyStatus().getValue())
+                .studyStatus(entity.getStudyStatus().name())
                 .build();
     }
 

@@ -95,6 +95,8 @@ dependencies {
 
     // google-guava (batch 처리)
     implementation 'com.google.guava:guava:33.3.1-jre'
+
+    implementation 'commons-codec:commons-codec:1.15'
 }
 dependencyManagement {
     imports {

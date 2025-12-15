@@ -57,13 +57,17 @@ public class StudyWordServiceImpl implements StudyWordService {
     @Override
     public void add(StudyWordDto.Add rq) {
 
-        // [1] 엔티티 생성
+        // [1] 이미 중복단어가 존재하면 예외 반환
+        if (studyWordRepository.existsByName(rq.getName()))
+            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST);
+
+        // [2] 엔티티 생성
         StudyWord studyWord = StudyWord.builder()
                 .name(rq.getName())
                 .meaning(rq.getMeaning())
                 .build();
 
-        // [2] 엔티티 저장
+        // [3] 엔티티 저장
         studyWordRepository.save(studyWord);
     }
 
@@ -96,10 +100,18 @@ public class StudyWordServiceImpl implements StudyWordService {
     @Override
     public void edit(StudyWordDto.Edit rq) {
 
-        studyWordRepository
+        // [1] 변경 대상 단어 조회
+        StudyWord studyWord = studyWordRepository
                 .findWithImageById(rq.getStudyWordId())
-                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND))
-                .edit(rq.getName(), rq.getMeaning());
+                .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
+
+        // [2] 만약 "단어명"을 변경하는 경우 중복 검증
+        if (!Objects.equals(studyWord.getName(), rq.getName()) &&
+                studyWordRepository.existsByName(rq.getName()))
+            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST);
+
+        // [3] 단어명 갱신 수행
+        studyWord.edit(rq.getName(), rq.getMeaning());
     }
 
 

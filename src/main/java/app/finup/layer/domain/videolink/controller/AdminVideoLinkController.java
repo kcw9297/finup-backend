@@ -1,6 +1,8 @@
 package app.finup.layer.domain.videolink.controller;
 
 import app.finup.common.constant.Url;
+import app.finup.common.dto.Page;
+import app.finup.common.dto.Pagination;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
@@ -23,6 +25,21 @@ import org.springframework.web.bind.annotation.*;
 public class AdminVideoLinkController {
 
     private final VideoLinkService videoLinkService;
+
+    /**
+     * 학습 영상 검색
+     * [GET /video-links/search
+     * @param rq 영상 검색요청 DTO
+     */
+    @GetMapping("/search")
+    public ResponseEntity<?> search(VideoLinkDto.Search rq) {
+
+        // [1] 학습 영상 수정
+        Page<VideoLinkDto.Row> rp = videoLinkService.getPagedList(rq);
+
+        // [2] 성공 응답 반환
+        return Api.ok(rp.getRows(), Pagination.of(rp));
+    }
 
 
     /**

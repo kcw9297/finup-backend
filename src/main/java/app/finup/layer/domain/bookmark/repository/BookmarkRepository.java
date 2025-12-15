@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 북마크 JPA 레포지토리 인터페이스
@@ -35,7 +34,10 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     @Modifying
     @Query("""
         DELETE FROM Bookmark b
-        WHERE b.targetId = :targetId AND b.bookmarkTarget = :bookmarkTarget
+        WHERE
+            b.member.memberId = :memberId AND
+            b.targetId = :targetId AND
+            b.bookmarkTarget = :bookmarkTarget
     """)
-    void deleteByTargetIdAndBookmarkTarget(Long targetId, BookmarkTarget bookmarkTarget);
+    void deleteBy(Long memberId, Long targetId, BookmarkTarget bookmarkTarget);
 }

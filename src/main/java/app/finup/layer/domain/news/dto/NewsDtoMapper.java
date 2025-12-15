@@ -9,10 +9,10 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NewsDtoMapper {
 
-    public static NewsDto.Row toRow(String title, String summary, String thumbnail, String publisher, LocalDateTime publishedAt, String link) {
+    public static NewsDto.Row toRow(String title, String description, String thumbnail, String publisher, LocalDateTime publishedAt, String link) {
         return NewsDto.Row.builder()
                 .title(title)
-                .summary(summary)
+                .description(description)
                 .thumbnail(thumbnail)
                 .publisher(publisher)
                 .publishedAt(publishedAt)
@@ -25,5 +25,12 @@ public final class NewsDtoMapper {
         ai.setKeywords((List<Map<String,String>>) map.get("keywords"));
         ai.setInsight((String) map.get("insight"));
         return ai;
+    }
+
+    public static NewsDto.Summary toSummary(Map<String,Object> map) {
+        NewsDto.Summary sum = new NewsDto.Summary();
+        sum.setSummary((String) map.get("summary"));
+        sum.setKeywords((List<Map<String,String>>) map.get("keywords"));
+        return sum;
     }
 }

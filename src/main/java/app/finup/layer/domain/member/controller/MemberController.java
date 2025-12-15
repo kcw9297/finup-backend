@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 
 import java.util.List;
 
@@ -56,5 +58,55 @@ public class MemberController {
         return Api.ok(rows);
     }
 
+    @PostMapping
+    public ResponseEntity<?> join(@Valid @RequestBody MemberJoinDto.JoinNember rq) {
+        MemberJoinDto.JoinNember rp = memberService.join(rq);
+        return Api.ok(rp);
+    }
+    /**
+     * 회원 닉네임 수정 API
+     * [PATCH] /members/{memberId}/nickname
+     * @param memberId 회원 번호
+     * @param rq 닉네임 수정 요청 DTO
+     */
+    @PatchMapping("/{memberId:[0-9]+}/nickname")
+    public ResponseEntity<?> editNickname(@PathVariable Long memberId,
+                                          @RequestBody MemberDto.EditNickname rq) {
+
+        // [1] 수정 요청
+        memberService.editNickname(memberId, rq);
+
+        // [2] 성공 응답
+        return Api.ok();
+    }
+    /**
+     * 회원 비밀번호 수정 API
+     * [PATCH] /members/{memberId}/password
+     * @param memberId 회원 번호
+     * @param rq 비밀번호 수정 요청 DTO
+     */
+    @PatchMapping("/{memberId:[0-9]+}/password")
+    public ResponseEntity<?> editPassword(@PathVariable Long memberId,
+                                          @RequestBody MemberDto.EditPassword rq) {
+
+        // [1] 수정 요청
+        memberService.editPassword(memberId, rq);
+
+        // [2] 성공 응답
+        return Api.ok();
+    }
+    /**
+     * 회원 프로필 이미지 수정 API
+     * [PATCH] /members/{memberId}/profile-image
+     * @param memberId 회원 번호
+     * @param file 업로드 이미지 파일
+     */
+    @PatchMapping("/{memberId:[0-9]+}/profile-image")
+    public ResponseEntity<?> editProfileImage(@PathVariable Long memberId,
+                                              @RequestParam("file") MultipartFile file) {
+
+        memberService.editProfileImage(memberId, file);
+        return Api.ok();
+    }
 
 }

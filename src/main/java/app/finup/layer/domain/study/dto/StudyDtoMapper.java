@@ -29,7 +29,6 @@ public final class StudyDtoMapper {
                 .studyId(entity.getStudyId())
                 .name(entity.getName())
                 .summary(entity.getSummary())
-                .description(entity.getDescription())
                 .level(entity.getLevel())
                 .build();
     }

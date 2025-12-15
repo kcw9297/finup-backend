@@ -32,6 +32,20 @@ public class StockDtoMapper {
                 .build();
     }
 
+    public static StockDto.TradingValueRow toTradingValueRow(JsonNode output) {
+        return StockDto.TradingValueRow.builder()
+                .htsKorIsnm(output.path("hts_kor_isnm").asText())
+                .mkscShrnIscd(output.path("mksc_shrn_iscd").asText())
+                .dataRank(output.path("data_rank").asText())
+                .stckPrpr(output.path("stck_prpr").asText())
+                .prdyVrssSign(output.path("prdy_vrss_sign").asText())
+                .prdyVrss(output.path("prdy_vrss").asText())
+                .prdyCtrt(output.path("prdy_ctrt").asText())
+                .acmlTrPbmn(output.path("acml_tr_pbmn").asText())
+                .avrgVol(output.path("avrg_vol").asText())
+                .build();
+    }
+
     public static StockDto.Detail toDetail(String htsKorIsnm, JsonNode output){
         return StockDto.Detail.builder()
                 /* 종목 기본 정보 */
@@ -75,10 +89,17 @@ public class StockDtoMapper {
                 .build();
     }
 
-    public static StockDto.YoutubeVideo toYoutube(String keyword, StockDto.YoutubeSearchResponse response) {
+    public static List<StockDto.YoutubeVideo> toYoutubeList(String keyword, StockDto.YoutubeSearchResponse response) {
+        if (response == null || response.getItems() == null) {
+            return List.of();
+        }
+        return response.getItems().stream()
+                .limit(4)
+                .map(item -> toYoutube(keyword, item))
+                .toList();
+    }
 
-        StockDto.YoutubeSearchResponse.Item item = response.getItems().get(0);
-
+    public static StockDto.YoutubeVideo toYoutube(String keyword, StockDto.YoutubeSearchResponse.Item item) {
         return StockDto.YoutubeVideo.builder()
                 .keyword(keyword)
                 .videoId(item.getId().getVideoId())

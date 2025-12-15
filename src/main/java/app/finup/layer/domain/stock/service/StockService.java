@@ -11,8 +11,12 @@ public interface StockService {
     List<StockDto.MarketCapRow> getMarketCapRow();
     void refreshMarketCapRow();
 
+    // 종목+탭 거래대금 순위 가져오기
+    List<StockDto.TradingValueRow> getTradingValueRow();
+    void refreshTradingValueRow();
+
     //List<StocksDto> getStocks();
-    void importKospi() throws Exception;
+    void importStockName() throws Exception;
     StockDto.Detail getDetail(String code);
     void refreshDetail(String code);
 

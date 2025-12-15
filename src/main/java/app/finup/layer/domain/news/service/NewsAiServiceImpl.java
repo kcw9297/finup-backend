@@ -34,7 +34,7 @@ public class NewsAiServiceImpl implements NewsAiService {
         if(article.isBlank()){
             return null;
         }
-        String prompt = PromptTemplates.NEWS_ANALYSIS.replace("{ARTICLE}", article);
+        String prompt = PromptTemplates.NEWS_ANALYSIS_DEEP.replace("{ARTICLE}", article);
         Map<String, Object> result= aiManager.runJsonPrompt(prompt);
         List<Map<String, String>> keywords = (List<Map<String, String>>) result.get("keywords");
         if(keywords != null){
@@ -45,6 +45,35 @@ public class NewsAiServiceImpl implements NewsAiService {
         return NewsDtoMapper.toAi(result);
     }
 
+    @Override
+    public NewsDto.Ai analyzeDeep(String url) {
+        String article = extractor.extract(url);
+        if(article.isBlank()){
+            return null;
+        }
+        String prompt = PromptTemplates.NEWS_ANALYSIS_DEEP.replace("{ARTICLE}", article);
+        Map<String, Object> result= aiManager.runJsonPrompt(prompt);
+        List<Map<String, String>> keywords = (List<Map<String, String>>) result.get("keywords");
+        if(keywords != null){
+            keywords.sort(Comparator.comparing(k -> k.get("term")));
+            result.put("keywords", keywords);
+        }
+
+        return NewsDtoMapper.toAi(result);
+    }
+
+    @Override
+    public NewsDto.Summary analyzeLight(String summary) {
+        String prompt = PromptTemplates.NEWS_ANALYSIS_DEEP.replace("{ARTICLE}", summary);
+        Map<String, Object> result= aiManager.runJsonPrompt(prompt);
+        List<Map<String, String>> keywords = (List<Map<String, String>>) result.get("keywords");
+        if(keywords != null){
+            keywords.sort(Comparator.comparing(k -> k.get("term")));
+            result.put("keywords", keywords);
+        }
+
+        return NewsDtoMapper.toSummary(result);
+    }
 
 
 }

@@ -33,4 +33,12 @@ public interface StudyProgressService {
      * @param memberId 회원번호
      */
     void complete(Long studyId, Long memberId);
+
+
+    /**
+     * 학습 진도 초기화 (제거)
+     * @param studyId 단계학습번호
+     * @param memberId 회원번호
+     */
+    void initialize(Long studyId, Long memberId);
 }

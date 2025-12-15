@@ -28,7 +28,7 @@ public class StudyProgress extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long memberStudyId;
+    private Long studyProgressId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
