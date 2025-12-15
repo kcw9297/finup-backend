@@ -17,6 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.service.UploadFileService;
 import org.springframework.web.multipart.MultipartFile;
+import app.finup.security.dto.CustomUserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import app.finup.layer.domain.uploadfile.enums.FileOwner;
+import app.finup.layer.domain.uploadfile.enums.FileType;
+import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 
 
 import java.util.List;
@@ -35,7 +41,7 @@ public class MemberServiceImpl implements MemberService {
     private final PasswordEncoder passwordEncoder;
     private final AuthRedisStorage authRedisStorage;
 
-    private final UploadFileService uploadFileService;
+    private final UploadFileManager uploadFileManager;
 
 
     @Override
@@ -47,6 +53,7 @@ public class MemberServiceImpl implements MemberService {
 
         return Page.of(rp, count.intValue(), rq.getPageNum(), rq.getPageSize());
     }
+
     @Override
     @Transactional(readOnly = true)
     public List<MemberDto.Row> getMemberList() {
@@ -54,10 +61,13 @@ public class MemberServiceImpl implements MemberService {
                 .map(MemberDtoMapper::toRow)
                 .toList();
     }
-    //  회원가입
+
+    /**
+     * 회원가입
+     */
     @Override
     @Transactional
-    public MemberDto.Join join(MemberDto.Join rq) {
+    public MemberDto.Row join(MemberDto.Join rq) {
 
         // 1) 이메일 중복 체크
         if (memberRepository.existsByEmail(rq.getEmail())) {
@@ -66,8 +76,6 @@ public class MemberServiceImpl implements MemberService {
 
         // 2) 이메일 인증 완료 여부 확인 (Redis VERIFIED 키)
         if (!authRedisStorage.isVerified(rq.getEmail())) {
-            // 지금은 임시로 AUTH_INVALID_REQUEST 쓰고 있지만,
-            // 실무에선 "AUTH_JOIN_EMAIL_NOT_VERIFIED" 같은 status를 따로 두는게 좋음
             throw new BusinessException(AppStatus.AUTH_INVALID_REQUEST);
         }
 
@@ -84,29 +92,26 @@ public class MemberServiceImpl implements MemberService {
                 nickname
         );
 
-        // 6) 저장
-        log.info("[MEMBER] join request email={}", rq.getEmail()); // join 시작
+        log.info("[JOIN][SERVICE][REQUEST] email={}", rq.getEmail());
 
-        Member newMember = memberRepository.save(member);
-        log.info("[MEMBER] saved memberId={}, email={}", newMember.getMemberId(), newMember.getEmail()); // save 직후
+        Member saved = memberRepository.save(member);
 
-        log.info("[MEMBER] join done memberId={}", newMember.getMemberId()); // 끝
+        log.info("[JOIN][SERVICE][SAVED] memberId={}, email={}",
+                saved.getMemberId(), saved.getEmail());
 
-
-        MemberDto.Join newMemberJoinDto = MemberDtoMapper.toMemberJoinDto(newMember);
-
-        // 7) 인증 완료 마크 제거 (재사용 방지)
         try {
             authRedisStorage.removeVerified(rq.getEmail());
         } catch (Exception e) {
-            log.warn("[MEMBER] Redis cleanup failed after join. email={}", rq.getEmail());
+            log.warn("[JOIN][SERVICE] removeVerified failed email={}", rq.getEmail(), e);
         }
 
-        return newMemberJoinDto;
+        return MemberDtoMapper.toRow(saved);
     }
+
 
     /**
      * 조회를 위해 사용
+     *
      * @param memberId
      * @return
      */
@@ -114,8 +119,10 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
     }
+
     /**
      * 닉네임 수정
+     *
      * @param
      * @param rq 닉네임 수정 요청 DTO
      */
@@ -133,11 +140,13 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // [3] 닉네임 수정
-        member.changeNickname(rq.getNickname());
+        member.editNickname(rq.getNickname());
 
     }
+
     /**
      * 비밀번호 수정
+     *
      * @param
      * @param rq 비밀번호 수정 요청 DTO
      */
@@ -155,23 +164,77 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // [3] 새 비밀번호 암호화 후 변경
-        member.changePassword(passwordEncoder.encode(rq.getNewPassword()));
+        member.editPassword(passwordEncoder.encode(rq.getNewPassword()));
     }
+
     /**
      * 프로필 이미지 수정
+     *
      * @param memberId 회원 번호
-     * @param file 업로드 이미지 파일
+     * @param file     업로드 이미지 파일
      */
     @Override
     public void editProfileImage(Long memberId, MultipartFile file) {
 
-        // [1] 회원 조회
+        log.info("[PROFILE_IMAGE][SERVICE][START] memberId={}", memberId);
+
+        if (file == null || file.isEmpty()) {
+            throw new BusinessException(AppStatus.VALIDATION_INVALID_PARAMETER);
+        }
+
         Member member = getMember(memberId);
 
-        // [2] 파일 업로드 (UploadFile 생성)
-        UploadFile uploadFile = uploadFileService.upload(file);
+        // 1) 기존 이미지 soft delete + 연관 끊기
+        if (member.getProfileImageFile() != null) {
+            member.removeProfileImage().softRemove();
+        }
 
-        // [3] 프로필 이미지 변경
-        member.changeProfileImage(uploadFile);
+        // 2) UploadFile 엔티티 생성
+        UploadFile newFile = uploadFileManager.setEntity(
+                file,
+                memberId,
+                FileOwner.MEMBER,
+                FileType.UPLOAD
+        );
+
+        // 3) 연관관계 연결
+        member.editProfileImage(newFile); // 또는 member.editProfileImage(newFile)
+
+        // 4) 실제 파일 저장
+        uploadFileManager.store(file, newFile.getFilePath());
+
+        log.info("[PROFILE_IMAGE][SERVICE][DONE] memberId={}, uploadFileId={}",
+                memberId, newFile.getUploadFileId());
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public MemberDto.Row getMe() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            throw new BusinessException(AppStatus.UNAUTHORIZED);
+        }
+
+        Object principal = auth.getPrincipal();
+        if (!(principal instanceof CustomUserDetails userDetails)) {
+            throw new BusinessException(AppStatus.UNAUTHORIZED);
+        }
+
+        Member member = getMember(userDetails.getMemberId());
+
+        MemberDto.Row row = MemberDtoMapper.toRow(member);
+
+        if (member.getProfileImageFile() != null) {
+            row.setProfileImageUrl(
+                    uploadFileManager.getFullUrl(
+                            member.getProfileImageFile().getFilePath()
+                    )
+            );
+        }
+
+        return row;
     }
 }

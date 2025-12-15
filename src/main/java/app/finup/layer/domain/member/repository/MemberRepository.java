@@ -16,7 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("""
         SELECT m
         FROM Member m
-        LEFT JOIN FETCH m.profileImage
+        LEFT JOIN FETCH m.profileImageFile
         WHERE m.email = :email
     """)
     Optional<Member> findByEmailWithProfileImage(String email);

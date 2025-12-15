@@ -33,8 +33,9 @@ public interface MemberService {
      *
      * @return 가입한 회원 정보
      */
-    MemberDto.Join join(MemberDto.Join rq);
+    MemberDto.Row join(MemberDto.Join rq);
 
+    MemberDto.Row getMe();
     /**
      * 회원 닉네임 수정
      * @param
