@@ -17,6 +17,7 @@ public class Const {
     public static final String XSRF_TOKEN = "XSRF-TOKEN";
     public static final String ISO8601 = "ISO8601";
     public static final String ASIA_SEOUL = "Asia/Seoul";
+    public static final String GLOBAL = "global";
 
     /* 접두사 상수 */
     public static final String PREFIX_KEY_JWT = "RT:";

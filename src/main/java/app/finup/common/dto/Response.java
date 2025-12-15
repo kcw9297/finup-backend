@@ -1,5 +1,6 @@
 package app.finup.common.dto;
 
+import app.finup.common.constant.Const;
 import app.finup.common.enums.AppStatus;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -86,7 +87,7 @@ public class Response<T> {
      * @param statusCode    오류 코드 (400, 401, 403, 500, ...)
      */
     public static Response<?> fail(String errorMessage, String status, int statusCode) {
-        return new Response<>(false, errorMessage, status, statusCode, null, null, null);
+        return new Response<>(false, errorMessage, status, statusCode, null, null, Map.of(Const.GLOBAL, errorMessage));
     }
 
     /**
@@ -94,7 +95,7 @@ public class Response<T> {
      * @param appStatus 애플레케이션 상태 상수
      */
     public static Response<?> fail(AppStatus appStatus) {
-        return fail(appStatus, null);
+        return fail(appStatus, Map.of(Const.GLOBAL, appStatus.getMessage()));
     }
 
 
