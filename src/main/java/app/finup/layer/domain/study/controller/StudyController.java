@@ -74,6 +74,23 @@ public class StudyController {
 
 
     /**
+     * 현재 학습의 진도를 진행 중 상태로 변경
+     * [PATCH] /{studyId}/progress/in-progress
+     */
+    @PatchMapping("/{studyId:[0-9]+}/progress/in-progress")
+    public ResponseEntity<?> progressStudyProgress(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                   @PathVariable Long studyId) {
+
+        // [1] 갱신 수행
+        Long memberId = userDetails.getMemberId();
+        studyProgressService.progress(studyId, memberId);
+
+        // [2] 성공 응답 반환
+        return Api.ok();
+    }
+
+
+    /**
      * 현재 학습의 진도를 완료 상태로 변경
      * [PATCH] /{studyId}/progress/complete
      */

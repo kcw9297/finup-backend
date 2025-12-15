@@ -81,7 +81,6 @@ public class Response<T> {
 
     /**
      * 실패 상태, 메세지, 오류코드 전달 (메세지를 직접 작성하는 경우)
-     *
      * @param errorMessage  오류 메세지
      * @param status        오류 상태 문자열 (INVALID_REQUEST, ...)
      * @param statusCode    오류 코드 (400, 401, 403, 500, ...)
@@ -95,8 +94,20 @@ public class Response<T> {
      * @param appStatus 애플레케이션 상태 상수
      */
     public static Response<?> fail(AppStatus appStatus) {
-        return new Response<>(false, appStatus.getMessage(), appStatus.getStatus(), appStatus.getHttpCode(), null, null, null);
+        return fail(appStatus, null);
     }
+
+
+    /**
+     * 실패 상태 및 status 전달 (비즈니스 예외를 FrontEnd 입력 필드에 전달 시 사용)
+     * @param appStatus 애플레케이션 상태 상수
+     * @param inputErrors 비즈니스 로직 실패 내용을 담은 map
+     */
+    public static Response<?> fail(AppStatus appStatus, Map<String, String> inputErrors) {
+        return new Response<>(false, appStatus.getMessage(), appStatus.getStatus(), appStatus.getHttpCode(), null, null, inputErrors);
+
+    }
+
 
     /**
      * 실패 상태 및 inputErrors 전달 (bean validation 실패 처리 시 사용)

@@ -54,11 +54,19 @@ public class StudyProgress extends BaseEntity {
     /* 갱신 메소드 */
 
     /**
+     * 진행중 상태로 변경
+     */
+    public void progress() {
+        this.studyStatus = StudyStatus.IN_PROGRESS;
+    }
+
+    /**
      * 완료 상태로 변경
      */
     public void complete() {
         this.studyStatus = StudyStatus.COMPLETED;
     }
+
 }
 
 

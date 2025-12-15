@@ -63,7 +63,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
         String videoId = YouTubeUtils.parseVideoId(rq.getVideoUrl());
 
         if (videoLinkRepository.existsByVideoId((videoId)))
-            throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS);
+            throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS, "videoUrl"); // 입력은 videoUrl로 받음
 
         // [2] YouTube 영상 메타데이터 조회 (단일 정보 조회는 캐시처리)
         YouTube.Detail video = youTubeProvider.getVideo(videoId);
@@ -124,8 +124,9 @@ public class VideoLinkServiceImpl implements VideoLinkService {
 
                         // 갱신 대상
                         VideoLink videoLink = videoLinkMap.get(video.getVideoId());
-
+                        log.warn("비디오 갱신 : video = {}", video);
                         try {
+
                             videoLink.sync(
                                     video.getTitle(), video.getThumbnailUrl(), video.getChannelTitle(),
                                     video.getDuration(), video.getViewCount(), video.getLikeCount(), video.getTags())
@@ -150,22 +151,24 @@ public class VideoLinkServiceImpl implements VideoLinkService {
                 .findById(rq.getVideoLinkId())
                 .orElseThrow(() -> new BusinessException(AppStatus.VIDEO_LINK_NOT_FOUND));
 
-        // 이미 존재하는 경우, 수정 불가
+        // [2] 필요 정보 추출
         String videoUrl = rq.getVideoUrl();
         String videoId = YouTubeUtils.parseVideoId(videoUrl);
-        if (Objects.equals(videoLink.getVideoId(), videoId))
-            throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS);
 
-        // [2] 정보 수정을 위한, 영상 정보 조회
+        // [3] 중복 검증
+        if (Objects.equals(videoLink.getVideoId(), videoId) || videoLinkRepository.existsByVideoId((videoId)))
+            throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS, "videoUrl"); // 입력은 videoUrl로 받음
+
+        // [4] 정보 수정을 위한, 영상 정보 조회
         YouTube.Detail video = youTubeProvider.getVideo(videoId);
 
-        // [3] 영상 정보 기반 수정
+        // [5] 영상 정보 기반 수정
         videoLink.edit(
                 videoUrl, videoId, video.getTitle(), video.getThumbnailUrl(), video.getChannelTitle(),
                 video.getDuration(), video.getViewCount(), video.getLikeCount(), video.getTags()
         );
 
-        // [4] 갱신된 영상 정보 반환
+        // [6] 갱신된 영상 정보 반환
         return VideoLinkDtoMapper.toRow(videoLink);
     }
 
