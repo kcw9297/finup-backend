@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 
 @Slf4j
@@ -29,9 +29,9 @@ public class PublicMemberController {
      * [POST] /public/api/members/join
      */
 
-    @PostMapping
+    @PostMapping("/join")
     public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
-        MemberDto.Join rp = memberService.join(rq);
+        MemberDto.Row rp = memberService.join(rq);
         return Api.ok(rp);
     }
 }

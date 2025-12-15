@@ -26,6 +26,7 @@ public final class MemberDto {
         private MemberRole memberRole;
         private MemberSocial socialType;
         private String socialId;
+        private String profileImageUrl;
 
         public String getMemberRoleValue() {
             return memberRole != null ? memberRole.getValue() : null;

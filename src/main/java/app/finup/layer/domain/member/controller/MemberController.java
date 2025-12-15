@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -30,6 +29,8 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+
+
 
 
     /**
@@ -58,6 +59,33 @@ public class MemberController {
 
         // [2] 페이징 응답 전달
         return Api.ok(rows);
+    }
+
+    /**
+     *현재 로그인한 회원 정보 조회
+     * [GET]
+     * @return 로그인한 회원 정보
+     */
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe() {
+        return Api.ok(memberService.getMe());
+    }
+
+    /**
+    * 회원가입
+    * [POST] /api/members
+    */
+    @PostMapping
+    public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
+
+        log.info("[JOIN][REQUEST] email={}", rq.getEmail());
+
+        MemberDto.Row rp = memberService.join(rq);
+
+        log.info("[JOIN][SUCCESS] memberId={}, email={}",
+                rp.getMemberId(), rp.getEmail());
+
+        return Api.ok(rp);
     }
 
   
@@ -115,16 +143,17 @@ public class MemberController {
     public ResponseEntity<?> editProfileImage(@PathVariable Long memberId,
                                               @RequestParam("file") MultipartFile file) {
 
-        log.info("[EDIT_PROFILE_IMAGE][REQUEST] memberId={}, fileName={}, size={}",
+        log.info("[PROFILE_IMAGE][REQUEST] memberId={}, fileNull={}, filename={}, size={}, contentType={}",
                 memberId,
-                file != null ? file.getOriginalFilename() : null,
-                file != null ? file.getSize() : null
+                (file == null),
+                (file != null ? file.getOriginalFilename() : null),
+                (file != null ? file.getSize() : null),
+                (file != null ? file.getContentType() : null)
         );
 
         memberService.editProfileImage(memberId, file);
 
-        log.info("[EDIT_PROFILE_IMAGE][SUCCESS] memberId={}", memberId);
-
+        log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", memberId);
         return Api.ok();
     }
 

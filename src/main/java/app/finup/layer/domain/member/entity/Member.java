@@ -55,7 +55,7 @@ public class Member extends BaseEntity {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE} // 이미지 자동 저장/수정 처리
     )
     @JoinColumn(name = "profile_image_id")
-    private UploadFile profileImage;
+    private UploadFile profileImageFile;
 
     // 생성자
     @Builder
@@ -69,6 +69,7 @@ public class Member extends BaseEntity {
         setDefault();
     }
 
+
     // 생성 시 기본 설정
     private void setDefault() {
         this.isActive = true;
@@ -76,7 +77,8 @@ public class Member extends BaseEntity {
 
     /**
      * 일반 회원가입을 위한 엔티티 생성
-     * @param email 이메일
+     *
+     * @param email    이메일
      * @param password 비밀번호
      * @param nickname 닉네임
      * @return 일반회원 엔티티
@@ -94,9 +96,10 @@ public class Member extends BaseEntity {
 
     /**
      * 소셜 회원가입을 위한 엔티티 생성
-     * @param email 이메일
+     *
+     * @param email    이메일
      * @param nickname 닉네임 (현재는 서비스에서 임의로 생성하여 제공)
-     * @param social 소셜 유형 (GOOGLE, NAVER, ...)
+     * @param social   소셜 유형 (GOOGLE, NAVER, ...)
      * @param socialId 소셜 회원번호
      * @return 소셜회원 엔티티
      */
@@ -113,7 +116,8 @@ public class Member extends BaseEntity {
 
     /**
      * 관리자 계정 엔티티 생성
-     * @param email 이메일
+     *
+     * @param email    이메일
      * @param password 비밀번호
      * @param nickname 닉네임
      * @return 관리자 회원 엔티티
@@ -131,25 +135,39 @@ public class Member extends BaseEntity {
 
     /**
      * 닉네임 변경
+     *
      * @param nickname
      */
-    public void changeNickname(String nickname) {
+    public void editNickname(String nickname) {
         this.nickname = nickname;
     }
 
     /**
      * 비밀번호 변경
+     *
      * @param encodedPassword
      */
-    public void changePassword(String encodedPassword) {
+    public void editPassword(String encodedPassword) {
         this.password = encodedPassword;
     }
 
     /**
      * 프로필 이미지 변경
-     * @param profileImage
+     *
+     * @param profileImageFile 프로필 이미지 파일 엔티티
      */
-    public void changeProfileImage(UploadFile profileImage) {
-        this.profileImage = profileImage;
+    public void editProfileImage(UploadFile profileImageFile) {
+        this.profileImageFile = profileImageFile;
+    }
+
+    /**
+     * 프로필 이미지 제거
+     *
+     * @return 제거된 이미지 파일 엔티티
+     */
+    public UploadFile removeProfileImage() {
+        UploadFile file = this.profileImageFile;
+        this.profileImageFile = null;
+        return file;
     }
 }
