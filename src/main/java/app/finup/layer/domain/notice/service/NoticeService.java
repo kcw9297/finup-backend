@@ -3,6 +3,8 @@ package app.finup.layer.domain.notice.service;
 import app.finup.common.dto.Page;
 import app.finup.layer.domain.notice.dto.NoticeDto;
 
+import java.util.List;
+
 /**
  * 공지사항 게시판 비즈니스 로직 인터페이스
  * @author khj
@@ -10,18 +12,43 @@ import app.finup.layer.domain.notice.dto.NoticeDto;
  */
 
 public interface NoticeService {
+
+    /**
+     * 게시글 조회
+     * @param noticeId 조회 대상 공지사항번호
+     * @return 조회된 게시글 상세 정보 DTO
+     */
+    NoticeDto.Detail getDetail(Long noticeId);
+
+
+    /**
+     * 게시글 검색
+     * @param rq 페이징 요청 DTO
+     * @return 검색된 게시글 DTO 페이지 리스트
+     */
+    Page<NoticeDto.Row> getPagedList(NoticeDto.Search rq);
+
+
     /**
      * 게시글 작성
      * @param rq 작성 요청 DTO
-     * @return 생성된 게시글 번호
      */
-    NoticeDto.Detail write(NoticeDto.Write rq, Long adminId);
+    void write(NoticeDto.Write rq);
+
 
     /**
      * 게시글 수정
      * @param rq 수정 요청 DTO
      */
-    NoticeDto.Detail edit(NoticeDto.Edit rq);
+    void edit(NoticeDto.Edit rq);
+
+
+    /**
+     * 게시글 열람 (조회수 증가)
+     * @param rq 게시글 조회수 증가요청 DTO List (스케줄링)
+     */
+    void watch(List<NoticeDto.Watch> rq);
+
 
     /**
      * 게시글 삭제
@@ -29,24 +56,4 @@ public interface NoticeService {
      */
     void remove(Long noticeId);
 
-    /**
-     * 게시글 조회
-     * @param noticeId 수정 요청
-     * @return 생성된 게시글 번호
-     */
-    NoticeDto.Detail getDetail(Long noticeId);
-
-
-    /**
-     * 게시글 목록 일괄 조회
-     * @return 조회된 게시글 DTO 페이지 리스트
-     */
-    Page<NoticeDto.Row> getList(NoticeDto.Search rq);
-
-
-    /**
-     * 게시글 검색
-     * @return 검색된 게시글 DTO 페이지 리스트
-     */
-    Page<NoticeDto.Row> search(NoticeDto.Search rq);
 }

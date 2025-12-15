@@ -90,6 +90,9 @@ public enum AppStatus {
 
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),
+    NOTICE_OK_WRITE(200, "공지사항을 작성했습니다.", "NOTICE_OK_WRITE"),
+    NOTICE_OK_EDIT(200, "공지사항을 수정했습니다.", "NOTICE_OK_EDIT"),
+    NOTICE_OK_REMOVE(200, "공지사항을 삭제했습니다.", "NOTICE_OK_REMOVE"),
 
 
     /* 금융 사전 API */

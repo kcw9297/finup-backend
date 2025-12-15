@@ -85,7 +85,7 @@ public class Url {
 
     /* notice */
     public static final String NOTICE = API + "/notices";
-    public static final String NOTICE_ADMIN_API = ADMIN + NOTICE;
+    public static final String NOTICE_ADMIN = ADMIN + NOTICE;
 
     /* level */
     public static final String LEVEL = API + "/levels";
