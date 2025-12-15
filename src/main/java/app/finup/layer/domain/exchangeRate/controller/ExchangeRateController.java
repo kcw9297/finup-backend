@@ -32,8 +32,9 @@ public class ExchangeRateController {
      */
     @GetMapping("/latest")
     public ResponseEntity<?> getLatestRates() {
-        List<ExchangeRateDto.Row> rp = exchangeRateService.getLatestRates();
-        return Api.ok(rp);
+        List<ExchangeRateDto.Row> result = exchangeRateService.getLatestRates();
+        log.info("환율 응답 개수: {}", result.size());
+        return Api.ok(result);
     }
 
     // 특정 통화 환율 조회 API
