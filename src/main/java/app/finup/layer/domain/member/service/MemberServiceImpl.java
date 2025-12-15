@@ -23,9 +23,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
 import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 
 import java.util.List;
+
 
 @Slf4j
 @Service
@@ -42,6 +44,22 @@ public class MemberServiceImpl implements MemberService {
     private final AuthRedisStorage authRedisStorage;
 
     private final UploadFileManager uploadFileManager;
+
+    private Long currentMemberId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth instanceof AnonymousAuthenticationToken) {
+            throw new BusinessException(AppStatus.UNAUTHORIZED);
+        }
+
+        Object principal = auth.getPrincipal();
+        if (!(principal instanceof CustomUserDetails userDetails)) {
+            throw new BusinessException(AppStatus.UNAUTHORIZED);
+        }
+
+        return userDetails.getMemberId();
+    }
+
 
 
     @Override
@@ -129,20 +147,17 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void editNickname(MemberDto.EditNickname rq) {
 
-        Long memberId = rq.getMemberId();
+        Long memberId = currentMemberId();
 
-        // [1] 회원 조회
         Member member = getMember(memberId);
 
-        // [2] 닉네임 중복 체크 (본인 제외)
         if (memberRepository.existsByNicknameAndMemberIdNot(rq.getNickname(), memberId)) {
             throw new BusinessException(AppStatus.MEMBER_DUPLICATE_NICKNAME);
         }
 
-        // [3] 닉네임 수정
         member.editNickname(rq.getNickname());
-
     }
+
 
     /**
      * 비밀번호 수정
@@ -153,28 +168,27 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void editPassword(MemberDto.EditPassword rq) {
 
-        Long memberId = rq.getMemberId();
+        Long memberId = currentMemberId();
 
-        // [1] 회원 조회
         Member member = getMember(memberId);
 
-        // [2] 현재 비밀번호 검증
         if (!passwordEncoder.matches(rq.getCurrentPassword(), member.getPassword())) {
             throw new BusinessException(AppStatus.AUTH_BAD_CREDENTIALS);
         }
 
-        // [3] 새 비밀번호 암호화 후 변경
         member.editPassword(passwordEncoder.encode(rq.getNewPassword()));
     }
+
 
     /**
      * 프로필 이미지 수정
      *
-     * @param memberId 회원 번호
      * @param file     업로드 이미지 파일
      */
     @Override
-    public void editProfileImage(Long memberId, MultipartFile file) {
+    public void editProfileImage(MultipartFile file) {
+
+        Long memberId = currentMemberId();
 
         log.info("[PROFILE_IMAGE][SERVICE][START] memberId={}", memberId);
 
@@ -185,8 +199,10 @@ public class MemberServiceImpl implements MemberService {
         Member member = getMember(memberId);
 
         // 1) 기존 이미지 soft delete + 연관 끊기
-        if (member.getProfileImageFile() != null) {
-            member.removeProfileImage().softRemove();
+        UploadFile old = member.getProfileImageFile();
+        if (old != null) {
+            member.removeProfileImage();
+            old.softRemove();
         }
 
         // 2) UploadFile 엔티티 생성
@@ -198,7 +214,7 @@ public class MemberServiceImpl implements MemberService {
         );
 
         // 3) 연관관계 연결
-        member.editProfileImage(newFile); // 또는 member.editProfileImage(newFile)
+        member.editProfileImage(newFile);
 
         // 4) 실제 파일 저장
         uploadFileManager.store(file, newFile.getFilePath());
@@ -212,18 +228,9 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public MemberDto.Row getMe() {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Long memberId = currentMemberId();
 
-        if (auth == null || !auth.isAuthenticated()) {
-            throw new BusinessException(AppStatus.UNAUTHORIZED);
-        }
-
-        Object principal = auth.getPrincipal();
-        if (!(principal instanceof CustomUserDetails userDetails)) {
-            throw new BusinessException(AppStatus.UNAUTHORIZED);
-        }
-
-        Member member = getMember(userDetails.getMemberId());
+        Member member = getMember(memberId);
 
         MemberDto.Row row = MemberDtoMapper.toRow(member);
 
@@ -237,4 +244,5 @@ public class MemberServiceImpl implements MemberService {
 
         return row;
     }
+
 }

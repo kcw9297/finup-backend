@@ -82,7 +82,7 @@ public final class MemberDto {
     @Builder
     public static class EditNickname {
         private String nickname;
-        private Long memberId;
+
     }
     /**
      * 비밀번호 수정 요청에 사용
@@ -94,7 +94,7 @@ public final class MemberDto {
     public static class EditPassword {
         private String currentPassword;
         private String newPassword;
-        private Long memberId;
+
     }
 
   

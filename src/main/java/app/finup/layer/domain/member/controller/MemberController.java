@@ -31,11 +31,10 @@ public class MemberController {
     private final MemberService memberService;
 
 
-
-
     /**
      * 회원 리스트
      * [GET] api/members/list
+     *
      * @param rq 회원 목록 검색 요청 DTO
      */
     @GetMapping("/list")
@@ -62,8 +61,9 @@ public class MemberController {
     }
 
     /**
-     *현재 로그인한 회원 정보 조회
+     * 현재 로그인한 회원 정보 조회
      * [GET]
+     *
      * @return 로그인한 회원 정보
      */
     @GetMapping("/me")
@@ -72,9 +72,9 @@ public class MemberController {
     }
 
     /**
-    * 회원가입
-    * [POST] /api/members
-    */
+     * 회원가입
+     * [POST] /api/members
+     */
     @PostMapping
     public ResponseEntity<?> join(@Valid @RequestBody MemberDto.Join rq) {
 
@@ -88,73 +88,57 @@ public class MemberController {
         return Api.ok(rp);
     }
 
-  
+
     /**
-     * 회원 닉네임 수정 API
-     * [PATCH] /members/{memberId}/nickname
-     * @param memberId 회원 번호
-     * @param rq 닉네임 수정 요청 DTO
+     * 회원 닉네임 수정 API (내 정보)
+     * [PATCH] /members/me/nickname
      */
-    @PatchMapping("/{memberId:[0-9]+}/nickname")
-    public ResponseEntity<?> editNickname(@PathVariable Long memberId,
-                                          @RequestBody MemberDto.EditNickname rq) {
-        rq.setMemberId(memberId);
+    @PatchMapping("/me/nickname")
+    public ResponseEntity<?> editNickname(@RequestBody @Valid MemberDto.EditNickname rq) {
 
-        log.info("[EDIT_NICKNAME][REQUEST] memberId={}", memberId);
+        log.info("[EDIT_NICKNAME][REQUEST]");
 
-        // [1] 수정 요청
         memberService.editNickname(rq);
 
+        log.info("[EDIT_NICKNAME][SUCCESS]");
 
-        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}", memberId);
-
-        // [2] 성공 응답
         return Api.ok();
     }
+
     /**
-     * 회원 비밀번호 수정 API
-     * [PATCH] /members/{memberId}/password
-     * @param memberId 회원 번호
-     * @param rq 비밀번호 수정 요청 DTO
+     * 회원 비밀번호 수정 API (내 정보)
+     * [PATCH] /members/me/password
      */
-    @PatchMapping("/{memberId:[0-9]+}/password")
-    public ResponseEntity<?> editPassword(@PathVariable Long memberId,
-                                          @RequestBody MemberDto.EditPassword rq) {
-        rq.setMemberId(memberId);
+    @PatchMapping("/me/password")
+    public ResponseEntity<?> editPassword(@RequestBody @Valid MemberDto.EditPassword rq) {
 
-        log.info("[EDIT_PASSWORD][REQUEST] memberId={}", memberId);
+        log.info("[EDIT_PASSWORD][REQUEST]");
 
-        // [1] 수정 요청
         memberService.editPassword(rq);
 
-        log.info("[EDIT_PASSWORD][SUCCESS] memberId={}", memberId);
+        log.info("[EDIT_PASSWORD][SUCCESS]");
 
-
-        // [2] 성공 응답
         return Api.ok();
     }
-    /**
-     * 회원 프로필 이미지 수정 API
-     * [PATCH] /members/{memberId}/profile-image
-     * @param memberId 회원 번호
-     * @param file 업로드 이미지 파일
-     */
-    @PatchMapping("/{memberId:[0-9]+}/profile-image")
-    public ResponseEntity<?> editProfileImage(@PathVariable Long memberId,
-                                              @RequestParam("file") MultipartFile file) {
 
-        log.info("[PROFILE_IMAGE][REQUEST] memberId={}, fileNull={}, filename={}, size={}, contentType={}",
-                memberId,
+    /**
+     * 회원 프로필 이미지 수정 API (내 정보)
+     * [PATCH] /members/me/profile-image
+     */
+    @PatchMapping("/me/profile-image")
+    public ResponseEntity<?> editProfileImage(@RequestParam("file") MultipartFile file) {
+
+        log.info("[PROFILE_IMAGE][REQUEST] fileNull={}, filename={}, size={}, contentType={}",
                 (file == null),
                 (file != null ? file.getOriginalFilename() : null),
                 (file != null ? file.getSize() : null),
                 (file != null ? file.getContentType() : null)
         );
 
-        memberService.editProfileImage(memberId, file);
+        memberService.editProfileImage(file);
 
-        log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", memberId);
+        log.info("[PROFILE_IMAGE][SUCCESS]");
         return Api.ok();
     }
-
 }
+
