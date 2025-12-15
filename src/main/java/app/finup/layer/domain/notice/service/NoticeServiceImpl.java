@@ -3,18 +3,13 @@ package app.finup.layer.domain.notice.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.layer.domain.member.entity.Member;
-import app.finup.layer.domain.member.repository.MemberRepository;
 import app.finup.layer.domain.notice.dto.NoticeDto;
 import app.finup.layer.domain.notice.dto.NoticeDtoMapper;
 import app.finup.layer.domain.notice.entity.Notice;
 import app.finup.layer.domain.notice.mapper.NoticeMapper;
 import app.finup.layer.domain.notice.repository.NoticeRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,41 +28,8 @@ import java.util.List;
 public class NoticeServiceImpl implements NoticeService {
 
     private final NoticeRepository noticeRepository;
-    private final MemberRepository memberRepository; // 작성자(admin) 조회
     private final NoticeMapper noticeMapper;
 
-    @Override
-    @Transactional
-    public NoticeDto.Detail write(NoticeDto.Write rq, Long adminId) {
-         // 로그인 정보
-        Member admin = memberRepository.findById(adminId)
-                .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
-        Notice entity = Notice.builder()
-                .title(rq.getTitle())
-                .content(rq.getContent())
-                .admin(admin)
-                .build();
-
-        Notice saved = noticeRepository.save(entity);
-        return NoticeDtoMapper.toDetailDto(saved);
-    }
-
-
-    @Override
-    @Transactional
-    public NoticeDto.Detail edit(NoticeDto.Edit rq) {
-        Notice notice = noticeRepository.findById(rq.getNoticeId())
-                .orElseThrow(() -> new BusinessException(AppStatus.NOTICE_NOT_FOUND));
-        // [1] 수정 로직
-        notice.update(rq.getTitle(), rq.getContent());
-
-        return NoticeDtoMapper.toDetailDto(notice);
-    }
-
-    @Override
-    public void remove(Long noticeId) {
-        noticeRepository.deleteById(noticeId);
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -77,23 +39,54 @@ public class NoticeServiceImpl implements NoticeService {
                 .orElseThrow(() -> new BusinessException(AppStatus.NOTICE_NOT_FOUND));
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Page<NoticeDto.Row> getList(NoticeDto.Search rq) {
-        // [1] MyBatis 호출
-        List<NoticeDto.Row> list = noticeMapper.search(rq);
-        Integer totalCount = noticeMapper.countForSearch(rq);
-
-        // [2] 반환
-        return Page.of(list, totalCount, rq.getPageNum(), list.size());
-    }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<NoticeDto.Row> search(NoticeDto.Search rq) {
-        List<NoticeDto.Row> list = noticeMapper.search(rq);
+    public Page<NoticeDto.Row> getPagedList(NoticeDto.Search rq) {
+
+        // [1] 검색 수행
+        List<NoticeDto.Row> rows = noticeMapper.search(rq);
         Integer count = noticeMapper.countForSearch(rq);
-        // count.intValue() 변환하여 전달
-        return Page.of(list, count.intValue(), rq.getPageNum(), rq.getPageSize());
+
+        // [2] 검색 결과 반환 (페이징 객체 변환)
+        return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
     }
+
+
+    @Override
+    public void write(NoticeDto.Write rq) {
+
+        // [1] DTO -> Entity
+        Notice entity = Notice.builder()
+                .title(rq.getTitle())
+                .content(rq.getContent())
+                .build();
+
+        // [2] 공지사항 저장
+        noticeRepository.save(entity);
+    }
+
+
+    @Override
+    public void edit(NoticeDto.Edit rq) {
+
+        noticeRepository
+                .findById(rq.getNoticeId())
+                .orElseThrow(() -> new BusinessException(AppStatus.NOTICE_NOT_FOUND))
+                .update(rq.getTitle(), rq.getContent());
+    }
+
+
+    @Override
+    public void watch(List<NoticeDto.Watch> rq) {
+        noticeMapper.updateBulkViewCount(rq);
+    }
+
+
+    @Override
+    public void remove(Long noticeId) {
+        noticeRepository.deleteById(noticeId);
+    }
+
+
 }

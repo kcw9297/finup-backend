@@ -37,7 +37,7 @@ public class NormalUserDetailService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException(""));
 
         // [2] UserDetails 객체 생성 및 반환
-        UploadFile profileImage = member.getProfileImage();
+        UploadFile profileImage = member.getProfileImageFile();
 
         return CustomUserDetails.builder()
                 .memberId(member.getMemberId())

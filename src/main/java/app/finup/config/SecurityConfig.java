@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -57,11 +58,12 @@ public class SecurityConfig {
         HttpSecurity config = http
 
                 // ▶ CSRF 설정 - 만약 Cookie에 AccessToken을 담는 경우 설정 권장 (방어 강화)
-                .csrf(customer -> customer
-                        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT, "/**") // 일반&소셜 로그인, 로그아웃
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .csrfTokenRepository(csrfTokenRepository()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
-                )
+                //.csrf(customer -> customer
+                //        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT) // 일반&소셜 로그인, 로그아웃
+                //        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                //        .csrfTokenRepository(csrfTokenRepository()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
+                //)
+                .csrf(AbstractHttpConfigurer::disable)
 
                 // ▶ 필터 설정 - 커스텀 필터 추가
                 // UsernamePasswordAuthenticationFilter 는 세션기반 인증 시에만 동작)
@@ -147,10 +149,11 @@ public class SecurityConfig {
         //config.setAllowedOrigins(List.of("*")); // 허용할 도메인 설정
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         //config.setAllowedMethods(List.of(("*"))); // 허용할 HTTP 메소드 설정
-        config.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE")); // 허용 method
+        config.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE", "PATCH")); // 허용 method
         config.setAllowedHeaders(List.of(("*")));   // 허용 Header
         config.setAllowCredentials(true);           // 인증 요청을 포함한 쿠키 정보 허용
-        config.applyPermitDefaultValues();
+        config.setMaxAge(3600L);
+        //config.applyPermitDefaultValues();
 
         // [2] 설정을 적용할 경로 적용 후 반환
         source.registerCorsConfiguration("/**", config); // 모든 경로에 CORS 설정 등록

@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "JWT 인증 실패 - 요청 중단 : %s", e.getMessage());
             cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
-            Api.writeFail(response, AppStatus.SERVER_ERROR); // 필터 처리 중단 (로직 실행하지 않음)
+            Api.writeFail(response, AppStatus.TOKEN_INVALID); // 필터 처리 중단 (로직 실행하지 않음)
         }
     }
 

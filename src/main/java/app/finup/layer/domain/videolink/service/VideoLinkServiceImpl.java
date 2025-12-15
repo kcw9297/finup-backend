@@ -107,6 +107,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
                 .forEach(chunk -> {
                     // 영상 조회
                     List<YouTube.Detail> videos = youTubeProvider.getVideos(chunk);
+                    log.warn("videos = {}", videos);
 
                     // 조회된 영상번호 목록 (숨김 처리되거나, 삭제된 영상은 결과에 미포함)
                     Set<String> resultIds = videos.stream()
