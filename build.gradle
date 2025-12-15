@@ -78,8 +78,8 @@ dependencies {
 
     // spring ai
     implementation "org.springframework.ai:spring-ai-starter-model-openai"
-    implementation "org.springframework.ai:spring-ai-vector-store"
-    implementation "org.springframework.ai:spring-ai-chroma-store"
+    implementation "org.springframework.ai:spring-ai-starter-vector-store-chroma"
+
     // text 유사도 
     implementation 'org.apache.commons:commons-text:1.10.0'
     
