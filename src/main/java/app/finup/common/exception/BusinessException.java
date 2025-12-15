@@ -24,6 +24,17 @@ public class BusinessException extends AppException {
         super(appStatus);
     }
 
+
+    /**
+     * 비즈니스 예외 상황 전파 (AppStatus 및 fieldName 정보 전달)
+     * @param appStatus 애플리케이션 상태 상수
+     * @param fieldName FrontEnd 오류 발생 필드명
+     */
+    public BusinessException(AppStatus appStatus, String fieldName) {
+        super(appStatus, fieldName);
+    }
+
+
     /**
      * 직접 비즈니스 예외 상황 전파 (오류 메세지와 상태 코드 수동 작성)
      * @param message 오류 메세지

@@ -134,6 +134,17 @@ public final class Api {
         return new ResponseEntity<>(Response.fail(appStatus), getStatusCode(appStatus));
     }
 
+
+    /**
+     * 실패 상태 및 status 전달 (비즈니스 예외를 FrontEnd 입력 필드에 전달 시 사용)
+     * @param appStatus 애플레케이션 상태 상수
+     * @param inputErrors 비즈니스 로직 실패 내용을 담은 map
+     */
+    public static ResponseEntity<Object> fail(AppStatus appStatus, Map<String, String> inputErrors) {
+        return new ResponseEntity<>(Response.fail(appStatus, inputErrors), getStatusCode(appStatus));
+    }
+
+
     /**
      * 실패 상태 및 inputErrors 전달 (bean validation 실패 처리 시 사용)
      * @param inputErrors bean validation 실패 시 반환되는 map
