@@ -33,9 +33,6 @@ public class StockDto {
         private String stckAvls;              // 시가 총액
         private String mrktWholAvlsRlim;      // 시장 전체 시가총액 비중
 
-
-
-
     }
 
     /**
@@ -67,17 +64,6 @@ public class StockDto {
         //private String avrgTrPbmn;                // 평균 거래 대금
         //private String trPbmnTnrt;                // 거래대금 회전율
         //private String ndayTrPbmnTnrt;            // N일 거래대금 회전율
-
-    }
-
-    /**
-     * 종목 거래량 순위 리스트 담기 위해 사용
-     */
-    @Data
-    @AllArgsConstructor
-    //@NoArgsConstructor
-    //@Builder
-    public static class VolumeRow {
 
     }
 
