@@ -37,17 +37,17 @@ public interface MemberService {
 
     /**
      * 회원 닉네임 수정
-     * @param memberId 회원 번호
+     * @param
      * @param rq 닉네임 수정 요청 DTO
      */
-    void editNickname(Long memberId, MemberDto.EditNickname rq);
+    void editNickname(MemberDto.EditNickname rq);
 
     /**
      * 회원 비밀번호 수정
-     * @param memberId 회원 번호
+     * @param
      * @param rq 비밀번호 수정 요청 DTO
      */
-    void editPassword(Long memberId, MemberDto.EditPassword rq);
+    void editPassword(MemberDto.EditPassword rq);
 
     /**
      * 회원 프로필 이미지 수정
