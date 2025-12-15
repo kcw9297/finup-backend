@@ -16,84 +16,98 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class ExchangeRateServiceImpl implements ExchangeRateService {
-
     private final ExchangeRateApiClient apiClient;
     private final ExchangeRateRepository repository;
-
     private static final int MAX_FALLBACK_DAYS = 10;
 
-    /**
-     * 홈 화면용 최신 환율 조회
-     * - 외부 API 호출 ❌
-     * - DB 데이터만 사용
-     */
+    // 홈 화면용 최신 환율 조회
     @Override
     public List<ExchangeRateDto.Row> getLatestRates() {
-
-        List<ExchangeRate> entities = repository.findAll();
+        List<ExchangeRate> entities = repository.findByCurrencyIn(List.of("USD", "JPY", "JPY(100)"));
 
         if (entities.isEmpty()) {
             log.warn("DB에 환율 데이터 없음");
             return List.of();
         }
-
         return entities.stream()
                 .map(ExchangeRateDtoMapper::toRow)
                 .toList();
     }
 
-    /**
-     * 환율 자동 갱신
-     * - 서버 시작 시 1회
-     * - 평일 11시 스케줄 실행
-     * - 외부 API 호출 + 10일 fallback
-     * - DB에 today / yesterday 갱신
-     */
+    // 환율 자동 갱신
     @Override
     public void updateRates() {
-
         LocalDate baseDate = determineInitialSearchDate();
+        LocalDate todayRateDate = null;
+        List<ExchangeRateDto.ApiRow> todayRows = List.of();
 
+        // today 기준 영업일 찾기 (최대 10일)
         for (int i = 0; i < MAX_FALLBACK_DAYS; i++) {
+            LocalDate date = baseDate.minusDays(i);
+            List<ExchangeRateDto.ApiRow> rows = apiClient.fetchRates(date);
 
-            LocalDate targetDate = baseDate.minusDays(i);
-            List<ExchangeRateDto.ApiRow> apiRows =
-                    apiClient.fetchRates(targetDate);
-
-            if (!isValid(apiRows)) {
-                log.info("환율 fallback 실패: {}", targetDate);
-                continue;
+            if (isValid(rows)) {
+                todayRateDate = date;
+                todayRows = rows;
+                break;
             }
-
-            log.info("환율 갱신 기준일: {}", targetDate);
-
-            for (ExchangeRateDto.ApiRow apiRow : apiRows) {
-
-                String unit = apiRow.getCurUnit();
-                if (!isTargetCurrency(unit)) continue;
-
-                double todayRate = parseRate(apiRow.getDealBasR());
-
-                Optional<ExchangeRate> optional =
-                        repository.findByCurrency(unit);
-
-                if (optional.isPresent()) {
-                    // 기존 통화 → today → yesterday 이동 후 갱신
-                    optional.get().update(todayRate, targetDate);
-                } else {
-                    // 최초 저장 (보합 처리)
-                    repository.save(ExchangeRateDtoMapper.toNewEntity(apiRow, targetDate));
-                }
-            }
-            return; // 성공 시 종료
+        }
+        if (todayRateDate == null) {
+            log.error("환율 갱신 실패: today 기준 데이터 없음");
+            return;
         }
 
-        log.error("환율 갱신 실패: 10일간 유효 데이터 없음");
+        // yesterday 기준 영업일 찾기
+        LocalDate yesterdayRateDate = null;
+        List<ExchangeRateDto.ApiRow> yesterdayRows = List.of();
+
+        for (int i = 1; i <= MAX_FALLBACK_DAYS; i++) {
+            LocalDate date = todayRateDate.minusDays(i);
+            List<ExchangeRateDto.ApiRow> rows = apiClient.fetchRates(date);
+
+            if (isValid(rows)) {
+                yesterdayRateDate = date;
+                yesterdayRows = rows;
+                break;
+            }
+        }
+
+        // yesterdayRate 매핑
+        Map<String, Double> yesterdayMap = new HashMap<>();
+        for (ExchangeRateDto.ApiRow r : yesterdayRows) {
+            if (isTargetCurrency(r.getCurUnit())) {
+                yesterdayMap.put(
+                        r.getCurUnit(),
+                        parseRate(r.getDealBasR())
+                );
+            }
+        }
+
+        // DB 반영
+        for (ExchangeRateDto.ApiRow r : todayRows) {
+            String unit = r.getCurUnit();
+            if (!isTargetCurrency(unit)) continue;
+
+            double todayRate = parseRate(r.getDealBasR());
+            double yesterdayRate = yesterdayMap.getOrDefault(unit, todayRate);
+
+            Optional<ExchangeRate> optional = repository.findByCurrency(unit);
+            ExchangeRate entity;
+            if (optional.isPresent()) {
+                entity = optional.get();
+            } else {
+                entity = ExchangeRateDtoMapper.toNewEntity(r, todayRateDate);
+            }
+            entity.update(todayRate, yesterdayRate, todayRateDate);
+            repository.save(entity);
+        }
+        log.info(
+                "환율 갱신 완료 (today={}, yesterday={})",
+                todayRateDate, yesterdayRateDate
+        );
     }
 
-    /**
-     * 단일 통화 조회 (DB)
-     */
+    // 단일 통화 조회 (DB)
     @Override
     public ExchangeRateDto.Row getRate(String currency) {
         ExchangeRate entity = repository.findByCurrency(currency)
@@ -103,17 +117,13 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         return ExchangeRateDtoMapper.toRow(entity);
     }
 
-    /**
-     * 전체 환율 조회 (DB)
-     */
+    // 전체 환율 조회 (DB)
     @Override
     public List<ExchangeRateDto.Row> getAllRates() {
         return repository.findAll().stream()
                 .map(ExchangeRateDtoMapper::toRow)
                 .toList();
     }
-
-    /* ===================== 내부 유틸 메소드 ===================== */
 
     // 조회 기준 날짜 계산 (주말 / 11시 이전 보정)
     private LocalDate determineInitialSearchDate() {

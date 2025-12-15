@@ -10,17 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ExchangeRateDtoMapper {
 
-    // 외부 API DTO → Entity 변환
-    public static ExchangeRate toEntity(ExchangeRate existing, ExchangeRateDto.ApiRow apiRow) {
-        double todayRate = parse(apiRow.getDealBasR());
-        return ExchangeRate.builder()
-                .currency(existing.getCurrency())
-                .yesterdayRate(existing.getTodayRate())
-                .todayRate(todayRate)
-                .updatedAt(LocalDateTime.now())
-                .build();
-    }
-
     // 신규 통화 최초 저장용
     public static ExchangeRate toNewEntity(ExchangeRateDto.ApiRow apiRow, LocalDate rateDate) {
         double rate = parse(apiRow.getDealBasR());
@@ -44,12 +33,10 @@ public final class ExchangeRateDtoMapper {
                 .build();
     }
 
-    // 문자열 환율 → double 변환
     private static double parse(String rate) {
         return Double.parseDouble(rate.replace(",", ""));
     }
 
-    // 통화 코드 → 한글명 매핑
     private static String getCurrencyName(String unit) {
         return switch (unit) {
             case "USD" -> "미국 달러";
