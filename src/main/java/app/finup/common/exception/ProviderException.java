@@ -13,7 +13,15 @@ public class ProviderException extends AppException {
         super(appStatus);
     }
 
+    public ProviderException(AppStatus appStatus, String fieldName) {
+        super(appStatus, fieldName);
+    }
+
     public ProviderException(AppStatus appStatus, Throwable cause) {
         super(appStatus, cause);
+    }
+
+    public ProviderException(AppStatus appStatus, String fieldName, Throwable cause) {
+        super(appStatus, fieldName, cause);
     }
 }
