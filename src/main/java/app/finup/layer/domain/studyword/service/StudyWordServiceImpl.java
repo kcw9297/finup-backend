@@ -115,7 +115,7 @@ public class StudyWordServiceImpl implements StudyWordService {
             throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
         // [3] 단어명 갱신 수행
-        studyWord.edit(rq.getName(), rq.getMeaning());
+        studyWord.edit(rq.getName(), rq.getMeaning(), null); // 수정필요
     }
 
 

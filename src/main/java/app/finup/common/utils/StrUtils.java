@@ -171,4 +171,10 @@ public final class StrUtils {
         return extIdx == -1 || extIdx == filename.length() - 1 ?
                 "" : filename.substring(extIdx + 1);
     }
+
+
+    public static String splitWithStart(String text, int splitDescriptionLen) {
+        return Objects.isNull(text) ? null :
+                text.length() > splitDescriptionLen ? text.substring(0, splitDescriptionLen) : text;
+    }
 }

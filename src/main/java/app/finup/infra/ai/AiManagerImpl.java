@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class AiManagerImpl implements AiManager {
-    private  final OpenAiChatModel openAiChatModel;
+    private final OpenAiChatModel openAiChatModel;
     private final OpenAiEmbeddingModel embeddingModel;
     private final ObjectMapper objectMapper;
 

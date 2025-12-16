@@ -66,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // [1] Cookie 내 포함된 AT 조회
             String at = cookieManager.getValue(request, jwtCookieName);
             String xsrfToken = request.getHeader("X-XSRF-TOKEN");
-            LogUtils.showInfo(this.getClass(), "\nCOOKIE JWT TOKEN : %s\nHEADER XSRF-TOKEN : %s", at, xsrfToken);
+            //LogUtils.showInfo(this.getClass(), "\nCOOKIE JWT TOKEN : %s\nHEADER XSRF-TOKEN : %s", at, xsrfToken);
 
             // [2] 토큰이 있는 경우 검증 수행 (위조, 만료 등..)
             if (Objects.nonNull(at) && !at.isBlank()) verifyToken(response, at);
