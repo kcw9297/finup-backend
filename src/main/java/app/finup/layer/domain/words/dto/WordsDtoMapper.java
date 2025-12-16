@@ -25,4 +25,18 @@ public class WordsDtoMapper {
                 .description(row.getDescription())
                 .build();
     }
+
+    public static WordsDto.Similarity toSimilarity(
+            Long termId,
+            String name,
+            String description,
+            double score
+    ) {
+        return new WordsDto.Similarity(
+                termId,
+                name,
+                description,
+                score
+        );
+    }
 }
