@@ -101,5 +101,6 @@ public class NewsProviderImpl implements NewsProvider {
             row.setSummary(null);
             return false;
         }
+
     }
 }

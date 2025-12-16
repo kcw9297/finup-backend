@@ -31,6 +31,7 @@ public class WordVectorRepository {
             ON DUPLICATE KEY UPDATE embedding = VALUES(embedding)
         """, termId, embeddingJson);
     }
+
     /**
      * 입력 벡터와 가장 유사한 단어 검색
      */
