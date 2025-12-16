@@ -25,17 +25,10 @@ server:
 app:
   domain: ${APP_DOMAIN} # 백엔드 도메인
 
-file:
-  dir: ${FILE_DIR} # 파일 경로
-  domain: ${FILE_DOMAIN} # 파일 접근 도메인
-  handler: ${FILE_HANDLER:} # 로컬 핸들러 경로 (기본값 설정)
-
-jwt:
-  cookie-name: ${JWT_COOKIE_NAME}
-  expiration:
-    access-token: ${JWT_EXPIRATION_ACCESS_TOKEN}
-    refresh-token: ${JWT_EXPIRATION_REFRESH_TOKEN}
-    cookie: ${JWT_EXPIRATION_COOKIE}
+  file:
+    dir: ${FILE_DIR} # 파일 경로
+    domain: ${FILE_DOMAIN} # 파일 접근 도메인
+    handler: ${FILE_HANDLER:} # 로컬 핸들러 경로 (기본값 설정)
 
 ### 외부 API 호출을 위한 상수 ###
 

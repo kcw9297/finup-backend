@@ -27,6 +27,21 @@ public class AdminNoticeController {
 
     private final NoticeService noticeService;
 
+    /**
+     * 게시글 검색
+     * [GET] /notices/search
+     * @param rq 게시글 검색 요청 DTO
+     */
+    @GetMapping("/search")
+    public ResponseEntity<?> search(NoticeDto.Search rq) {
+
+        // [1] 요청
+        Page<NoticeDto.Row> rp = noticeService.getPagedList(rq);
+
+        // [2] 페이징 응답 전달
+        return Api.ok(rp.getRows(), Pagination.of(rp));
+    }
+
 
     /**
      * 공지사항 추가

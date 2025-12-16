@@ -24,13 +24,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final Environment env;
 
-    @Value("${file.handler}")
+    @Value("${app.file.handler}")
     private String fileHandler;
 
-    @Value("${file.dir}")
+    @Value("${app.file.dir}")
     private String fileDir;
 
-    @Value("${file.domain}")
+    @Value("${app.file.domain}")
     private String fileDomain;
 
     // 프로필 판별 값

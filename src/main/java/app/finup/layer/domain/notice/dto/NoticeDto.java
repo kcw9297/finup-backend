@@ -31,6 +31,8 @@ public final class NoticeDto {
 
         private String title;
 
+        private String content;
+
         private Long viewCount;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
@@ -96,19 +98,6 @@ public final class NoticeDto {
 
         @Text(min = 1, max = 1000)
         private String content;
-    }
-
-
-    /**
-     * 조회수 증가 로직을 위해 사용
-     */
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class Watch {
-        private Long noticeId;
-        private Long increment;
     }
 
 
