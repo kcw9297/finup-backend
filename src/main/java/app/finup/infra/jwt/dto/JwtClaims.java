@@ -15,4 +15,5 @@ public class JwtClaims {
     private String nickname;
     private String role;
     private String social;
+    private String profileImageUrl;
 }
