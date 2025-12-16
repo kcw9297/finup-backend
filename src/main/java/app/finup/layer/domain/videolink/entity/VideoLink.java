@@ -46,6 +46,9 @@ public class VideoLink extends BaseEntity {
     @Column(nullable = false)
     private String channelTitle;
 
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
     @Convert(converter = DurationConverter.class) // 컨버터를 이용한 변환
     @Column(nullable = false)
     private Duration duration;
@@ -72,17 +75,19 @@ public class VideoLink extends BaseEntity {
 
 
     @Builder
-    public VideoLink(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, Duration duration, LocalDateTime publishedAt, Long viewCount, Long likeCount, List<String> tags) {
+    public VideoLink(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, String description, Duration duration, LocalDateTime publishedAt, Long viewCount, Long likeCount, List<String> tags, byte[] embedding) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
         this.channelTitle = channelTitle;
+        this.description = description;
         this.duration = duration;
         this.publishedAt = publishedAt;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.tags = tags;
+        this.embedding = embedding;
         setDefault();
     }
 
@@ -94,23 +99,51 @@ public class VideoLink extends BaseEntity {
     /* 엔티티 메소드 */
 
     /**
-     * 비디오 링크 갱신 (사로운 영상으로 대체)
+     * 비디오 링크 갱신 (새로운 영상으로 대체)
      * @param videoUrl 비디오 Full URL
      * @param videoId 비디오 아이디 (API 에서 얻어온 번호)
      * @param title 유튜브 영상 제목
      * @param thumbnailUrl 썸네일 이미지 주소
      * @param channelTitle 유튜브 채널명
+     * @param description 영상 요약 내용 (없을 수도 있음. 현재는 200자만 사용)
      * @param duration 유튜브 영상 재생시간
      * @param viewCount 영상 조회수
      * @param likeCount 영상 좋아요 수
      * @param tags 비디오 태그 정보 (JSON 문자열로 DB에 저장)
+     * @param embedding 임베딩 문자열
      */
-    public void edit(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, Duration duration, Long viewCount, Long likeCount, List<String> tags) {
+    public void edit(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, String description, Duration duration, Long viewCount, Long likeCount, List<String> tags, byte[] embedding) {
         this.videoUrl = videoUrl;
         this.videoId = videoId;
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
         this.channelTitle = channelTitle;
+        this.description = description;
+        this.duration = duration;
+        this.viewCount = viewCount;
+        this.likeCount = likeCount;
+        this.tags = tags;
+        this.embedding = embedding;
+        this.lastSyncedAt = LocalDateTime.now();
+    }
+
+
+    /**
+     * 비디오 링크 정보 동기회
+     * @param title        유튜브 영상 제목
+     * @param thumbnailUrl 썸네일 이미지 주소
+     * @param channelTitle 유튜브 채널명
+     * @param description  영상 요약 내용 (없을 수도 있음. 현재는 200자만 사용)
+     * @param duration     유튜브 영상 재생시간
+     * @param viewCount    영상 조회수
+     * @param likeCount    영상 좋아요 수
+     * @param tags         비디오 태그 정보 (JSON 문자열로 DB에 저장)
+     */
+    public void sync(String title, String thumbnailUrl, String channelTitle, String description, Duration duration, Long viewCount, Long likeCount, List<String> tags) {
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
+        this.channelTitle = channelTitle;
+        this.description = description;
         this.duration = duration;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
@@ -120,25 +153,30 @@ public class VideoLink extends BaseEntity {
 
 
     /**
-     * 비디오 링크 정보 동기회
-     * @param title 유튜브 영상 제목
+     * 비디오 링크 정보 동기회 (임베딩 문자열 포함)
+     * @param title        유튜브 영상 제목
      * @param thumbnailUrl 썸네일 이미지 주소
      * @param channelTitle 유튜브 채널명
-     * @param duration 유튜브 영상 재생시간
-     * @param viewCount 영상 조회수
-     * @param likeCount 영상 좋아요 수
-     * @param tags 비디오 태그 정보 (JSON 문자열로 DB에 저장)
+     * @param description  영상 요약 내용 (없을 수도 있음. 현재는 200자만 사용)
+     * @param duration     유튜브 영상 재생시간
+     * @param viewCount    영상 조회수
+     * @param likeCount    영상 좋아요 수
+     * @param tags         비디오 태그 정보 (JSON 문자열로 DB에 저장)
+     * @param embedding    임베딩 문자열
      */
-    public void sync(String title, String thumbnailUrl, String channelTitle, Duration duration, Long viewCount, Long likeCount, List<String> tags) {
+    public void sync(String title, String thumbnailUrl, String channelTitle, String description, Duration duration, Long viewCount, Long likeCount, List<String> tags, byte[] embedding) {
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
         this.channelTitle = channelTitle;
+        this.description = description;
         this.duration = duration;
         this.viewCount = viewCount;
         this.likeCount = likeCount;
         this.tags = tags;
+        this.embedding = embedding;
         this.lastSyncedAt = LocalDateTime.now();
     }
+
 
 }
 
