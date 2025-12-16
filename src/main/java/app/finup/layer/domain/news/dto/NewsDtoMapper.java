@@ -1,4 +1,5 @@
 package app.finup.layer.domain.news.dto;
+import app.finup.layer.domain.news.enums.AiType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public final class NewsDtoMapper {
     }
     public static NewsDto.Ai toAi(Map<String,Object> map) {
         NewsDto.Ai ai = new NewsDto.Ai();
+        ai.setType(AiType.DEEP);
         ai.setSummary((String) map.get("summary"));
         ai.setKeywords((List<Map<String,String>>) map.get("keywords"));
         ai.setInsight((String) map.get("insight"));
@@ -29,6 +31,7 @@ public final class NewsDtoMapper {
 
     public static NewsDto.Summary toSummary(Map<String,Object> map) {
         NewsDto.Summary sum = new NewsDto.Summary();
+        sum.setType(AiType.LIGHT);
         sum.setSummary((String) map.get("summary"));
         sum.setKeywords((List<Map<String,String>>) map.get("keywords"));
         return sum;

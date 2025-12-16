@@ -3,5 +3,7 @@ package app.finup.layer.domain.news.service;
 import app.finup.layer.domain.news.dto.NewsDto;
 
 public interface StockNewsAiService {
-    public NewsDto.Summary analyzeLightCached(String link, String description);
+    Object analyzeAuto(String link, String description);
+    NewsDto.Summary analyzeLightCached(String link, String description);
+    NewsDto.Ai analyzeDeepCached(String link);
 }

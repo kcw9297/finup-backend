@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 종목+ 리스트 REST API 클래스
@@ -74,17 +76,17 @@ public class PublicStocksController {
 
     /**
      * 종목 뉴스 리스트  조회 API
-     * [GET] stocks/news?category={category}&stockName={stockName}
-     * @param  category  // 문자열도 있음
+     * [GET] stocks/news?stockName={stockName}
+     * @param  stockName
      */
     @GetMapping("/news")
-    public ResponseEntity<?> getNews(String category, String stockName) {
-        return Api.ok(stockService.getStockNews(stockName, category));
+    public ResponseEntity<?> getNews(String stockName) {
+        return Api.ok(stockService.getStockNews(stockName));
     }
 
     @PostMapping("/news/ai")
-    public ResponseEntity<?> getStockNewsAi(@RequestBody NewsDto.AiRequest arq ) {
-        return Api.ok(stockNewsAiService.analyzeLightCached(arq.getLink(), arq.getDescription()));
+    public ResponseEntity<?> getStockNewsAi(@RequestBody NewsDto.AiRequest req ) {
+        return Api.ok(stockNewsAiService.analyzeAuto(req.getLink(), req.getDescription()));
     }
 
     /**
