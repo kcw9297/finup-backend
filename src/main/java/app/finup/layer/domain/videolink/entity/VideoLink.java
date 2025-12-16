@@ -66,6 +66,11 @@ public class VideoLink extends BaseEntity {
     @Column(columnDefinition = "json")
     private List<String> tags; // JSON 문자열로 저장된 태그 정보
 
+    @Lob // vector 유사도 검색을 위한 컬럼
+    @Column(name = "embedding", columnDefinition = "VECTOR(1536)", nullable = false)
+    private byte[] embedding;
+
+
     @Builder
     public VideoLink(String videoUrl, String videoId, String title, String thumbnailUrl, String channelTitle, Duration duration, LocalDateTime publishedAt, Long viewCount, Long likeCount, List<String> tags) {
         this.videoUrl = videoUrl;
