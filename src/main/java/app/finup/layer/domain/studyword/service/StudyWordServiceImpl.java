@@ -4,6 +4,7 @@ import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
+import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
 import app.finup.layer.domain.studyword.mapper.StudyWordMapper;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
@@ -13,10 +14,13 @@ import app.finup.layer.domain.uploadfile.enums.FileType;
 import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -145,5 +149,19 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [3] 이미지 Soft Delete 처리 및 연관관계 해제
         studyWord.removeImage().softRemove();
+    }
+
+    @Override
+    public List<StudyWordDto.Quiz> getQuizData() {
+        List<StudyWord> studyWordList = studyWordRepository.findRandomWords(PageRequest.of(0, 30));
+
+        List<StudyWordDto.Quiz> result = new ArrayList<>();
+
+        for (StudyWord studyWord : studyWordList) {
+            StudyWordDto.Quiz quizData = StudyWordDtoMapper.toQuiz(studyWord);
+            result.add(quizData);
+        }
+
+        return result;
     }
 }

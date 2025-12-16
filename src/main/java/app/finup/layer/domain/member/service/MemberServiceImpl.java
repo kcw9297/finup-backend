@@ -26,6 +26,7 @@ import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -169,42 +170,28 @@ public class MemberServiceImpl implements MemberService {
 
     /**
      * 프로필 이미지 수정
-     *
      * @param memberId 회원 번호
      * @param file     업로드 이미지 파일
      */
     @Override
-    public void editProfileImage(Long memberId, MultipartFile file) {
+    public String editProfileImage(Long memberId, MultipartFile file) {
 
-        log.info("[PROFILE_IMAGE][SERVICE][START] memberId={}", memberId);
+        // [1] 멤버 데이터 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
+        
+        // [2] 변경 전 원래 이미지 정보 추출 후, 소유자를 null로 변경
+        // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
+        if (Objects.nonNull(member.getProfileImageFile())) member.removeProfileImage().softRemove();
 
-        if (file == null || file.isEmpty()) {
-            throw new BusinessException(AppStatus.VALIDATION_INVALID_PARAMETER);
-        }
+        // [3] 새롭게 등록하는 파일 엔티티 생성 후 삽입
+        UploadFile newProfileImageFile = uploadFileManager.setEntity(file, memberId, FileOwner.MEMBER, FileType.PROFILE);
+        member.editProfileImage(newProfileImageFile);
 
-        Member member = getMember(memberId);
+        uploadFileManager.store(file, newProfileImageFile.getFilePath());
 
-        // 1) 기존 이미지 soft delete + 연관 끊기
-        if (member.getProfileImageFile() != null) {
-            member.removeProfileImage().softRemove();
-        }
+        return uploadFileManager.getFullUrl(newProfileImageFile.getFilePath());
 
-        // 2) UploadFile 엔티티 생성
-        UploadFile newFile = uploadFileManager.setEntity(
-                file,
-                memberId,
-                FileOwner.MEMBER,
-                FileType.UPLOAD
-        );
-
-        // 3) 연관관계 연결
-        member.editProfileImage(newFile); // 또는 member.editProfileImage(newFile)
-
-        // 4) 실제 파일 저장
-        uploadFileManager.store(file, newFile.getFilePath());
-
-        log.info("[PROFILE_IMAGE][SERVICE][DONE] memberId={}, uploadFileId={}",
-                memberId, newFile.getUploadFileId());
     }
 
 

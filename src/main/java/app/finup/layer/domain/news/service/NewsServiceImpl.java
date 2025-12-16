@@ -31,12 +31,12 @@ public class NewsServiceImpl implements NewsService {
      */
     @Override
     public List<NewsDto.Row> getNews(String category) {
-        return newsProvider.getNews(category, 50);
+        return newsProvider.getNews(category, 5);
     }
 
     @Override
     public List<NewsDto.Row> getLatestNews(String category, int limit) {
-        List<NewsDto.Row> list = newsProvider.getNews(category, 10);
+        List<NewsDto.Row> list = newsProvider.getNews(category, 5);
         if(list == null || list.isEmpty()){
             return List.of();
         }

@@ -25,4 +25,11 @@ public final class StudyWordDtoMapper {
                 .build();
     }
 
+    public static StudyWordDto.Quiz toQuiz(StudyWord entity) {
+
+        return StudyWordDto.Quiz.builder()
+                .name(entity.getName())
+                .meaning(entity.getMeaning())
+                .build();
+    }
 }

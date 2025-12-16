@@ -3,6 +3,7 @@ package app.finup.layer.domain.member.controller;
 import app.finup.common.constant.Url;
 import app.finup.common.dto.Page;
 import app.finup.common.dto.Pagination;
+import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.service.MemberService;
@@ -10,6 +11,7 @@ import app.finup.security.dto.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -133,14 +135,17 @@ public class MemberController {
      * @param userDetails 유저 정보
      * @param file 업로드 이미지 파일
      */
-    @PostMapping("/me/profile-image")
+    @PostMapping(
+            value = "/me/profile-image",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<?> editProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                               @RequestParam("file") MultipartFile file) {
 
-        memberService.editProfileImage(userDetails.getMemberId(), file);
+        String profileImageUrl = memberService.editProfileImage(userDetails.getMemberId(), file);
 
         log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", userDetails.getMemberId());
-        return Api.ok();
+        return Api.ok(AppStatus.UPLOAD_FILE_ADD ,profileImageUrl);
     }
 
 }
