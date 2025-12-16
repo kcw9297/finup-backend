@@ -116,6 +116,9 @@ public class Url {
     /* index-market */
     public static final String MARKET = "/index-market";
     public static final String HOME_MARKET_PUBLIC = HOME_PUBLIC + MARKET;
+
+    /* quiz */
+    public static final String QUIZ = API + "/quiz";
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */

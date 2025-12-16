@@ -28,7 +28,7 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
 
 
     @Query("""
-        select w from StudyWord w
+        select sw from StudyWord sw
         order by function('rand')
     """)
     List<StudyWord> findRandomWords(Pageable pageable);
