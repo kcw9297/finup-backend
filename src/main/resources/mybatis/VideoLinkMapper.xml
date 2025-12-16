@@ -14,14 +14,14 @@
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
         <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">
             <choose>
-                <when test="filter eq 'name'">
-                    AND vl.name LIKE CONCAT('%', #{keyword}, '%')
+                <when test="filter eq 'title'">
+                    AND vl.title LIKE CONCAT('%', #{keyword}, '%')
                 </when>
-                <when test="filter eq 'channelName'">
-                    AND vl.channel_name LIKE CONCAT('%', #{keyword}, '%')
+                <when test="filter eq 'channelTitle'">
+                    AND vl.channel_title LIKE CONCAT('%', #{keyword}, '%')
                 </when>
-                <when test="filter eq 'nameChannelName'">
-                    AND (vl.name LIKE CONCAT('%', #{keyword}, '%') OR vl.channel_name LIKE CONCAT('%', #{keyword}, '%'))
+                <when test="filter eq 'titleChannelTitle'">
+                    AND (vl.title LIKE CONCAT('%', #{keyword}, '%') OR vl.channel_title LIKE CONCAT('%', #{keyword}, '%'))
                 </when>
             </choose>
         </if>
@@ -62,14 +62,14 @@
         WHERE 1=1 <!--검색 파라미터 추가를 위한 조건 (없을 시 하단의 필터 적용 불가) -->
         <if test="filter neq null and filter neq '' and keyword neq null and keyword neq ''">
             <choose>
-                <when test="filter eq 'name'">
-                    AND vl.name LIKE CONCAT('%', #{keyword}, '%')
+                <when test="filter eq 'title'">
+                    AND vl.title LIKE CONCAT('%', #{keyword}, '%')
                 </when>
-                <when test="filter eq 'channelName'">
-                    AND vl.channel_name LIKE CONCAT('%', #{keyword}, '%')
+                <when test="filter eq 'channelTitle'">
+                    AND vl.channel_title LIKE CONCAT('%', #{keyword}, '%')
                 </when>
-                <when test="filter eq 'nameChannelName'">
-                    AND (vl.name LIKE CONCAT('%', #{keyword}, '%') OR vl.channel_name LIKE CONCAT('%', #{keyword}, '%'))
+                <when test="filter eq 'titleChannelTitle'">
+                    AND (vl.title LIKE CONCAT('%', #{keyword}, '%') OR vl.channel_title LIKE CONCAT('%', #{keyword}, '%'))
                 </when>
             </choose>
         </if>

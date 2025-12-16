@@ -20,7 +20,7 @@ public interface StockService {
     StockDto.Detail getDetail(String code);
     void refreshDetail(String code);
 
-    List<NewsDto.Row> getStockNews(String stockName, String category);
+    List<NewsDto.Row> getStockNews(String stockName);
 
 
 

@@ -1,5 +1,6 @@
 package app.finup.layer.domain.news.dto;
 
+import app.finup.layer.domain.news.enums.AiType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
@@ -37,7 +38,7 @@ public final class NewsDto {
     public static class Ai implements Serializable{
         @Serial
         private static final long serialVersionUID = 1L;
-
+        private AiType type;
         private String summary;
         private List<Map<String,String>> keywords;
         private String insight;
@@ -48,7 +49,7 @@ public final class NewsDto {
     public static class Summary implements Serializable{
         @Serial
         private static final long serialVersionUID = 1L;
-
+        private AiType type;
         private String summary;
         private List<Map<String,String>> keywords;
     }
@@ -59,5 +60,6 @@ public final class NewsDto {
     public static class AiRequest {
         private String link;
         private String description;
+        private String mode;
     }
 }

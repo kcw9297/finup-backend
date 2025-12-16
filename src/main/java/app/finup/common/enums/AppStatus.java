@@ -45,6 +45,9 @@ public enum AppStatus {
     YOUTUBE_VIDEO_NOT_FOUND(500, "삭제되었거나 숨김 처리 된 영상입니다.", "YOUTUBE_ID_NOT_VALID"),
     YOUTUBE_REQUEST_FAILED(500, "유튜브 영상 조회에 실패했습니다.", "YOUTUBE_REQUEST_FAILED"),
 
+    /* Infra - AI */
+    AI_CHAT_RESPONSE_ERROR(500, "AI 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.", "AI_CHAT_RESPONSE_ERROR"),
+
 
     /* ======================================== 작성 영역 (외에는 건들이지 말 것) ====================================== */
 

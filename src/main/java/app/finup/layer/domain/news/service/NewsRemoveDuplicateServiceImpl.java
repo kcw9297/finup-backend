@@ -6,10 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * NewsRemoveDuplicateService 구현 클래스
@@ -25,7 +23,7 @@ public class NewsRemoveDuplicateServiceImpl implements NewsRemoveDuplicateServic
 
         list = distinctByUrl(list);
 
-        list = removeByTitleSimilarity(list, 0.85);
+        list = removeByTitleSimilarity(list);
 
         return list;
     }
@@ -36,17 +34,54 @@ public class NewsRemoveDuplicateServiceImpl implements NewsRemoveDuplicateServic
                 .filter(item -> seen.add(item.getLink()))
                 .toList();
     }
+
+
     //제목 유사도 중복 제거
-    private List<NewsDto.Row> removeByTitleSimilarity(List<NewsDto.Row> list, double sim) {
+    private List<NewsDto.Row> removeByTitleSimilarity(List<NewsDto.Row> list) {
         List<NewsDto.Row> result = new ArrayList<>();
-        for(NewsDto.Row row : list) {
-            boolean isDuplicate = result.stream().anyMatch(existing ->
-                    similarity(existing.getTitle(), row.getTitle()) > sim);
-            if(!isDuplicate) {
+        for (NewsDto.Row row : list) {
+            boolean isDuplicate = result.stream().anyMatch(existing -> {
+                double j = jaccard(existing.getTitle(), row.getTitle());
+
+                // 의미 거의 동일 → 바로 컷
+                if (j >= 0.6) return true;
+
+                //  단어 일부만 겹치지만 표현이 거의 동일
+                if (j >= 0.4) {
+                    double l = similarity(existing.getTitle(), row.getTitle());
+                    return l >= 0.75;
+                }
+
+                return false;
+            });
+
+            if (!isDuplicate) {
                 result.add(row);
             }
         }
         return result;
+    }
+
+    private Set<String> tokenize(String s) {
+        return Arrays.stream(
+                        s.replaceAll("[^가-힣0-9 ]", " ")
+                                .split("\\s+")
+                )
+                .filter(token -> !token.isBlank())
+                .collect(Collectors.toSet()); // 중복 자동 제거
+    }
+
+    private double jaccard(String a, String b) {
+        Set<String> s1 = tokenize(a);
+        Set<String> s2 = tokenize(b);
+
+        Set<String> intersection = new HashSet<>(s1);
+        intersection.retainAll(s2);
+
+        Set<String> union = new HashSet<>(s1);
+        union.addAll(s2);
+
+        return union.isEmpty() ? 0.0 : (double) intersection.size() / union.size();
     }
 
     private double similarity(String s1, String s2) {

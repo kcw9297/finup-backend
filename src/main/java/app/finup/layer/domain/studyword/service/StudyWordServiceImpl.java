@@ -115,7 +115,7 @@ public class StudyWordServiceImpl implements StudyWordService {
             throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
         // [3] 단어명 갱신 수행
-        studyWord.edit(rq.getName(), rq.getMeaning());
+        studyWord.edit(rq.getName(), rq.getMeaning(), null); // 수정필요
     }
 
 
@@ -153,15 +153,17 @@ public class StudyWordServiceImpl implements StudyWordService {
 
     @Override
     public List<StudyWordDto.Quiz> getQuizData() {
-        List<StudyWord> studyWordList = studyWordRepository.findRandomWords(PageRequest.of(0, 30));
 
+        // [1] 엔티티 조회 : 랜덤 20개
+        List<StudyWord> studyWordList = studyWordRepository.findRandomWords(PageRequest.of(0, 20));
+
+        // [2] StudyWordDto.Quiz List 생성
         List<StudyWordDto.Quiz> result = new ArrayList<>();
-
         for (StudyWord studyWord : studyWordList) {
             StudyWordDto.Quiz quizData = StudyWordDtoMapper.toQuiz(studyWord);
             result.add(quizData);
         }
-
+        // [3] 반환
         return result;
     }
 }
