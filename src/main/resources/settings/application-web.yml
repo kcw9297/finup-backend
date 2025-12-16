@@ -11,6 +11,13 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
 
+jwt:
+  cookie-name: ${JWT_COOKIE_NAME}
+  expiration:
+    access-token: ${JWT_EXPIRATION_ACCESS_TOKEN}
+    refresh-token: ${JWT_EXPIRATION_REFRESH_TOKEN}
+    cookie: ${JWT_EXPIRATION_COOKIE}
+
 # ===============================
 # profile - local
 # ===============================

@@ -32,10 +32,10 @@ public class UploadFileManagerImpl implements UploadFileManager {
     @Value("${server.port}")
     private Integer serverPort;
 
-    @Value("${file.domain}")
+    @Value("${app.file.domain}")
     private String fileDomain;
 
-    @Value("${file.dir}")
+    @Value("${app.file.dir}")
     private String fileDir;
 
     @Override

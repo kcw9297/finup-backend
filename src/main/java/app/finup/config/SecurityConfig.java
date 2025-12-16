@@ -58,12 +58,12 @@ public class SecurityConfig {
         HttpSecurity config = http
 
                 // ▶ CSRF 설정 - 만약 Cookie에 AccessToken을 담는 경우 설정 권장 (방어 강화)
-                //.csrf(customer -> customer
-                //        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT) // 일반&소셜 로그인, 로그아웃
-                //        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                //        .csrfTokenRepository(csrfTokenRepository()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
-                //)
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(customer -> customer
+                        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_OAUTH, Url.LOGOUT) // 일반&소셜 로그인, 로그아웃
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .csrfTokenRepository(csrfTokenRepository()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
+                )
+                //.csrf(AbstractHttpConfigurer::disable)
 
                 // ▶ 필터 설정 - 커스텀 필터 추가
                 // UsernamePasswordAuthenticationFilter 는 세션기반 인증 시에만 동작)

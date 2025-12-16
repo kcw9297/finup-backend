@@ -158,6 +158,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .nickname(jwtClaims.getNickname())
                 .role(jwtClaims.getRole())
                 .social(jwtClaims.getSocial())
+                .profileImageUrl(jwtClaims.getProfileImageUrl())
                 .authorities(List.of(new SimpleGrantedAuthority(MemberRole.valueOf(jwtClaims.getRole()).getAuthority())))
                 .build();
     }

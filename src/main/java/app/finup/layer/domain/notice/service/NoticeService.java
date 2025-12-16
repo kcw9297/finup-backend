@@ -30,6 +30,13 @@ public interface NoticeService {
 
 
     /**
+     * 페이지 홈에 게시할 공지사항 목록
+     * @return 페이지 홈에 게시할 공지사항 DTO 리스트
+     */
+    List<NoticeDto.Row> getHomeList();
+
+
+    /**
      * 게시글 작성
      * @param rq 작성 요청 DTO
      */
@@ -44,10 +51,9 @@ public interface NoticeService {
 
 
     /**
-     * 게시글 열람 (조회수 증가)
-     * @param rq 게시글 조회수 증가요청 DTO List (스케줄링)
+     * 게시글 조회수 동기화
      */
-    void watch(List<NoticeDto.Watch> rq);
+    void syncViewCount();
 
 
     /**
