@@ -30,18 +30,36 @@ public interface VideoLinkService {
 
     /**
      * 학습 영상 추천 (페이지 홈)
+     * @param memberId 추천 대상 회원번호
      * @return 게시할 추천 영상 DTO 리스트
      */
-    List<VideoLinkDto.Row> recommendForLoginHome(String retry);
+    List<VideoLinkDto.Row> recommendForLoginHome(Long memberId);
+
+
+    /**
+     * 학습 영상 재추천 (페이지 홈)
+     * @param memberId 추천 대상 회원번호
+     * @return 게시할 추천 영상 DTO 리스트
+     */
+    List<VideoLinkDto.Row> retryRecommendForLoginHome(Long memberId);
 
 
     /**
      * 학습 영상 추천 (학습 페이지)
-     * @param studyId 대상 학습번호
-     * @param retry   재시도 여부
+     * @param studyId  대상 학습번호
+     * @param memberId 추천 대상 회원번호
      * @return 게시할 추천 영상 DTO 리스트
      */
-    List<VideoLinkDto.Row> recommendForStudy(Long studyId, Boolean retry);
+    List<VideoLinkDto.Row> recommendForStudy(Long studyId, Long memberId);
+
+
+    /**
+     * 학습 영상 재추천 (학습 페이지)
+     * @param studyId  대상 학습번호
+     * @param memberId 추천 대상 회원번호
+     * @return 게시할 추천 영상 DTO 리스트
+     */
+    List<VideoLinkDto.Row> retryRecommendForStudy(Long studyId, Long memberId);
 
 
     /**

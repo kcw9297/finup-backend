@@ -25,50 +25,37 @@ public class VideoLinkAiManagerImpl implements VideoLinkAiManager {
     public static final String RECOMMEND_KEYWORDS_AMOUNT = "10";
 
     @Override
-    public String recommendKeywordsForHome() {
+    public String recommendKeywordsForLogoutHome() {
 
         // [1] 프롬프트 생성
         String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_HOME
                 .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${RETRY}", "");
+                .replace("${LATEST_KEYWORDS}", "");
 
         // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
         return chatProvider.query(prompt);
     }
 
     @Override
-    public String recommendKeywordsForHome(String prevKeywords) {
+    public String recommendKeywordsForLoginHome(String lastestKeywords) {
 
         // [1] 프롬프트 생성
         String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_HOME
                 .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${RETRY}", VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_RETRY)
-                .replace("${PREV_KEYWORDS}", prevKeywords);
+                .replace("${LATEST_KEYWORDS}", lastestKeywords);
 
         // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
         return chatProvider.query(prompt);
     }
 
+
     @Override
-    public String recommendKeywordsForStudy() {
+    public String recommendKeywordsForStudy(String lastestKeywords) {
 
         // [1] 프롬프트 생성
         String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_STUDY
                 .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${RETRY}", "");
-
-        // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
-        return chatProvider.query(prompt);
-    }
-
-    @Override
-    public String recommendKeywordsForStudy(String prevKeywords) {
-
-        // [1] 프롬프트 생성
-        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_HOME
-                .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${RETRY}", VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_RETRY)
-                .replace("${PREV_KEYWORDS}", prevKeywords);
+                .replace("${LATEST_KEYWORDS}", lastestKeywords);
 
         // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
         return chatProvider.query(prompt);

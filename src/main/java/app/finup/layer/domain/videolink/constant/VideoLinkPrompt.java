@@ -31,16 +31,18 @@ public final class VideoLinkPrompt {
             """;
 
 
-    public static final String PROMPT_RECOMMEND_KEYWORDS_RETRY =
+    public static final String PROMPT_RECOMMEND_KEYWORDS_LATEST_KEYWORDS =
             """
-                [재시도 요청]
-                아래는 이전에 생성된 키워드 목록입니다.
-                이전 키워드와 중복되지 않도록 다른 관점이나 세부 주제에 초점을 맞춘 새로운 키워드를 생성해 주세요.
-                이전 키워드: ${PREV_KEYWORDS}
+                ### 이전에 생성한 키워드 이력
+                아래는 이전에 생성된 키워드 입니다.
+                이전 키워드와 의미가 최대한 중복되지 않도록 다른 관점이나 세부 주제에 초점을 맞춘 새로운 키워드를 생성해 주세요.
+                만약 이전 키워드가 제시되지 않은 경우는, 최초 검색이므로 제한 없이 키워드를 추천해도 됩니다.
+                이전 키워드: ${LATEST_KEYWORDS}
             """;
 
     public static final String PROMPT_RECOMMEND_KEYWORDS_HOME =
             """
+                ### 당신의 역할
                 당신은 주식 초보자들을 위한 투자, 경제 정보를 제공하는 서비스 사이트의 학습 영상 추천 AI입니다.
                 페이지 홈(INDEX)에 게시될 유튜브 영상을 검색할 키워드를 생성해 주세요.
 
@@ -52,13 +54,15 @@ public final class VideoLinkPrompt {
             
                 ${RULE}
             
-                ${RETRY}
+                ${FILTER_LATEST_KEYWORDS}
             
-            """.replace("${RULE}", PROMPT_RECOMMEND_RULE);
+            """.replace("${RULE}", PROMPT_RECOMMEND_RULE)
+                    .replace("${FILTER_LATEST_KEYWORDS}", PROMPT_RECOMMEND_KEYWORDS_LATEST_KEYWORDS);
 
 
     public static final String PROMPT_RECOMMEND_KEYWORDS_STUDY =
             """
+                ### 당신의 역할
                 당신은 현재 학습명과 학습 요약본을 보고, 현재 학습에 적절한 유튜브 영상을 추천하는 AI입니다.
                 현재 "학습 정보"의 학습 제목[name], 학습 요약 정보[summary]를 보고,
                 해당 학습에 도움이 될 유튜브 영상을 검색할 키워드를 생성해 주세요.
@@ -69,7 +73,8 @@ public final class VideoLinkPrompt {
                 학습 제목 [name] : ${TARGET_STUDY_NAME}
                 학습 요약 정보[summary]: ${TARGET_STUDY_SUMMARY}
             
-                ${RETRY}
+                ${FILTER_LATEST_KEYWORDS}
             
-            """.replace("${RULE}", PROMPT_RECOMMEND_RULE);
+            """.replace("${RULE}", PROMPT_RECOMMEND_RULE)
+                    .replace("${FILTER_LATEST_KEYWORDS}", PROMPT_RECOMMEND_KEYWORDS_LATEST_KEYWORDS);
 }
