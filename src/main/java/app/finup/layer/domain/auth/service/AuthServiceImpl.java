@@ -4,6 +4,9 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.infra.mail.MailProvider;
 import app.finup.layer.domain.auth.redis.AuthRedisStorage;
+import app.finup.layer.domain.member.dto.MemberDto;
+import app.finup.layer.domain.member.dto.MemberDtoMapper;
+import app.finup.layer.domain.member.entity.Member;
 import app.finup.layer.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
 
     // 인증 완료 상태 유효시간 (10분)
     private static final Duration JOIN_EMAIL_VERIFIED_TTL = Duration.ofMinutes(10);
+
 
     /**
      * 회원가입용 이메일 인증 코드 발송
@@ -79,6 +83,14 @@ public class AuthServiceImpl implements AuthService {
         authRedisStorage.markVerified(email, Duration.ofMinutes(10));
 
         log.info("[AUTH] 회원가입 이메일 인증 성공. email={}", email);
+    }
+
+    @Override
+    public MemberDto.Row getProfile(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
+
+        return MemberDtoMapper.toRow(member);
     }
 
     // 내부 유틸: 6자리 난수 생성 (000000 ~ 999999)

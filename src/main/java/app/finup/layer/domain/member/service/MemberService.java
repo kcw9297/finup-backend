@@ -54,7 +54,8 @@ public interface MemberService {
      * 회원 프로필 이미지 수정
      * @param memberId 회원 번호
      * @param file 업로드 이미지 파일
+     * @return 프로필 이미지 경로
      */
-    void editProfileImage(Long memberId, MultipartFile file);
+    String editProfileImage(Long memberId, MultipartFile file);
 
 }
