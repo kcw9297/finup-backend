@@ -233,7 +233,7 @@ public class PromptTemplates {
     public static final String QUIZ = """
         너는 금융 학습용 퀴즈를 만드는 AI다.
             
-        아래에 주어진 studyWords 30개 중에서
+        아래에 주어진 studyWords 20개 중에서
         중복 없이 10개를 무작위로 선택하여 퀴즈를 만들어라.
     
         [규칙]
@@ -244,19 +244,20 @@ public class PromptTemplates {
         5. 출력은 JSON 배열 형식으로만 한다. 마크다운, 설명 문장, ```json``` 을 포함하지 마라.
         6. 같은 studyWord로 두 개 이상의 문제를 만들지 마라.
         7. 각 문제는 아래 형식을 따른다.
+        - "answer"는 **정답 보기의 index (0~3)** 로 표시할 것
         
         {
           "output": [
             {
               "question": "문제 1",
               "choices": ["보기1", "보기2", "보기3", "보기4"],
-              "answer": "정답",
+              "answer": 0,
               "explanation": "설명 1"
             },
             {
               "question": "문제 2",
               "choices": ["보기1", "보기2", "보기3", "보기4"],
-              "answer": "정답",
+              "answer": 2,
               "explanation": "설명 2"
             }
             // ... 총 10개

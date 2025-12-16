@@ -34,7 +34,7 @@ public class QuizDtoMapper {
 
             String question = (String) questionAi.get("question");
             List<String> choices = (List<String>) questionAi.get("choices");
-            String answer = (String) questionAi.get("answer");
+            Integer answer = (Integer) questionAi.get("answer");
             String explanation = (String) questionAi.get("explanation");
 
             questionList.add(
