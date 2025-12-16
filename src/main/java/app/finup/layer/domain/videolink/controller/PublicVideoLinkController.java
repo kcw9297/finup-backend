@@ -23,5 +23,9 @@ public class PublicVideoLinkController {
 
     private final VideoLinkService videoLinkService;
 
+    @GetMapping("/recommend/home")
+    public ResponseEntity<?> recommendForHome() {
+        return Api.ok(videoLinkService.recommendForLogoutHome());
+    }
 
 }

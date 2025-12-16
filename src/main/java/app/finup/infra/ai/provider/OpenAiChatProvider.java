@@ -25,17 +25,29 @@ public class OpenAiChatProvider implements ChatProvider {
     // OPEN AI Model 의존성
     private final OpenAiChatModel openAiChatModel;
 
+
     @Override
-    public <T> T question(String prompt, Class<T> type) {
+    public String query(String prompt) {
+        return sendQuery(prompt);
+    }
+
+
+    @Override
+    public <T> T queryJson(String prompt, Class<T> type) {
+        return StrUtils.fromJson(sendQuery(prompt), type);
+    }
+
+
+    // 쿼리(프롬프트) 전달 후 응답 반환
+    private String sendQuery(String prompt) {
 
         // [1] 질문 응답
-        String jsonAnswer = openAiChatModel.call(prompt);
+        String answer = openAiChatModel.call(prompt);
 
         // [2] 만약 질문 결과가 null인 경우 예외 반환
-        if (Objects.isNull(jsonAnswer) || jsonAnswer.isBlank())
+        if (Objects.isNull(answer) || answer.isBlank())
             throw new ProviderException(AppStatus.AI_CHAT_RESPONSE_ERROR);
 
-        // [3] 응답 메세지를 제공한 타입으로 변환 및 반환
-        return StrUtils.fromJson(jsonAnswer, type);
+        return answer;
     }
 }

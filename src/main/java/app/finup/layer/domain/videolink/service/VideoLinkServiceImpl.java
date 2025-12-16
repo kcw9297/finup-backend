@@ -15,11 +15,13 @@ import app.finup.infra.youtube.utils.YouTubeUtils;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import app.finup.layer.domain.videolink.dto.VideoLinkDtoMapper;
 import app.finup.layer.domain.videolink.entity.VideoLink;
+import app.finup.layer.domain.videolink.manager.VideoLinkAiManager;
 import app.finup.layer.domain.videolink.mapper.VideoLinkMapper;
 import app.finup.layer.domain.videolink.repository.VideoLinkRepository;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,11 +46,14 @@ public class VideoLinkServiceImpl implements VideoLinkService {
     // 사용 의존성
     private final VideoLinkRepository videoLinkRepository;
     private final VideoLinkMapper videoLinkMapper;
+    private final VideoLinkAiManager videoLinkAiManager;
     private final YouTubeProvider youTubeProvider;
     private final EmbeddingProvider embeddingProvider;
 
     // 사용 상수
     private static final int SPLIT_DESCRIPTION_LEN = 200;
+    public static final String KEY_NAME_RECOMMENDATION_KEYWORD = "VIDEO_LINK_RECOMMENDATION_KEYWORD";
+
 
     @Override
     @Transactional(readOnly = true)
@@ -61,6 +66,40 @@ public class VideoLinkServiceImpl implements VideoLinkService {
         // [2] 페이징 객체 매핑 및 반환
         rows.forEach(row -> row.setDuration(FormatUtils.formatDuration(row.getDuration()))); // mybatis에서 문자열로 제공됨
         return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
+    }
+
+
+    @Cacheable(value = KEY_NAME_RECOMMENDATION_KEYWORD, key = "'HOME'")
+    @Override
+    @Transactional(readOnly = true)
+    public List<VideoLinkDto.Row> recommendForLogoutHome() {
+
+        // [1] AI에게 키워드 추천 (공백 기준으로 나누어진 키워드 목록)
+        String keywords = videoLinkAiManager.recommendKeywordsForHome();
+        LogUtils.showWarn(this.getClass(), "AI Keyword = %s", keywords);
+
+        // [2] 추천받은 키워드 기반 embedded 배열 생성
+        byte[] embedding = embeddingProvider.generate(keywords);
+
+        // [3] embedded 기반 영상 추천 후, 결과 반환
+        return videoLinkRepository
+                .findSimilar(embedding, 6)
+                .stream()
+                .map(VideoLinkDtoMapper::toRow)
+                .toList();
+    }
+
+
+    @Override
+    public List<VideoLinkDto.Row> recommendForLoginHome(String retry) {
+        return List.of();
+    }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VideoLinkDto.Row> recommendForStudy(Long studyId, Boolean retry) {
+        return List.of();
     }
 
 

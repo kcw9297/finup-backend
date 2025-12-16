@@ -3,6 +3,9 @@ package app.finup.layer.domain.studyword.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
+import app.finup.common.utils.StrUtils;
+import app.finup.infra.ai.provider.EmbeddingProvider;
+import app.finup.infra.ai.utils.AiUtils;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
@@ -39,6 +42,7 @@ public class StudyWordServiceImpl implements StudyWordService {
     private final StudyWordRepository studyWordRepository;
     private final StudyWordMapper studyWordMapper;
     private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
+    private final EmbeddingProvider embeddingProvider;
 
     @Override
     @Transactional(readOnly = true)
@@ -65,13 +69,18 @@ public class StudyWordServiceImpl implements StudyWordService {
         if (studyWordRepository.existsByName(rq.getName()))
             throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
-        // [2] 엔티티 생성
+        // [2] 임베딩 텍스트 생성
+        String text = AiUtils.generateEmbeddingText(rq.getName(), rq.getMeaning());
+        byte[] embedding = embeddingProvider.generate(text);
+
+        // [3] 엔티티 생성
         StudyWord studyWord = StudyWord.builder()
                 .name(rq.getName())
                 .meaning(rq.getMeaning())
+                .embedding(embedding)
                 .build();
 
-        // [3] 엔티티 저장
+        // [4] 엔티티 저장
         studyWordRepository.save(studyWord);
     }
 
@@ -114,8 +123,12 @@ public class StudyWordServiceImpl implements StudyWordService {
                 studyWordRepository.existsByName(rq.getName()))
             throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
-        // [3] 단어명 갱신 수행
-        studyWord.edit(rq.getName(), rq.getMeaning(), null); // 수정필요
+        // [3] 임베딩 텍스트 생성
+        String text = AiUtils.generateEmbeddingText(studyWord.getName(), studyWord.getMeaning());
+        byte[] embedding = embeddingProvider.generate(text);
+
+        // [4] 단어명 갱신 수행
+        studyWord.edit(rq.getName(), rq.getMeaning(), embedding); // 수정필요
     }
 
 
