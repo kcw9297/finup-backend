@@ -16,7 +16,7 @@ import java.util.List;
 
 @Slf4j
 @Component
-@Profile("prod") //잠깐 비활성화
+//@Profile("prod") //잠깐 비활성화
 @RequiredArgsConstructor
 public class NewsScheduler {
     private final NewsProvider newsProvider;
@@ -25,8 +25,8 @@ public class NewsScheduler {
 
     @Scheduled(fixedRate = 1000 * 60 * 15)
     public void updateNewsCache(){
-        refresh("date", 50);
-        refresh("sim", 50);
+        refresh("date", 5);
+        refresh("sim", 5);
         log.info("[SCHEDULER] 뉴스 캐시 갱신 완료");
     }
 

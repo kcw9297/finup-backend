@@ -1,8 +1,6 @@
 package app.finup.layer.domain.words.repository;
 
-import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.entity.Words;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +43,7 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
             @Param("termId") Long termId,
             Pageable pageable
     );// 전체 건수 (isInitialized 용)
+
+    @Query("select w from Words w order by w.termId asc")
+    List<Words> findTop10(Pageable pageable);
 }
