@@ -118,7 +118,7 @@ public class Url {
     public static final String HOME_MARKET_PUBLIC = HOME_PUBLIC + MARKET;
 
     /* quiz */
-    public static final String QUIZ =  PUBLIC + API + "/quiz"; // 테스트 위해서 일단 잠시 public으로 함
+    public static final String QUIZ = API + "/quiz";
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* DOMAIN - PATTERN */
