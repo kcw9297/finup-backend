@@ -19,6 +19,7 @@ public class AiManagerImpl implements AiManager {
     private final OpenAiEmbeddingModel embeddingModel;
     private final ObjectMapper objectMapper;
 
+    @Override
     public Map<String, Object> runJsonPrompt(String prompt) {
 
         ChatResponse response = openAiChatModel.call(new Prompt(prompt));
@@ -36,6 +37,17 @@ public class AiManagerImpl implements AiManager {
     @Override
     public float[] embed(String text) {
         return embeddingModel.embed(text);
+    }
+
+    @Override
+    public String embedJson(String text) {
+        float[] embedding = embed(text);
+        try {
+            return objectMapper.writeValueAsString(embedding);
+        } catch (Exception e) {
+            log.error("Embedding JSON 변환 실패", e);
+            throw new IllegalStateException("Embedding 변환 실패");
+        }
     }
 
     private String extractJson(String text) {

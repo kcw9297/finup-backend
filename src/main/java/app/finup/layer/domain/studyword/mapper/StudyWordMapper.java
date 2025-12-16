@@ -1,6 +1,7 @@
 package app.finup.layer.domain.studyword.mapper;
 
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
+import app.finup.layer.domain.studyword.entity.StudyWord;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -29,4 +30,5 @@ public interface StudyWordMapper {
      * @return 검색 파라미터를 적용한 전체 데이터 수
      */
     Integer countForSearch(StudyWordDto.Search rq);
+
 }

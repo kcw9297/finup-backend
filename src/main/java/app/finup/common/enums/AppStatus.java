@@ -55,7 +55,7 @@ public enum AppStatus {
 
     /* 파일 UploadFile */
     UPLOAD_FILE_NOT_FOUND(500, "파일이 존재하지 않습니다.", "UPLOAD_FILE_NOT_FOUND"),
-
+    UPLOAD_FILE_ADD(200, "파일 업로드에 성공했습니다.", "UPLOAD_FILE_ADD"),
     /* 회원 Member */
     MEMBER_NOT_FOUND(400, "회원 정보가 존재하지 않습니다.", "MEMBER_NOT_FOUND"),
     MEMBER_DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.", "MEMBER_DUPLICATE_NICKNAME"),

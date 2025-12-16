@@ -17,5 +17,4 @@ public final class AuthDtoMapper {
                 .profileImageUrl(userDetails.getProfileImageUrl())
                 .build();
     }
-
 }

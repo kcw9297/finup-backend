@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface StockRepository extends JpaRepository<Stock, Long> {
     Optional<Stock> findByMkscShrnIscd(String mkscShrnIscd);
-    boolean existsByMkscShrnIscd(String code);
 }
 

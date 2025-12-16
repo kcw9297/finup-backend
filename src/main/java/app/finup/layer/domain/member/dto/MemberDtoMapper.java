@@ -22,6 +22,7 @@ public class MemberDtoMapper {
                 .memberRole(entity.getRole())
                 .socialType(entity.getSocial())
                 .socialId(entity.getSocialId())
+                .profileImageUrl(entity.getProfileImageFile().getFilePath())
                 .build();
     }
 

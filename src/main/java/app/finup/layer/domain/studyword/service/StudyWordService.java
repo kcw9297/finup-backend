@@ -4,6 +4,8 @@ import app.finup.common.dto.Page;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * 단계별 학습 단어 서비스 인터페이스
  * @author kcw
@@ -55,4 +57,9 @@ public interface StudyWordService {
      * @param studyWordId 학습단어번호
      */
     void removeImage(Long studyWordId);
+
+    /**
+     * Quiz 데이터용 단어 랜덤 30개 가져오기
+     */
+    List<StudyWordDto.Quiz> getQuizData();
 }
