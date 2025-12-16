@@ -85,4 +85,16 @@ public final class StudyWordDto {
         private String meaning;
     }
 
+    /**
+     * Quiz(수준 테스트) AI prompt용
+     */
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Quiz {
+        private String name;
+        private String meaning;
+    }
+
 }

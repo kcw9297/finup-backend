@@ -141,9 +141,7 @@ public class StockServiceImpl implements StockService {
         //[1] 종목코드(String code)로 DB에서 한글 종목명 가져오기
         Stock stock;
         try {
-            if (!stockRepository.existsByMkscShrnIscd(code)) {
-                if (stockRepository.count() == 0) importStockName();
-            }
+            if (stockRepository.count() == 0) importStockName();
             stock = stockRepository.findByMkscShrnIscd(code)
                     .orElseThrow(() -> new RuntimeException("종목 없음: " + code));
         } catch (Exception e) {

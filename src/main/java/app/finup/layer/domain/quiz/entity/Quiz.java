@@ -7,6 +7,10 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "quiz")
@@ -23,11 +27,18 @@ public class Quiz extends BaseEntity {
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(
+            name = "member_id",
+            nullable = false
+    )
     private Member member;
 
     @Column(nullable = false)
     private Integer score;
+
+    @CreatedDate
+    @LastModifiedDate
+    private LocalDateTime regdate;
 
     @Builder
     private Quiz(Member member, Integer score) {
@@ -36,5 +47,7 @@ public class Quiz extends BaseEntity {
         setDefault();
     }
 
-    private void setDefault() { }
+    private void setDefault() {
+        if (this.score == null) this.score = 0;
+    }
 }

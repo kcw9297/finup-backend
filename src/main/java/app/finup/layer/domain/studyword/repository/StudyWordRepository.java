@@ -1,9 +1,11 @@
 package app.finup.layer.domain.studyword.repository;
 
 import app.finup.layer.domain.studyword.entity.StudyWord;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -23,4 +25,11 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
     Optional<StudyWord> findWithImageById(Long studyWordId);
 
     boolean existsByName(String name);
+
+
+    @Query("""
+        select w from StudyWord w
+        order by function('rand')
+    """)
+    List<StudyWord> findRandomWords(Pageable pageable);
 }
