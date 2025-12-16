@@ -36,6 +36,7 @@ public class NewsProviderImpl implements NewsProvider {
         log.info("[NEWS_PROVIDER] HIT {}", key);
         return cached;
     }
+
     private static final int MAX_DEEP = 10;
     @Override
     public List<NewsDto.Row> fetchNews(String category, int limit) {
@@ -45,55 +46,32 @@ public class NewsProviderImpl implements NewsProvider {
         List<NewsDto.Row> result = new ArrayList<>();
         int deepCount = 0;
 
-        for (NewsDto.Row row : list) {
-            try {
-                if (newsContentExtractor.isSupported(row.getLink()) && deepCount < MAX_DEEP) {
-                    // DEEP
-                    NewsDto.Ai deep = newsAiService.analyzeDeep(row.getLink());
-                    row.setAi(deep);
-                    deepCount++;
-                } else {
-                    // LIGHT
-                    NewsDto.Summary light =
-                            newsAiService.analyzeLight(row.getDescription());
-                    row.setSummary(light);
-                }
-            } catch (Exception e) {
-                log.warn("[NEWS_PROVIDER] AI 분석 실패, URL={}", row.getLink(), e);
-                row.setAi(null);
-            }
+        for(NewsDto.Row row : list) {
+            boolean useDeep = applyAi(row, deepCount < MAX_DEEP);
+            if (useDeep) deepCount++;
             result.add(row);
         }
         log.info("[NEWS_PROVIDER] DEEP={}, LIGHT={}", deepCount, result.size() - deepCount);
         return result;
     }
 
-    private  void analyzeAndAttach(NewsDto.Row row) {
-        try{
-            if(newsContentExtractor.isSupported(row.getLink())){
-                NewsDto.Ai deep = newsAiService.analyzeDeep(row.getLink());
-                row.setAi(deep);
-            }else{
-                NewsDto.Summary light = newsAiService.analyzeLight(row.getDescription());
-                row.setSummary(light);
-            }
-        }catch (Exception e){
-            log.warn("[NEWS_PROVIDER] AI 분석 실패, URL={}", row.getLink());
-            row.setAi(null);
-        }
-    }
-
     @Override
     public List<NewsDto.Row> getStockNews(String keyword, String category, int limit) {
-        String key = "NEWS:STOCK:" + keyword + ":" + category + ":" + limit;
+        String key = "NEWS:STOCK:" + keyword + ":" + limit;
         List<NewsDto.Row> cached = newsRedisStorage.getNews(key, new TypeReference<List<NewsDto.Row>>() {
         });
-        if (cached == null) {
-            log.warn("[NEWS_PROVIDER] CACHE MISS {}", key);
-            return List.of(); //or fallback
+        if (cached != null) {
+            log.info("[NEWS_PROVIDER] HIT {}", key);
+            return cached; //or fallback
         }
-        log.info("[NEWS_PROVIDER] HIT {}", key);
-        return cached;
+        log.warn("[NEWS_PROVIDER] CACHE MISS {}", key);
+        List<NewsDto.Row> fetched = fetchStockNews(keyword, category, limit);
+        if(fetched == null || fetched.isEmpty()) {
+            return List.of();
+        }
+
+        newsRedisStorage.saveNews(key, fetched, Duration.ofSeconds(30));
+        return fetched;
     }
 
     @Override
@@ -102,5 +80,26 @@ public class NewsProviderImpl implements NewsProvider {
         List<NewsDto.Row> list = newsApiClient.fetchNews(keyword, category,limit);
         list = duplicateService.removeDuplicate(list);
         return list;
+    }
+
+    private boolean applyAi(NewsDto.Row row, boolean allowDeep) {
+        try{
+            if(allowDeep && newsContentExtractor.isSupported(row.getLink())) {
+                NewsDto.Ai deep = newsAiService.analyzeDeep(row.getLink());
+                row.setSummary(null);
+                row.setAi(deep);
+                return true;
+            }else {
+                NewsDto.Summary light = newsAiService.analyzeLight(row.getDescription());
+                row.setAi(null);
+                row.setSummary(light);
+                return false;
+            }
+        }catch (Exception e){
+            log.warn("[NEWS_PROVIDER] AI 분석 실패, URL={}", row.getLink(), e);
+            row.setAi(null);
+            row.setSummary(null);
+            return false;
+        }
     }
 }

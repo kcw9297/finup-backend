@@ -39,4 +39,7 @@ public class WordsDtoMapper {
                 score
         );
     }
+    private static String stripHanja(String name) {
+        return name.replaceAll("\\s*\\([^)]*\\)", "");
+    }
 }

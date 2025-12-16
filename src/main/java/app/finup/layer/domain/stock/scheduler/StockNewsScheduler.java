@@ -3,6 +3,8 @@ package app.finup.layer.domain.stock.scheduler;
 import app.finup.infra.news.provider.NewsProvider;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
+import app.finup.layer.domain.stock.dto.StockDto;
+import app.finup.layer.domain.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
@@ -10,36 +12,49 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Component
-//@Profile("prod") //잠깐 비활성화
+@Profile("prod") //잠깐 비활성화
 @RequiredArgsConstructor
 public class StockNewsScheduler {
     private final NewsProvider newsProvider;
     private final NewsRedisStorage newsRedisStorage;
     private static final Duration TTL_STOCK = Duration.ofMinutes(30);
+    private final StockService stockService;
 
     @Scheduled(fixedRate = 15 * 60 * 1000)
     public void updateStockNews() {
-        List<String> stocks = List.of(
-                "삼성전자",
-                "SK하이닉스",
-                "현대차",
-                "LG에너지솔루션");
 
-        for (String stockName : stocks){
-            refresh(stockName, "date", 30);
-            //refresh(stockName,"sim", 30);
+        List<StockDto.MarketCapRow> marketCapList = stockService.getMarketCapRow();
+        List<StockDto.TradingValueRow> tradingValueList = stockService.getTradingValueRow();
+
+        if (marketCapList.isEmpty() && tradingValueList.isEmpty()) {
+            log.warn("[SCHEDULER] 종목 리스트 비어있음");
+            return;
+        }
+        Set<String> stockNames = new HashSet<>();
+        for(StockDto.MarketCapRow row : marketCapList)
+        {
+            stockNames.add(row.getHtsKorIsnm());
+        }
+        for(StockDto.TradingValueRow row : tradingValueList)
+        {
+            stockNames.add(row.getHtsKorIsnm());
+        }
+        for (String stockName : stockNames)
+        {
+            refresh(stockName, "date", 10);
         }
 
-        log.info("[STOCK_SCHEDULER] 갱신 완료 ({} 종목)", stocks.size());
-
+        log.info("[STOCK_SCHEDULER] 갱신 완료 ({} 종목)", stockNames.size());
     }
 
     private void refresh(String keyword, String category, int limit) {
-        String key = "NEWS:STOCK:" + keyword + ":" + category +":" + limit;
+        String key = "NEWS:STOCK:" + keyword +":" + limit;
 
         List<NewsDto.Row> fresh = newsProvider.fetchStockNews(keyword, category, limit);
 
