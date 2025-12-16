@@ -48,7 +48,7 @@ public class AuthController {
      * CSRF 토큰 발급 (GET 외 요청 시, Spring Security 자동 발급)
      * [GET] /auth/csrf
      */
-    @GetMapping("/csrf")
+    @PostMapping("/csrf")
     public ResponseEntity<?> getCsrf() {
         return Api.ok(AppStatus.AUTH_OK_ISSUE_CSRF);
     }

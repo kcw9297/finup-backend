@@ -99,6 +99,7 @@ dependencies {
 
     implementation 'commons-codec:commons-codec:1.15'
 }
+
 dependencyManagement {
     imports {
         mavenBom "org.springframework.ai:spring-ai-bom:1.1.0"

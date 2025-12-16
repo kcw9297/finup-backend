@@ -32,7 +32,6 @@ public class StudyWord extends BaseEntity {
     @Column(nullable = false)
     private String meaning;
 
-
     @OneToOne(
             fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE} // 이미지 자동 저장/수정 처리
@@ -40,11 +39,16 @@ public class StudyWord extends BaseEntity {
     @JoinColumn(name = "word_image_id")
     private UploadFile wordImageFile; // 단어 이미지
 
+    @Lob // vector 유사도 검색을 위한 컬럼
+    @Column(name = "embedding", columnDefinition = "VECTOR(1536)", nullable = false)
+    private byte[] embedding;
+
 
     @Builder
-    public StudyWord(String name, String meaning) {
+    public StudyWord(String name, String meaning, byte[] embedding) {
         this.name = name;
         this.meaning = meaning;
+        this.embedding = embedding;
     }
 
     /* 갱신 메소드 */
@@ -73,10 +77,12 @@ public class StudyWord extends BaseEntity {
      * 단어명 수정
      * @param name 단어명
      * @param meaning 단어 뜻
+     * @param embedding 단어 임베딩 배열
      */
-    public void edit(String name, String meaning) {
+    public void edit(String name, String meaning, byte[] embedding) {
         this.name = name;
         this.meaning = meaning;
+        this.embedding = embedding;
     }
 }
 
