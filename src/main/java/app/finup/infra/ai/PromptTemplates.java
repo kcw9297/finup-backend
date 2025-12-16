@@ -230,5 +230,40 @@ public class PromptTemplates {
         }
         """;
 
-
+    public static final String QUIZ = """
+        너는 금융 학습용 퀴즈를 만드는 AI다.
+            
+        아래에 주어진 studyWords 30개 중에서
+        중복 없이 10개를 무작위로 선택하여 퀴즈를 만들어라.
+    
+        [규칙]
+        1. 문제는 객관식 4지선다형이다.
+        2. 정답은 반드시 studyWords에 있는 내용이어야 한다.
+        3. 오답은 비슷하지만 틀린 금융 용어 또는 개념으로 구성한다.
+        4. 문제 난이도는 초급 투자자 기준이다.
+        5. 출력은 JSON 배열 형식으로만 한다. 마크다운, 설명 문장, ```json``` 을 포함하지 마라.
+        6. 같은 studyWord로 두 개 이상의 문제를 만들지 마라.
+        7. 각 문제는 아래 형식을 따른다.
+        
+        {
+          "output": [
+            {
+              "question": "문제 1",
+              "choices": ["보기1", "보기2", "보기3", "보기4"],
+              "answer": "정답",
+              "explanation": "설명 1"
+            },
+            {
+              "question": "문제 2",
+              "choices": ["보기1", "보기2", "보기3", "보기4"],
+              "answer": "정답",
+              "explanation": "설명 2"
+            }
+            // ... 총 10개
+          ]
+        }
+    
+        [studyWords]
+        {studyWords}
+    """;
 }

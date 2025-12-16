@@ -40,7 +40,7 @@ public class QuizDto {
     public static class Question {
         private String question;      // 문제
         private List<String> choices; // 보기
-        private int answerIndex;      // 정답 인덱스
+        private String answer;        // 정답
         private String explanation;   // 해설
     }
 }
