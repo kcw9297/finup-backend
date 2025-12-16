@@ -58,4 +58,13 @@ public final class WordsDto {
         private List<String> recentKeywords;
     }
 
+    @Data
+    @AllArgsConstructor
+    public static class Similarity {
+        Long termId;
+        String name;
+        String description;
+        double score;
+    }
+
 }
