@@ -11,7 +11,7 @@ import java.util.List;
 public interface VideoLinkRedisStorage {
 
     /**
-     * 현재 사용자에게 추천되었던 영상 이력 저장 (최근 30개 까지만 저장)
+     * 현재 사용자에게 추천되었던 영상 이력 저장
      * @param videoLinkIds 추천된 영상 고유번호 목록 (문자열 변환 필수)
      * @param memberId 추천 대상 회원번호
      */
@@ -19,7 +19,7 @@ public interface VideoLinkRedisStorage {
 
 
     /**
-     * 현재 사용자에게 추천되었던 영상 번호 목록 조회 (최근 30개)
+     * 현재 사용자에게 추천되었던 영상 번호 목록 조회
      * @param memberId 추천 대상 회원번호
      */
     List<Long> getLatestRecommendedIds(Long memberId);

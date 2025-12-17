@@ -30,13 +30,18 @@ public class Study extends BaseEntity {
 
     @Column(nullable = false)
     private Integer level; // 수준
+    
+    @Lob // vector 유사도 검색시 사용 (제공)
+    @Column(name = "embedding", columnDefinition = "VECTOR(1536)", nullable = false)
+    private byte[] embedding;
 
     @Builder
-    public Study(String name, String summary, String detail, Integer level) {
+    public Study(String name, String summary, String detail, Integer level, byte[] embedding) {
         this.name = name;
         this.summary = summary;
         this.detail = detail;
         this.level = level;
+        this.embedding = embedding;
     }
 
     /* 갱신 메소드 */
@@ -47,12 +52,14 @@ public class Study extends BaseEntity {
      * @param summary 요약 내용
      * @param detail 학습 상세 (AI가 참고 가능)
      * @param level 학습 레벨
+     * @param embedding 현재 학습에 대한 임베딩 배열
      */
-    public void edit(String name, String summary, String detail, Integer level) {
+    public void edit(String name, String summary, String detail, Integer level, byte[] embedding) {
         this.name = name;
         this.summary = summary;
         this.detail = detail;
         this.level = level;
+        this.embedding = embedding;
     }
 }
 

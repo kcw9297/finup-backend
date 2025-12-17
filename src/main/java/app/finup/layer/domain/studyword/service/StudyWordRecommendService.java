@@ -20,10 +20,10 @@ public interface StudyWordRecommendService {
 
     /**
      * 학습 단어 재추천 (학습 페이지)
-     * @param studyId  대상 학습번호
      * @param memberId 추천 대상 회원번호
+     * @param studyId  대상 학습번호
      * @return 게시할 추천 영상 DTO 리스트
      */
-    List<StudyWordDto.Row> retryRecommendForStudy(Long studyId, Long memberId);
+    List<StudyWordDto.Row> retryRecommendForStudy(Long memberId, Long studyId);
 
 }

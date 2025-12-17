@@ -5,7 +5,10 @@ import app.finup.layer.base.validation.annotation.NoSpecialText;
 import app.finup.layer.base.validation.annotation.PartSpecialText;
 import app.finup.layer.base.validation.annotation.Select;
 import app.finup.layer.base.validation.annotation.Text;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * Study(개념학습) DTO 클래스
@@ -96,10 +99,10 @@ public final class StudyDto {
 
         private Long studyId;
 
-        @NoSpecialText(min = 2, max = 30)
+        @PartSpecialText(min = 2, max = 30)
         private String name;
 
-        @NoSpecialText(min = 5, max = 40)
+        @PartSpecialText(min = 5, max = 40)
         private String summary;
 
         @Text(min = 1, max = 300)
@@ -108,9 +111,5 @@ public final class StudyDto {
         @Select
         private Integer level;
     }
-
-
-
-
 
 }

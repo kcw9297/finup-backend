@@ -3,6 +3,8 @@ package app.finup.layer.domain.study.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
+import app.finup.infra.ai.provider.EmbeddingProvider;
+import app.finup.infra.ai.utils.AiUtils;
 import app.finup.layer.domain.study.dto.StudyDto;
 import app.finup.layer.domain.study.dto.StudyDtoMapper;
 import app.finup.layer.domain.study.entity.Study;
@@ -32,6 +34,7 @@ public class StudyServiceImpl implements StudyService {
     private final StudyRepository studyRepository;
     private final StudyProgressRepository studyProgressRepository;
     private final StudyMapper studyMapper;
+    private final EmbeddingProvider embeddingProvider;
 
     @Override
     @Transactional(readOnly = true)
@@ -60,15 +63,26 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public Long add(StudyDto.Add rq) {
 
-        // [1] 엔티티 생성
+        // [1] 양끝 공백 제거
+        String name = rq.getName().trim();
+        String summary = rq.getSummary().trim();
+        String detail = rq.getDetail().trim();
+        Integer level = rq.getLevel();
+
+        // [2] 임베딩 배열 생성
+        String text = AiUtils.generateEmbeddingText(name, summary, detail,getLevelText(level));
+        byte[] embedding = embeddingProvider.generate(text);
+
+        // [2] 엔티티 생성
         Study study = Study.builder()
-                .name(rq.getName().trim())
-                .summary(rq.getSummary().trim())
-                .detail(rq.getDetail().trim())
-                .level(rq.getLevel())
+                .name(name)
+                .summary(summary)
+                .detail(detail)
+                .level(level)
+                .embedding(embedding)
                 .build();
 
-        // [2] 엔티티 저장
+        // [3] 엔티티 저장
         return studyRepository.save(study).getStudyId();
     }
 
@@ -76,19 +90,45 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public void edit(StudyDto.Edit rq) {
 
-        // [1] 엔티티 조회
+        // [1] 양끝 공백 제거
+        String name = rq.getName().trim();
+        String summary = rq.getSummary().trim();
+        String detail = rq.getDetail().trim();
+        Integer level = rq.getLevel();
+
+        // [2] 엔티티 조회
         Study study = studyRepository
                 .findById(rq.getStudyId())
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_NOT_FOUND));
 
-        // [2] 정보 갱신 수행
-        Integer prevLevel = study.getLevel();
-        Integer afterLevel = rq.getLevel();
-        study.edit(rq.getName().trim(), rq.getSummary().trim(), rq.getDetail().trim(), afterLevel);
+        // 변경 내용이 있는지 검증 (없는 경우에 불필요한 API 호출 방지)
+        if (Objects.equals(study.getName(), name) &&
+                Objects.equals(study.getSummary(), summary) &&
+                Objects.equals(study.getDetail(), detail) &&
+                Objects.equals(study.getLevel(), rq.getLevel())) throw new BusinessException(AppStatus.STUDY_NOT_UPDATABLE);
 
-        // [3] 난이도(level)가 변경된 경우, 사용자 진도 정보 일괄 삭제
-        if (!Objects.equals(prevLevel, afterLevel))
-            studyProgressRepository.deleteByStudyId(rq.getStudyId());
+        // [3] 임베딩 배열 생성
+        String text = AiUtils.generateEmbeddingText(name, summary, detail, getLevelText(level));
+        byte[] embedding = embeddingProvider.generate(text);
+
+        // [4] 정보 갱신 수행
+        study.edit(name, summary, detail, level, embedding);
+
+        // [5] 사용자 진도 정보 일괄 삭제
+        studyProgressRepository.deleteByStudyId(rq.getStudyId());
+    }
+
+    // 숫자 레벨 기반 텍스트로 변환 (임베딩 시)
+    private String getLevelText(Integer level) {
+
+        return switch(level) {
+            case 1 -> "입문 초급";
+            case 2 -> "초중급";
+            case 3 -> "중급";
+            case 4 -> "중고급";
+            case 5 -> "고급 실전";
+            default -> "";
+        };
     }
 
 
