@@ -21,9 +21,5 @@ public class NewsController {
 
     private final NewsService newsService;
 
-    @GetMapping("/list")
-    public ResponseEntity<?> getNews(String category) {
-        return Api.ok(newsService.getNews(category));
 
-    }
 }
