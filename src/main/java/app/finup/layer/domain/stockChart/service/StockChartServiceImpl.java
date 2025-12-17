@@ -1,6 +1,7 @@
 package app.finup.layer.domain.stockChart.service;
 
 import app.finup.layer.domain.stock.api.AuthStockApiClient;
+import app.finup.layer.domain.stock.redis.StockStorage;
 import app.finup.layer.domain.stockChart.dto.StockChartDto;
 import app.finup.layer.domain.stockChart.enums.CandleType;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,9 +28,28 @@ public class StockChartServiceImpl implements StockChartService {
     @Qualifier("kisClient")
     private final WebClient kisClient;
     private final AuthStockApiClient authStockApiClient;
+    private final StockStorage stockStorage;
 
     @Override
     public StockChartDto.Row inquireDaily(String code, CandleType candleType) {
+       return null;
+    }
+
+    @Override
+    public StockChartDto.Row getInquireDaily(String code, CandleType candleType) {
+
+        StockChartDto.Row row = stockStorage.getChart(code);
+        if(row == null){
+            refreshInquireDaily(code, candleType);
+            row = stockStorage.getChart(code);
+        }else{
+            log.info("차트 상세 정보 Redis에서 가져옴");
+        }
+        return row;
+    }
+
+    @Override
+    public void refreshInquireDaily(String code, CandleType candleType) {
         String accessToken = authStockApiClient.getToken();
         String type = candleType.getKisCode();
         try {
@@ -60,11 +79,13 @@ public class StockChartServiceImpl implements StockChartService {
 
             ObjectMapper om = new ObjectMapper();
             StockChartDto.Row row = om.readValue(json, StockChartDto.Row.class);
+
             //null 안전처리
-            if(row.getOutput() == null){
-                row.setOutput(new ArrayList<>());
-                return row;
+            if (row.getOutput() == null || row.getOutput().isEmpty()) {
+                log.warn("일봉 데이터 없음 - code={}, candleType={}", code, candleType);
+                return;
             }
+
             //날짜 오름차순(프론트 라이브러리 요구)
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
             row.getOutput().sort(Comparator.comparing(
@@ -79,7 +100,8 @@ public class StockChartServiceImpl implements StockChartService {
             calculateMA(row.getOutput(), 5, true);
             calculateMA(row.getOutput(), 20, true);
 
-            return row;
+            log.info("차트 Redis 갱신함 code={}", code);
+            stockStorage.setChart(code, row);
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
