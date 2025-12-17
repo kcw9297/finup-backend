@@ -3,7 +3,7 @@ package app.finup.layer.domain.videolink.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.videolink.service.VideoLinkService;
+import app.finup.layer.domain.videolink.service.VideoLinkRecommendService;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class VideoLinkController {
 
-    private final VideoLinkService videoLinkService;
+    private final VideoLinkRecommendService videoLinkRecommendService;
+
+
+    @GetMapping("/recommend/home")
+    public ResponseEntity<?> recommendForHome(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                              @RequestParam boolean retry) {
+
+        // [1] 현재 로그인 회원 정보
+        Long memberId = userDetails.getMemberId();
+
+        // [2] 재시도 여부에 따라 추천 영상 반환 (캐시 여부)
+        return retry ?
+                Api.ok(videoLinkRecommendService.retryRecommendForLoginHome(memberId)) :
+                Api.ok(videoLinkRecommendService.recommendForLoginHome(memberId));
+    }
+
 
     @GetMapping("/recommend/study")
     public ResponseEntity<?> recommendForStudy(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -38,8 +53,8 @@ public class VideoLinkController {
 
         // [2] 재시도 여부에 따라 추천 영상 반환 (캐시 여부)
         return retry ?
-                Api.ok(videoLinkService.recommendForStudy(studyId, memberId)) :
-                Api.ok(videoLinkService.retryRecommendForStudy(studyId, memberId));
+                Api.ok(videoLinkRecommendService.retryRecommendForStudy(studyId, memberId)) :
+                Api.ok(videoLinkRecommendService.recommendForStudy(studyId, memberId));
     }
 
 }

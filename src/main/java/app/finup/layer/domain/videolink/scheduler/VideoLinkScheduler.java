@@ -1,6 +1,7 @@
 package app.finup.layer.domain.videolink.scheduler;
 
 import app.finup.common.utils.LogUtils;
+import app.finup.layer.domain.videolink.service.VideoLinkRecommendService;
 import app.finup.layer.domain.videolink.service.VideoLinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class VideoLinkScheduler {
 
     private final VideoLinkService videoLinkService;
+    private final VideoLinkRecommendService videoLinkRecommendService;
 
     /**
      * 10분마다 유튜브 영상 동기화
@@ -37,7 +39,7 @@ public class VideoLinkScheduler {
      */
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
     public void initHomeVideoLinks() {
-        videoLinkService.recommendForLogoutHome();
+        videoLinkRecommendService.recommendForLogoutHome();
         LogUtils.showInfo(this.getClass(), "페이지 홈 추천 영상 조회 완료");
     }
 

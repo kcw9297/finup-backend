@@ -25,6 +25,7 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
     @Query(value = """
         SELECT *
         FROM video_link
+        WHERE embedding IS NOT NULL
         ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
         LIMIT :lim
     """, nativeQuery = true)
@@ -35,7 +36,7 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
     @Query(value = """
         SELECT *
         FROM video_link
-        WHERE VEC_DISTANCE_COSINE(embedding, :embedding) < :threshold
+        WHERE embedding IS NOT NULL AND VEC_DISTANCE_COSINE(embedding, :embedding) < :threshold
         ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
         LIMIT :lim
     """, nativeQuery = true)

@@ -24,7 +24,13 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
     """)
     Optional<StudyWord> findWithImageById(Long studyWordId);
 
-    boolean existsByName(String name);
+
+    @Query("""
+        SELECT CASE WHEN COUNT(sw) > 0 THEN true ELSE false END
+        FROM StudyWord sw
+        WHERE REPLACE(sw.name, ' ', '') = REPLACE(:name, ' ', '')
+    """)
+    boolean existsByNameIgnoreSpaces(String name);
 
 
     @Query("""

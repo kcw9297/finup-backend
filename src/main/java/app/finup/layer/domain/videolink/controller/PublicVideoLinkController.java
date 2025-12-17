@@ -3,7 +3,7 @@ package app.finup.layer.domain.videolink.controller;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
-import app.finup.layer.domain.videolink.service.VideoLinkService;
+import app.finup.layer.domain.videolink.service.VideoLinkRecommendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PublicVideoLinkController {
 
-    private final VideoLinkService videoLinkService;
+    private final VideoLinkRecommendService videoLinkRecommendService;
 
     @GetMapping("/recommend/home")
     public ResponseEntity<?> recommendForHome() {
-        return Api.ok(videoLinkService.recommendForLogoutHome());
+        return Api.ok(videoLinkRecommendService.recommendForLogoutHome());
     }
 
 }

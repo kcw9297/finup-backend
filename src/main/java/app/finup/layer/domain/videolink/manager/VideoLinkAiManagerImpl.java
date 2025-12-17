@@ -21,28 +21,23 @@ public class VideoLinkAiManagerImpl implements VideoLinkAiManager {
     // 사용 의존성
     private final ChatProvider chatProvider;
 
-    // 사용 상수
-    public static final String RECOMMEND_KEYWORDS_AMOUNT = "10";
-
     @Override
-    public String recommendKeywordsForLogoutHome() {
+    public String recommendSentenceForLogoutHome() {
 
         // [1] 프롬프트 생성
-        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_HOME
-                .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${LATEST_KEYWORDS}", "");
+        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_SENTENCE_HOME
+                .replace("${LATEST_SENTENCES}", "");
 
         // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
         return chatProvider.query(prompt);
     }
 
     @Override
-    public String recommendKeywordsForLoginHome(String lastestKeywords) {
+    public String recommendSentenceForLoginHome(String latestSentences) {
 
         // [1] 프롬프트 생성
-        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_HOME
-                .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${LATEST_KEYWORDS}", lastestKeywords);
+        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_SENTENCE_HOME
+                .replace("${LATEST_SENTENCES}", latestSentences);
 
         // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
         return chatProvider.query(prompt);
@@ -50,12 +45,15 @@ public class VideoLinkAiManagerImpl implements VideoLinkAiManager {
 
 
     @Override
-    public String recommendKeywordsForStudy(String lastestKeywords) {
+    public String recommendSentenceForStudy(String studyName, String studySummary, String studyDetail, Integer studyLevel, String latestSentences) {
 
         // [1] 프롬프트 생성
-        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_KEYWORDS_STUDY
-                .replace("${RECOMMEND_KEYWORDS_AMOUNT}", RECOMMEND_KEYWORDS_AMOUNT)
-                .replace("${LATEST_KEYWORDS}", lastestKeywords);
+        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_SENTENCE_STUDY
+                .replace("${TARGET_STUDY_NAME}", studyName)
+                .replace("${TARGET_STUDY_SUMMARY}", studySummary)
+                .replace("${TARGET_STUDY_DETAIL}", studyDetail)
+                .replace("${TARGET_STUDY_LEVEL}", String.valueOf(studyLevel))
+                .replace("${LATEST_SENTENCES}", latestSentences);
 
         // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
         return chatProvider.query(prompt);

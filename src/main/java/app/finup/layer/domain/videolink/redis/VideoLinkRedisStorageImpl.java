@@ -25,78 +25,78 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
     private final StringRedisTemplate srt;
 
     // 사용 상수
-    private static final Duration TTL_LATEST_KEYWORDS = Duration.ofHours(6); // 1시간 지속
-    private static final int MAX_KEYWORDS_HOME = 2;
-    private static final int MAX_KEYWORDS_STUDY = 1;
+    private static final Duration TTL_LATEST_KEYWORDS = Duration.ofHours(12); // 12시간 지속
+    private static final int MAX_STORE_AMOUNT_ID = 4; // 4개 저장
+    private static final int MAX_SENTENCE_HOME = 5;
 
-    @Override // TODO 기존 @Cacheable 결과를 덮어쓰게 해야함
-    public void storeLatestKeywordsForHome(String keywords, Long memberId) {
+
+    @Override
+    public void storeLatestRecommendedIds(List<String> videoLinkIds, Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_KEYWORDS_HOME
+        String key = VideoLinkCache.LATEST_RECOMMENDED_VIDEO_IDS
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] 현재 키 존재여부 확인
         Boolean exists = srt.hasKey(key);
 
         // [3] redis 내 저장
-        srt.opsForList().leftPush(key, keywords);
-        srt.opsForList().trim(key, 0, MAX_KEYWORDS_HOME - 1); // 최대 저장하는 개수
+        srt.opsForList().leftPushAll(key, videoLinkIds);
+        srt.opsForList().trim(key, 0, MAX_STORE_AMOUNT_ID - 1); // 최대 저장하는 개수
         if (!exists) srt.expire(key, TTL_LATEST_KEYWORDS); // 키가 존재하지 않으면 TTL 설정
     }
 
 
     @Override
-    public String getLatestKeywordsForHome(Long memberId) {
+    public List<Long> getLatestRecommendedIds(Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_KEYWORDS_HOME
+        String key = VideoLinkCache.LATEST_RECOMMENDED_VIDEO_IDS
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] redis 내 저장된 최근 문자열 일괄 조회
-        return getLatestKeywords(key);
+        List<String> keywords = srt.opsForList().range(key, 0L, -1L);
+
+        // 만약 조회에 실패한 경우, 빈 리스트 반환
+        if (Objects.isNull(keywords)) return List.of();
+
+        // [3] 조회된 모든 번호를 Long 타입으로 변환 후 반환
+        return keywords.stream().map(Long::parseLong).toList();
     }
 
 
     @Override
-    public void storeLatestKeywordsForStudy(String keywords, Long studyId, Long memberId) {
+    public void storeLatestSentenceForHome(String sentence, Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_KEYWORDS_STUDY
-                .replace("${STUDY_ID}", String.valueOf(studyId))
+        String key = VideoLinkCache.LATEST_SENTENCE_HOME
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] 현재 키 존재여부 확인
         Boolean exists = srt.hasKey(key);
 
-        // [2] redis 내 저장
-        srt.opsForList().leftPush(key, keywords);
-        srt.opsForList().trim(key, 0, MAX_KEYWORDS_STUDY - 1); // 최대 저장하는 개수
+        // [3] redis 내 저장
+        srt.opsForList().leftPush(key, sentence);
+        srt.opsForList().trim(key, 0, MAX_SENTENCE_HOME - 1); // 최대 저장하는 개수
         if (!exists) srt.expire(key, TTL_LATEST_KEYWORDS); // 키가 존재하지 않으면 TTL 설정
     }
 
 
     @Override
-    public String getLatestKeywordsForStudy(Long studyId, Long memberId) {
+    public String getLatestSentenceForHome(Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_KEYWORDS_STUDY
-                .replace("${STUDY_ID}", String.valueOf(studyId))
+        String key = VideoLinkCache.LATEST_SENTENCE_HOME
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
-        return getLatestKeywords(key);
+        // [2] redis 내 저장된 최근 문장 일괄 조회
+        List<String> sentences = srt.opsForList().range(key, 0L, -1L);
+
+        // 만약 조회에 실패한 경우, 빈 문자열 반환
+        if (Objects.isNull(sentences)) return "";
+
+        // [3] 조회된 모든 문장을 쉼표로 합친 후 반환
+        return String.join(",", sentences);
     }
 
-
-    // 최근 키워드 일괄 조회
-    private String getLatestKeywords(String key) {
-        // [2] redis 내 저장된 최근 문자열 일괄 조회
-        List<String> keywords = srt.opsForList().range(key, 0L, -1L);
-
-        // 만약 키워드 조회에 실패한 경우, 빈 문자열 반환
-        if (Objects.isNull(keywords)) return "";
-
-        // [3] 조회된 모든 키워드를 조합 후 반환
-        return String.join(" ", keywords);
-    }
 }
