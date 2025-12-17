@@ -75,13 +75,19 @@ public class IndexMarketServiceImpl implements IndexMarketService {
         double rate = (diff / pair.yesterday) * 100;
 
         // DB 저장
-        repository.save(IndexMarket.builder()
-                .indexName(indexName)
-                .closePrice(pair.today)
-                .diff(diff)
-                .rate(rate)
-                .updatedAt(LocalDateTime.now())
-                .build());
+        IndexMarket entity =
+                repository.findTopByIndexNameOrderByUpdatedAtDesc(indexName)
+                        .orElseGet(() ->
+                                IndexMarket.builder()
+                                        .indexName(indexName)
+                                        .closePrice(0)
+                                        .diff(0)
+                                        .rate(0)
+                                        .updatedAt(LocalDateTime.now())
+                                        .build()
+                        );
+        entity.update(pair.today, diff, rate);
+        repository.save(entity);
 
         log.info("지수 저장 완료: {}", indexName);
     }
