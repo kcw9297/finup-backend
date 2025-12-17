@@ -12,6 +12,22 @@ spring:
     activate:
       on-profile: local
 
+  security:
+
+    # OAuth2 Social Login
+    oauth2:
+      client:
+        registration:
+
+          # Google
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}         # Oauth2 google client id
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET} # Oauth2 google client secret
+            scope:
+              - profile
+              - email
+            redirect-uri: "{baseUrl}/api/v1/auth/google/callback"
+
 logging:
   level:
     org.springframework.security: INFO #DEBUG
