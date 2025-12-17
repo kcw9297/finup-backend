@@ -25,8 +25,8 @@ public class NewsScheduler {
 
     @Scheduled(fixedRate = 1000 * 60 * 15)
     public void updateNewsCache(){
-        refresh("date", 30);
-        refresh("sim", 30);
+        refresh("date", 50);
+        refresh("sim", 50);
         log.info("[SCHEDULER] 뉴스 캐시 갱신 완료");
     }
 
