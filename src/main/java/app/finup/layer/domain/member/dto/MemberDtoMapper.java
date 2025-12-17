@@ -2,6 +2,9 @@ package app.finup.layer.domain.member.dto;
 
 
 import app.finup.layer.domain.member.entity.Member;
+import app.finup.layer.domain.uploadfile.entity.UploadFile;
+
+import java.util.Objects;
 
 /**
  * Member Entity -> DTO 매퍼 클래스
@@ -14,6 +17,9 @@ public class MemberDtoMapper {
      */
 
     public static MemberDto.Row toRow(Member entity) {
+
+        UploadFile profileImageFile = entity.getProfileImageFile();
+
         return MemberDto.Row.builder()
                 .memberId(entity.getMemberId())
                 .email(entity.getEmail())
@@ -22,7 +28,7 @@ public class MemberDtoMapper {
                 .memberRole(entity.getRole())
                 .socialType(entity.getSocial())
                 .socialId(entity.getSocialId())
-                .profileImageUrl(entity.getProfileImageFile().getFilePath())
+                .profileImageUrl(Objects.isNull(profileImageFile) ? null : profileImageFile.getFilePath())
                 .build();
     }
 

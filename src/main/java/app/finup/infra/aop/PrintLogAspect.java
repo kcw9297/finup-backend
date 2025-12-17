@@ -28,7 +28,8 @@ public class PrintLogAspect {
          @RestController 한정
      */
 
-    @Around("app.finup.infra.aop.Pointcuts.restCtlAnno()")
+    @Around("app.finup.infra.aop.Pointcuts.restCtlAnno() ||" +
+            "app.finup.infra.aop.Pointcuts.layerSchedulerAnno()")
     public Object printSuccessLog(ProceedingJoinPoint joinPoint) throws Throwable {
 
         // [1] 로직 시작 시점 기록

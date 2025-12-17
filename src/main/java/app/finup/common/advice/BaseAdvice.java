@@ -1,12 +1,10 @@
 package app.finup.common.advice;
 
-import app.finup.common.exception.AppException;
-import app.finup.common.exception.JwtVerifyException;
+import app.finup.common.exception.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import app.finup.common.enums.AppStatus;
-import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -131,6 +129,17 @@ public class BaseAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = BusinessException.class)
     public ResponseEntity<?> handleBusinessEx(BusinessException e) {
         log.error("비즈니스 로직 실패! : {}", e.getAppStatus().getInfo());
+        return Api.fail(e.getAppStatus(), e.getInputErrors());
+    }
+
+
+    /**
+     * Manager, Provider 실패 시
+     */
+    @ExceptionHandler(value = {ManagerException.class, ProviderException.class})
+    public ResponseEntity<?> handleManaProvEx(AppException e) {
+
+        log.error("Manager/Provider 로직 실패! : {}", e.getAppStatus().getInfo());
         return Api.fail(e.getAppStatus(), e.getInputErrors());
     }
 

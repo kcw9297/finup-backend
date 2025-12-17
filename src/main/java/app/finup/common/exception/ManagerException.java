@@ -13,7 +13,15 @@ public class ManagerException extends AppException {
         super(appStatus);
     }
 
+    public ManagerException(AppStatus appStatus, String fieldName) {
+        super(appStatus, fieldName);
+    }
+
     public ManagerException(AppStatus appStatus, Throwable cause) {
         super(appStatus, cause);
+    }
+
+    public ManagerException(AppStatus appStatus, String fieldName, Throwable cause) {
+        super(appStatus, fieldName, cause);
     }
 }

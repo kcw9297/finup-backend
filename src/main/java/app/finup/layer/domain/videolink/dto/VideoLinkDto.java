@@ -5,6 +5,8 @@ import app.finup.layer.base.dto.SearchRequest;
 import app.finup.layer.base.validation.annotation.YouTubeUrl;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -23,7 +25,10 @@ public final class VideoLinkDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Row {
+    public static class Row implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private Long videoLinkId;
         private String videoId;
@@ -38,6 +43,7 @@ public final class VideoLinkDto {
         private String tags; // 태그 문자열
     }
 
+
     /**
      * 검색 요청
      */
@@ -49,6 +55,10 @@ public final class VideoLinkDto {
         private String filter = "";
         private String keyword = "";
         private String order = "latest";
+
+        public Search() {
+            super(6); // 한 줄에는 3개 씩 총 2줄
+        }
     }
 
 

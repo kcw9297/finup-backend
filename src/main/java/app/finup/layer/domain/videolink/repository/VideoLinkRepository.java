@@ -21,6 +21,28 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
 
     List<VideoLink> findByLastSyncedAtBefore(LocalDateTime threshold);
 
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM video_link
+        WHERE embedding IS NOT NULL
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<VideoLink> findSimilar(byte[] embedding, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM video_link
+        WHERE embedding IS NOT NULL AND VEC_DISTANCE_COSINE(embedding, :embedding) < :threshold
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<VideoLink> findSimilarWithThreshold(byte[] embedding, int lim, double threshold);
+
+
     @Modifying
     @Query("""
         DELETE FROM VideoLink vl

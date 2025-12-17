@@ -10,9 +10,13 @@ public abstract class SearchRequest {
     private Integer pageNum;
     private Integer pageSize;
 
-    public SearchRequest() {
+    protected SearchRequest(int pageSize) {
         this.pageNum = 0;
-        this.pageSize = 5;
+        this.pageSize = pageSize;
+    }
+
+    protected SearchRequest() {
+        this(5);
     }
 
     public void setPageNum(Integer pageNum) {

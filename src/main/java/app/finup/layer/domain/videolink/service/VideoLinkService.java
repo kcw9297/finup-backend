@@ -3,6 +3,7 @@ package app.finup.layer.domain.videolink.service;
 import app.finup.common.dto.Page;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 
+
 /**
  * 학습 영상 서비스 인터페이스
  * @author kcw

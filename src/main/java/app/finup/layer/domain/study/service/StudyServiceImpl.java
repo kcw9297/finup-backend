@@ -62,8 +62,9 @@ public class StudyServiceImpl implements StudyService {
 
         // [1] 엔티티 생성
         Study study = Study.builder()
-                .name(rq.getName())
-                .summary(rq.getSummary())
+                .name(rq.getName().trim())
+                .summary(rq.getSummary().trim())
+                .detail(rq.getDetail().trim())
                 .level(rq.getLevel())
                 .build();
 
@@ -83,7 +84,7 @@ public class StudyServiceImpl implements StudyService {
         // [2] 정보 갱신 수행
         Integer prevLevel = study.getLevel();
         Integer afterLevel = rq.getLevel();
-        study.edit(rq.getName(), rq.getSummary(), afterLevel);
+        study.edit(rq.getName().trim(), rq.getSummary().trim(), rq.getDetail().trim(), afterLevel);
 
         // [3] 난이도(level)가 변경된 경우, 사용자 진도 정보 일괄 삭제
         if (!Objects.equals(prevLevel, afterLevel))
