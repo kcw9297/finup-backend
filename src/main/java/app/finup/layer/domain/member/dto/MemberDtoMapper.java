@@ -31,4 +31,14 @@ public class MemberDtoMapper {
                 .email(entity.getEmail())
                 .build();
     }
+
+    public static MemberDto.Detail toDetail(Member entity) {
+        return MemberDto.Detail.builder()
+                .memberId(entity.getMemberId())
+                .nickname(entity.getNickname())
+                .email(entity.getEmail())
+                .profileImageUrl(entity.getProfileImageFile() != null
+                        ? entity.getProfileImageFile().getFilePath() : null)
+                .build();
+    }
 }

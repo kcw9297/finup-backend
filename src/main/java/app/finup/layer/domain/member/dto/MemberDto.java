@@ -97,18 +97,31 @@ public final class MemberDto {
         private Long memberId;
     }
 
-  
-  
+
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class Join {
-      
+
         @Email
         private String email;
 
         @Password
         private String password;
     }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class Detail {
+
+        private Long memberId;
+        private String email;
+        private String nickname;
+        private String profileImageUrl;
+    }
+
 }
