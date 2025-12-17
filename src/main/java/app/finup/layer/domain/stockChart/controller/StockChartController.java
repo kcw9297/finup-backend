@@ -25,7 +25,7 @@ public class StockChartController {
     public ResponseEntity<?> getStockChart(@RequestParam String code,
                                            @RequestParam(defaultValue = "day") String candleType){
         CandleType type = CandleType.fromParam(candleType);
-        return Api.ok(stockChartService.inquireDaily(code, type));
+        return Api.ok(stockChartService.getInquireDaily(code, type));
     }
 
     @GetMapping("/chart/ai")
@@ -36,14 +36,14 @@ public class StockChartController {
         CandleType type = CandleType.fromParam(candleType);
 
         // 여기서도 KIS API 직접 안 부르고, 항상 이 서비스만 호출
-        StockChartDto.Row chart = stockChartService.inquireDaily(code, type);
+        StockChartDto.Row chart = stockChartService.getInquireDaily(code, type);
 
         StockChartDto.AiInput input = StockChartDtoMapper.toAiInput(
                 type.name(),          // DAY / WEEK / MONTH
                 chart.getOutput()
         );
 
-        StockChartDto.ChartAi ai = stockChartAiService.analyze(input);
+        StockChartDto.ChartAi ai = stockChartAiService.getChartAi(code, input);
 
         return Api.ok(ai);
     }

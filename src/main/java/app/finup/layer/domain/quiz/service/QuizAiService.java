@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface QuizAiService {
     List<QuizDto.Question> getQuizAi();
+    void refreshQuizAi();
 }
