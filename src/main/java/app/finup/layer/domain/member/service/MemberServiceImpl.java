@@ -128,7 +128,7 @@ public class MemberServiceImpl implements MemberService {
      * @param rq 닉네임 수정 요청 DTO
      */
     @Override
-    public void editNickname(MemberDto.EditNickname rq) {
+    public String editNickname(MemberDto.EditNickname rq) {
 
         Long memberId = rq.getMemberId();
 
@@ -143,6 +143,7 @@ public class MemberServiceImpl implements MemberService {
         // [3] 닉네임 수정
         member.editNickname(rq.getNickname());
 
+        return member.getNickname();
     }
 
     /**
@@ -152,7 +153,7 @@ public class MemberServiceImpl implements MemberService {
      * @param rq 비밀번호 수정 요청 DTO
      */
     @Override
-    public void editPassword(MemberDto.EditPassword rq) {
+    public String editPassword(MemberDto.EditPassword rq) {
 
         Long memberId = rq.getMemberId();
 
@@ -166,6 +167,8 @@ public class MemberServiceImpl implements MemberService {
 
         // [3] 새 비밀번호 암호화 후 변경
         member.editPassword(passwordEncoder.encode(rq.getNewPassword()));
+
+        return "OK";
     }
 
     /**
@@ -197,22 +200,23 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional(readOnly = true)
-    public MemberDto.Row getDetail(Long memberId) {
+    public MemberDto.Detail getDetail(Long memberId) {
         // [1] 회원 조회 (존재 여부 검증 포함)
-        Member member = getMember(memberId);
+        Member member = memberRepository.findByIdWithProfileImage(memberId)
+                .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
 
         // [2] Entity → DTO 변환
-        MemberDto.Row row = MemberDtoMapper.toRow(member);
+        MemberDto.Detail memberDetail = MemberDtoMapper.toDetail(member);
 
         // [3] 프로필 이미지 URL 보정
         if (member.getProfileImageFile() != null) {
-            row.setProfileImageUrl(
+            memberDetail.setProfileImageUrl(
                     uploadFileManager.getFullUrl(
                             member.getProfileImageFile().getFilePath()
                     )
             );
         }
 
-        return row;
+        return memberDetail;
     }
 }

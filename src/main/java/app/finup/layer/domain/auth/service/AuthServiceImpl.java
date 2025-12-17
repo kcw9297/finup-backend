@@ -86,11 +86,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public MemberDto.Row getProfile(Long memberId) {
-        Member member = memberRepository.findById(memberId)
+    public MemberDto.Detail getProfile(Long memberId) {
+        Member member = memberRepository.findByIdWithProfileImage(memberId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
 
-        return MemberDtoMapper.toRow(member);
+        return MemberDtoMapper.toDetail(member);
     }
 
     // 내부 유틸: 6자리 난수 생성 (000000 ~ 999999)

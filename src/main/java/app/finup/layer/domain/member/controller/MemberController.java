@@ -35,8 +35,6 @@ public class MemberController {
     private final MemberService memberService;
 
 
-
-
     /**
      * 회원 리스트
      * [GET] api/members/list
@@ -105,12 +103,12 @@ public class MemberController {
                                           @RequestBody MemberDto.EditNickname rq) {
         rq.setMemberId(userDetails.getMemberId());
         // [1] 수정 요청
-        memberService.editNickname(rq);
+        String nickname = memberService.editNickname(rq);
 
-        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}", userDetails.getMemberId());
+        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}, nickname={}", userDetails.getMemberId(), userDetails.getNickname());
 
         // [2] 성공 응답
-        return Api.ok();
+        return Api.ok(nickname);
     }
     /**
      * 회원 비밀번호 수정 API
@@ -142,10 +140,10 @@ public class MemberController {
     public ResponseEntity<?> editProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                               @RequestParam("file") MultipartFile file) {
 
-        String profileImageUrl = memberService.editProfileImage(userDetails.getMemberId(), file);
+        memberService.editProfileImage(userDetails.getMemberId(), file);
 
         log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", userDetails.getMemberId());
-        return Api.ok(AppStatus.UPLOAD_FILE_ADD ,profileImageUrl);
+        return Api.ok(AppStatus.UPLOAD_FILE_ADD);
     }
 
 }

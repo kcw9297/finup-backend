@@ -14,5 +14,5 @@ public interface AuthService {
      */
     void verifyJoinEmail(String email, String code);
 
-    MemberDto.Row getProfile(Long memberId);
+    MemberDto.Detail getProfile(Long memberId);
 }
