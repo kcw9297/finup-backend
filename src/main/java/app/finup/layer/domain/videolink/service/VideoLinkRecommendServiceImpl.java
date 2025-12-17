@@ -3,6 +3,7 @@ package app.finup.layer.domain.videolink.service;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.LogUtils;
+import app.finup.common.utils.StrUtils;
 import app.finup.infra.ai.provider.EmbeddingProvider;
 import app.finup.infra.ai.utils.AiUtils;
 import app.finup.layer.domain.study.entity.Study;
@@ -21,7 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * VideoLinkService 구현 클래스
@@ -32,7 +36,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService {
 
     // 사용 의존성
@@ -46,7 +50,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
     private static final int RECOMMEND_AMOUNT_REQUEST = 20; // DB에 요청하는 추천 영상 개수
     private static final int RECOMMEND_AMOUNT_RESPONSE = 6; // 최대 추천 영상 수
     private static final int RECOMMEND_AMOUNT_LOGOUT = 6; // 페이지 홈의 로그아웃 회원에게 제공하는 영상 수
-    private static final double RECOMMEND_THRESHOLD = 0.75; // 페이지 홈의 로그아웃 회원에게 제공하는 영상 수
+    private static final double RECOMMEND_THRESHOLD = 0.85; // 영상 유사도 기준 (낮을수록 연관성 높음)
 
 
     @Cacheable( // 홈은 단일 캐시 (모두에게 공용으로 보임)
@@ -136,7 +140,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
     @Override
     @Transactional(readOnly = true)
     public List<VideoLinkDto.Row> recommendForStudy(Long studyId, Long memberId) {
-        return doRecommendForStudy(studyId, memberId, false);
+        return doRecommendForStudy(studyId, memberId);
     }
 
 
@@ -146,54 +150,81 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
     )
     @Override
     public List<VideoLinkDto.Row> retryRecommendForStudy(Long studyId, Long memberId) {
-        return doRecommendForStudy(studyId, memberId, true);
+        return doRecommendForStudy(studyId, memberId);
     }
 
 
     // 페이지 홈에 추천할 영상 조회
-    private List<VideoLinkDto.Row> doRecommendForStudy(Long studyId, Long memberId, boolean retry) {
+    private List<VideoLinkDto.Row> doRecommendForStudy(Long studyId, Long memberId) {
 
         // [1] 현재 대상 학습정보 조회
         Study study = studyRepository
                 .findById(studyId)
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_NOT_FOUND));
 
-        // [2] 이전 추천영상번호 조회 및 데이터 가공
-        List<Long> recommendedIds = videoLinkRedisStorage.getLatestRecommendedIds(memberId);
-        String levelText = switch(study.getLevel()) {
-            case 1 -> "입문 초급";
-            case 2 -> "초중급";
-            case 3 -> "중급";
-            case 4 -> "중고급";
-            case 5 -> "고급 실전";
-            default -> "";
-        };
+        // [2] 이전 추천영상번호 조회 및 학습 임베딩 배열 조회
+        List<Long> latestVideoLinkIds = videoLinkRedisStorage.getLatestRecommendedIds(memberId);
+        log.warn("latestVideoLinkIds = {}", latestVideoLinkIds);
+        byte[] embedding = study.getEmbedding();
 
-        // [3] 임베딩 요청 문자열 생성 및 임베딩 수행
-        String text = AiUtils.generateEmbeddingText(study.getName(), study.getSummary(), study.getDetail(), levelText);
-        byte[] embedding = embeddingProvider.generate(text);
-
-        // [4] 임베딩 기반 영상 추천 후 반환
-        List<VideoLinkDto.Row> candidates = videoLinkRepository
+        // [3] 유사도 기반 검색 수행
+        Map<Long, VideoLinkDto.Row> candidates = videoLinkRepository
                 .findSimilarWithThreshold(embedding, RECOMMEND_AMOUNT_REQUEST, RECOMMEND_THRESHOLD)
                 .stream()
-                .filter(videoLink -> !recommendedIds.contains(videoLink.getVideoLinkId()))
                 .map(VideoLinkDtoMapper::toRow)
-                .collect(Collectors.toList()); // 가변 배열로 저장
+                .collect(Collectors.toConcurrentMap(
+                        VideoLinkDto.Row::getVideoLinkId,
+                        Function.identity()
+                ));
 
-        // 재시도인 경우 목록 셔플
-        if (retry) Collections.shuffle(candidates);
-        List<VideoLinkDto.Row> results = candidates.stream().limit(RECOMMEND_AMOUNT_RESPONSE).toList();
-
-        // [5] 현재 추천 검색 문장 저장
-        if (!results.isEmpty()) {
-            videoLinkRedisStorage.storeLatestRecommendedIds(
-                    results.stream().map(row -> String.valueOf(row.getVideoLinkId())).toList(), memberId
-            );
-        }
-        return results;
+        // [4] 영상 추천 수행 및 결과 반환
+        return candidates.isEmpty() ? List.of() : doRecommend(memberId, study, candidates, latestVideoLinkIds);
     }
 
+    // 추천 수행
+    private List<VideoLinkDto.Row> doRecommend(Long memberId, Study study, Map<Long, VideoLinkDto.Row> candidates, List<Long> latestVideoLinkIds) {
+
+        try {
+            String json = StrUtils.toJson(VideoLinkDtoMapper.toRecommendation(study, candidates.values(), latestVideoLinkIds));
+            log.warn("AI REQUEST JSON : {}", json);
+
+            // 추천 수행
+            List<Long> resultIds = videoLinkAiManager.recommendForStudy(json);
+
+            // 만약 6개 미만으로 추천된 경우 (AI가 없는 ID를 추천한 경우)
+            List<Long> validIds = resultIds.stream()
+                    .filter(candidates::containsKey)
+                    .distinct()
+                    .collect(Collectors.toList());
+
+            // 부족한 수 만큼 채워 넣음
+            if (validIds.size() < 6) {
+                List<Long> finalValidIds = validIds;
+                List<Long> additional = candidates.keySet().stream()
+                        .filter(id -> !finalValidIds.contains(id))
+                        .limit(RECOMMEND_AMOUNT_RESPONSE - validIds.size())
+                        .toList();
+
+                validIds = Stream.concat(validIds.stream(), additional.stream()).collect(Collectors.toList());
+                LogUtils.showError(this.getClass(), "AI 분석 결과 부족분 발생. 보충 정보: %s", additional);
+            }
+
+            // 추천 결과 Id 정보 저장
+            List<String> strIds = validIds.stream().map(String::valueOf).toList();
+            videoLinkRedisStorage.storeLatestRecommendedIds(strIds, memberId);
+
+            // 결과 아이디 기반 후보 Map 내에서 추출 후 반환
+            Collections.shuffle(validIds); // 순서 섞기
+            return validIds.stream()
+                    .map(candidates::get)
+                    .toList();
+
+            // AI가 JSON 이외의 문자열을 반환하는 등 예기치 않은 반환으로 실패
+        } catch (Exception e) {
+            LogUtils.showError(this.getClass(), "AI 분석 실패. 유사도 분석 상위 6개 반환");
+            return candidates.values().stream().limit(6).toList();
+        }
+    }
 
 
 }

@@ -64,6 +64,7 @@ public enum AppStatus {
     MEMBER_DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.", "MEMBER_DUPLICATE_NICKNAME"),
     /* 단계 학습 Study */
     STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),
+    STUDY_NOT_UPDATABLE(400, "수정된 정보가 없습니다.", "STUDY_NOT_UPDATABLE"),
     STUDY_OK_ADD(200, "단계학습 정보를 추가했습니다.", "STUDY_OK_ADD"),
     STUDY_OK_EDIT(200, "단계학습 정보를 수정했습니다.", "STUDY_OK_EDIT"),
     STUDY_OK_REMOVE(200, "단계학습 정보를 삭제했습니다.", "STUDY_OK_REMOVE"),

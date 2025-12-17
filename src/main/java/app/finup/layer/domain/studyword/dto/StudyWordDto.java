@@ -4,7 +4,12 @@ import app.finup.layer.base.dto.SearchRequest;
 import app.finup.layer.base.validation.annotation.NoSpecialText;
 import app.finup.layer.base.validation.annotation.PartSpecialText;
 import app.finup.layer.base.validation.annotation.Text;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -41,7 +46,10 @@ public final class StudyWordDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Row {
+    public static class Row implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private Long studyWordId;
         private String name;
@@ -95,6 +103,38 @@ public final class StudyWordDto {
     public static class Quiz {
         private String name;
         private String meaning;
+    }
+
+
+    @Getter
+    @Builder
+    public static class Recommendation {
+
+        @JsonProperty("study")
+        private StudyInfo study;
+
+        @JsonProperty("candidates")
+        private List<WordCandidate> candidates;
+
+        @JsonProperty("latestStudyWordIds")
+        private List<Long> latestStudyWordIds;
+
+        @Getter
+        @Builder
+        public static class StudyInfo {
+            private String name;
+            private String summary;
+            private String detail;
+            private int level;
+        }
+
+        @Getter
+        @Builder
+        public static class WordCandidate {
+            private Long studyWordId;
+            private String name;
+            private String meaning;
+        }
     }
 
 }
