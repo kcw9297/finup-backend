@@ -1,6 +1,5 @@
 package app.finup.layer.domain.stock.scheduler;
 
-import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.redis.StockStorage;
 import app.finup.layer.domain.stock.service.StockAiService;
@@ -192,11 +191,6 @@ public class StockScheduler {
         List<StockDto.MarketCapRow> marketCapList = stockService.getMarketCapRow();
         List<StockDto.TradingValueRow> tradingValueList = stockService.getTradingValueRow();
 
-        if (marketCapList.isEmpty() && tradingValueList.isEmpty()) {
-            log.warn("[SCHEDULER] 종목 리스트 비어있음");
-            return null;
-        }
-
         Set<String> codes = new HashSet<>();
 
         for (StockDto.MarketCapRow row : marketCapList) {
@@ -206,6 +200,11 @@ public class StockScheduler {
         for (StockDto.TradingValueRow row : tradingValueList) {
             codes.add(row.getMkscShrnIscd());
         }
+
+        if (codes.isEmpty()) {
+            log.warn("[SCHEDULER] 종목 리스트 비어있음");
+        }
+
         return codes;
     }
 }
