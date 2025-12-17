@@ -83,7 +83,7 @@ public class RedisCoreConfig {
 
         // Redis 직렬화 설정
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60)); // 60분 TTL
+                .entryTtl(Duration.ofHours(6)); // 6시간 TTL
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)

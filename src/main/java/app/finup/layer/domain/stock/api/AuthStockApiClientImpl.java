@@ -8,6 +8,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.util.retry.Retry;
+
+import java.time.Duration;
 import java.util.Map;
 
 @Slf4j
@@ -60,6 +64,10 @@ public class AuthStockApiClientImpl implements AuthStockApiClient {
                 ))
                 .retrieve()
                 .bodyToMono(TokenDto.Token.class)
+                .retryWhen(
+                        Retry.backoff(3, Duration.ofMillis(300))
+                                .filter(e -> e instanceof WebClientResponseException)
+                )
                 .block();
 
         if (token == null || token.getAccessToken() == null) {

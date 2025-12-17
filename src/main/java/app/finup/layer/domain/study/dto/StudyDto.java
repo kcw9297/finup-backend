@@ -2,11 +2,10 @@ package app.finup.layer.domain.study.dto;
 
 import app.finup.layer.base.dto.SearchRequest;
 import app.finup.layer.base.validation.annotation.NoSpecialText;
+import app.finup.layer.base.validation.annotation.PartSpecialText;
 import app.finup.layer.base.validation.annotation.Select;
 import app.finup.layer.base.validation.annotation.Text;
 import lombok.*;
-
-import java.util.Objects;
 
 /**
  * Study(개념학습) DTO 클래스
@@ -29,6 +28,7 @@ public final class StudyDto {
         private Long studyId;
         private String name;
         private String summary;
+        private String detail;
         private Integer level;
     }
 
@@ -45,7 +45,8 @@ public final class StudyDto {
         private Long studyId;
         private String name;
         private String summary;
-        private String description;
+        private String detail;
+        private String aiAnalyzation;
         private Integer level;
     }
 
@@ -70,11 +71,14 @@ public final class StudyDto {
     @NoArgsConstructor
     public static class Add {
 
-        @NoSpecialText(min = 2, max = 20)
+        @PartSpecialText(min = 2, max = 30)
         private String name;
 
-        @NoSpecialText(min = 5, max = 20)
+        @PartSpecialText(min = 5, max = 40)
         private String summary;
+
+        @Text(min = 1, max = 300)
+        private String detail; // 관리자만 조작할 수 있는, AI 추천을 위한문장
 
         @Select
         private Integer level;
@@ -92,11 +96,14 @@ public final class StudyDto {
 
         private Long studyId;
 
-        @NoSpecialText(min = 2, max = 20)
+        @NoSpecialText(min = 2, max = 30)
         private String name;
 
-        @NoSpecialText(min = 5, max = 20)
+        @NoSpecialText(min = 5, max = 40)
         private String summary;
+
+        @Text(min = 1, max = 300)
+        private String detail; // 관리자만 조작할 수 있는, AI 추천을 위한문장
 
         @Select
         private Integer level;

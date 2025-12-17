@@ -35,20 +35,20 @@ public interface MemberService {
      */
     MemberDto.Row join(MemberDto.Join rq);
 
-    MemberDto.Row getDetail(Long memberId);
+    MemberDto.Detail getDetail(Long memberId);
     /**
      * 회원 닉네임 수정
      * @param
      * @param rq 닉네임 수정 요청 DTO
      */
-    void editNickname(MemberDto.EditNickname rq);
+    String editNickname(MemberDto.EditNickname rq);
 
     /**
      * 회원 비밀번호 수정
      * @param
      * @param rq 비밀번호 수정 요청 DTO
      */
-    void editPassword(MemberDto.EditPassword rq);
+    String editPassword(MemberDto.EditPassword rq);
 
     /**
      * 회원 프로필 이미지 수정

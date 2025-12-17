@@ -2,6 +2,7 @@ package app.finup.layer.domain.studyword.dto;
 
 import app.finup.layer.base.dto.SearchRequest;
 import app.finup.layer.base.validation.annotation.NoSpecialText;
+import app.finup.layer.base.validation.annotation.PartSpecialText;
 import app.finup.layer.base.validation.annotation.Text;
 import lombok.*;
 
@@ -23,13 +24,12 @@ public final class StudyWordDto {
     @EqualsAndHashCode(callSuper = false)
     public static class Search extends SearchRequest {
 
-        private Integer rowSize = 2; // 표시할 줄 수
         private String order = "latest";
         private String filter = "";
         private String keyword = "";
 
         public Search() {
-            super.setPageSize(3 * this.rowSize); // 한 줄에는 3개만 보임
+            super(6); // 한 줄에는 3개 씩 총 2줄
         }
     }
 
@@ -59,7 +59,7 @@ public final class StudyWordDto {
     @NoArgsConstructor
     public static class Add {
 
-        @NoSpecialText(max = 20)
+        @PartSpecialText(max = 50)
         private String name;
 
         @Text(min = 10, max = 100)
@@ -78,7 +78,7 @@ public final class StudyWordDto {
 
         private Long studyWordId;
 
-        @NoSpecialText(max = 20)
+        @PartSpecialText(max = 50)
         private String name;
 
         @Text(min = 10, max = 100)

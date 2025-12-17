@@ -47,7 +47,7 @@ public class StockNewsScheduler {
         }
         for (String stockName : stockNames)
         {
-            refresh(stockName, "date", 10);
+            refresh(stockName, "sim", 30);
         }
 
         log.info("[STOCK_SCHEDULER] 갱신 완료 ({} 종목)", stockNames.size());

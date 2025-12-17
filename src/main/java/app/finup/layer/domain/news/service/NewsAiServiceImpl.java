@@ -18,9 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.Duration;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -55,12 +54,15 @@ public class NewsAiServiceImpl implements NewsAiService {
                 .replace("{TERMS}", context);
 
         Map<String, Object> result= aiManager.runJsonPrompt(prompt);
+        //프롬프터가 뽑은 단어 검증
+        //validateKeywords(result, terms);
 
         List<Map<String, String>> keywords = (List<Map<String, String>>) result.get("keywords");
 
-        if(keywords != null){
-            keywords.sort(Comparator.comparing(k -> k.get("term")));
-            result.put("keywords", keywords);
+        if(keywords != null) {
+            List<Map<String, String>> mutable = new ArrayList<>(keywords);
+            mutable.sort(Comparator.comparing(k -> k.get("term")));
+            result.put("keywords", mutable);
         }
 
         return NewsDtoMapper.toAi(result);
@@ -85,16 +87,45 @@ public class NewsAiServiceImpl implements NewsAiService {
                 .replace("{TERMS}", context);
 
         Map<String, Object> result= aiManager.runJsonPrompt(prompt);
+        //프롬프터가 뽑은 단어 검증
+        //validateKeywords(result, terms);
 
         List<Map<String, String>> keywords = (List<Map<String, String>>) result.get("keywords");
 
         if(keywords != null){
-            keywords.sort(Comparator.comparing(k -> k.get("term")));
-            result.put("keywords", keywords);
+            List<Map<String, String>> mutable = new ArrayList<>(keywords);
+            mutable.sort(Comparator.comparing(k -> k.get("term")));
+            result.put("keywords", mutable);
         }
 
         return NewsDtoMapper.toSummary(result);
     }
+
+    private void validateKeywords(
+            Map<String, Object> result,
+            List<WordsDto.Similarity> terms
+    ) {
+        Set<String> allowedTerms = terms.stream()
+                .map(WordsDto.Similarity::getName)
+                .collect(Collectors.toSet());
+
+        List<Map<String, String>> keywords =
+                (List<Map<String, String>>) result.get("keywords");
+
+        if (keywords == null) return;
+
+        List<Map<String, String>> filtered = keywords.stream()
+                .filter(k -> allowedTerms.contains(k.get("term")))
+                .collect(Collectors.toList());
+
+        if (filtered.size() != keywords.size()) {
+            log.warn("[AI] 후보에 없는 키워드 제거됨: before={}, after={}",
+                    keywords.size(), filtered.size());
+        }
+
+        result.put("keywords", filtered);
+    }
+
 
 
 }

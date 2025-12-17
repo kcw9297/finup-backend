@@ -40,5 +40,11 @@ public class AppException extends RuntimeException {
         this.appStatus = appStatus;
     }
 
+    public AppException(AppStatus appStatus, String fieldName, Throwable cause) {
+        super(appStatus.getMessage(), cause);
+        this.appStatus = appStatus;
+        this.inputErrors = Map.of(fieldName, appStatus.getMessage());
+    }
+
     public AppException() {}
 }

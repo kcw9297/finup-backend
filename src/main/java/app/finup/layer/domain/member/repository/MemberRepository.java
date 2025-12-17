@@ -12,6 +12,17 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    /**
+     * 회원 상세 조회 전용 (프로필 이미지 Fetch) - id
+     */
+
+    @Query("""
+        SELECT m
+        FROM Member m
+        LEFT JOIN FETCH m.profileImageFile
+        WHERE m.memberId = :memberId
+    """)
+    Optional<Member> findByIdWithProfileImage(Long memberId);
 
     @Query("""
         SELECT m

@@ -3,6 +3,9 @@ package app.finup.layer.domain.studyword.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
+import app.finup.common.utils.StrUtils;
+import app.finup.infra.ai.provider.EmbeddingProvider;
+import app.finup.infra.ai.utils.AiUtils;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
@@ -39,6 +42,7 @@ public class StudyWordServiceImpl implements StudyWordService {
     private final StudyWordRepository studyWordRepository;
     private final StudyWordMapper studyWordMapper;
     private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
+    private final EmbeddingProvider embeddingProvider;
 
     @Override
     @Transactional(readOnly = true)
@@ -62,16 +66,25 @@ public class StudyWordServiceImpl implements StudyWordService {
     public void add(StudyWordDto.Add rq) {
 
         // [1] 이미 중복단어가 존재하면 예외 반환
-        if (studyWordRepository.existsByName(rq.getName()))
-            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
+        String name = rq.getName().trim();
+        String meaning = rq.getMeaning().trim();
 
-        // [2] 엔티티 생성
+        if (studyWordRepository.existsByNameIgnoreSpaces(rq.getName())) {
+            throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
+        }
+
+        // [2] 임베딩 텍스트 생성
+        String text = AiUtils.generateEmbeddingText(name, meaning);
+        byte[] embedding = embeddingProvider.generate(text);
+
+        // [3] 엔티티 생성
         StudyWord studyWord = StudyWord.builder()
-                .name(rq.getName())
-                .meaning(rq.getMeaning())
+                .name(name)
+                .meaning(meaning)
+                .embedding(embedding)
                 .build();
 
-        // [3] 엔티티 저장
+        // [4] 엔티티 저장
         studyWordRepository.save(studyWord);
     }
 
@@ -105,17 +118,26 @@ public class StudyWordServiceImpl implements StudyWordService {
     public void edit(StudyWordDto.Edit rq) {
 
         // [1] 변경 대상 단어 조회
+        String nextName = rq.getName().trim();
+        String nextMeaning = rq.getMeaning().trim();
+
         StudyWord studyWord = studyWordRepository
                 .findWithImageById(rq.getStudyWordId())
                 .orElseThrow(() -> new BusinessException(AppStatus.STUDY_WORD_NOT_FOUND));
 
         // [2] 만약 "단어명"을 변경하는 경우 중복 검증
-        if (!Objects.equals(studyWord.getName(), rq.getName()) &&
-                studyWordRepository.existsByName(rq.getName()))
+        String prevName = studyWord.getName().trim();
+
+        if (!prevName.replace(" ", "").equals(nextName.replace(" ", "")) &&
+                studyWordRepository.existsByNameIgnoreSpaces(nextName))
             throw new BusinessException(AppStatus.STUDY_WORD_ALREADY_EXIST, "name");
 
-        // [3] 단어명 갱신 수행
-        studyWord.edit(rq.getName(), rq.getMeaning(), null); // 수정필요
+        // [3] 임베딩 텍스트 생성
+        String text = AiUtils.generateEmbeddingText(nextName, nextMeaning);
+        byte[] embedding = embeddingProvider.generate(text);
+
+        // [4] 단어명 갱신 수행
+        studyWord.edit(nextName, nextMeaning, embedding); // 수정필요
     }
 
 

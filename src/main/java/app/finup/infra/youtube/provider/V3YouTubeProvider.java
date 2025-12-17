@@ -2,6 +2,7 @@ package app.finup.infra.youtube.provider;
 
 import app.finup.common.constant.Const;
 import app.finup.common.enums.AppStatus;
+import app.finup.common.exception.AppException;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
@@ -63,14 +64,14 @@ public class V3YouTubeProvider implements YouTubeProvider {
                 .timeout(Duration.ofSeconds(5)) // API 요청 + 응답 역직렬화까지 Timeout 시간
 
                 // [4] 빈 응답 처리 (응답 자체가 없는 경우)
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.YOUTUBE_REQUEST_FAILED)))
+                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.YOUTUBE_REQUEST_FAILED, "videoUrl")))
 
                 // [5] 역직렬화 수행
                 .map(json -> StrUtils.fromJson(json, YouTube.VideosRp.class))
 
                 // [6] 만약 비어있는 경우 예외 반환
                 .filter(rp -> !rp.getItems().isEmpty())
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.YOUTUBE_URL_NOT_VALID)))
+                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.YOUTUBE_URL_NOT_VALID, "videoUrl")))
 
                 // [7] 최종적으로 외부에 제공할 DTO 변환
                 .map(rp -> YouTubeDtoMapper.toDetail(rp, videoId))
@@ -79,7 +80,7 @@ public class V3YouTubeProvider implements YouTubeProvider {
                 .onErrorMap(Exception.class, ex -> {
                     LogUtils.showError(this.getClass(), "Youtube 영상 상세 API 요청 실패.\n원인 : %s", ex.getMessage());
                     if (ex instanceof ProviderException) return ex;
-                    return new ProviderException(AppStatus.YOUTUBE_REQUEST_FAILED, ex);
+                    return new ProviderException(AppStatus.YOUTUBE_REQUEST_FAILED, "videoUrl", ex);
                 })
                 .block();
     }

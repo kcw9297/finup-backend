@@ -25,6 +25,11 @@ public class NewsRemoveDuplicateServiceImpl implements NewsRemoveDuplicateServic
 
         list = removeByTitleSimilarity(list);
 
+        list = list.stream()
+                .filter(row -> !isTooShort(row))
+                .filter(row -> !isPriceOnlyNews(row))
+                .filter(row -> !isTrivialMention(row))
+                .toList();
         return list;
     }
     //url 기준 중복 제거
@@ -92,5 +97,26 @@ public class NewsRemoveDuplicateServiceImpl implements NewsRemoveDuplicateServic
         if (maxLen == 0) return 1.0;
 
         return 1.0 - ((double) distance / maxLen); // 0.0 ~ 1.0 사이 값
+    }
+    private boolean isTooShort(NewsDto.Row row) {
+        return row.getTitle() == null
+                || row.getTitle().length() < 15
+                || row.getDescription() == null
+                || row.getDescription().length() < 30;
+    }
+
+    private static final List<String> PRICE_ONLY_KEYWORDS = List.of(
+            "상장","퀴즈","금시세","소개","챌린지","이벤트"
+    );
+
+    private boolean isPriceOnlyNews(NewsDto.Row row) {
+        String title = row.getTitle();
+        return PRICE_ONLY_KEYWORDS.stream().anyMatch(title::contains);
+    }
+
+    private boolean isTrivialMention(NewsDto.Row row) {
+        return row.getTitle().contains("언급")
+                || row.getTitle().contains("관련")
+                || row.getTitle().contains("거론");
     }
 }

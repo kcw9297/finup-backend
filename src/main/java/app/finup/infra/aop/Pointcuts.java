@@ -40,6 +40,7 @@ class Pointcuts {
     @Pointcut("within(app.finup.layer.domain..*) && !securityPack()")
     public void domainPack() {}
 
+
     /*
      * Pointcut - Annotation 적용 클래스
      */
@@ -47,4 +48,8 @@ class Pointcuts {
     // @RestController 적용 클래스
     @Pointcut("@within(org.springframework.web.bind.annotation.RestController) && basePack()")
     public void restCtlAnno() {}
+
+    // @Scheduled 적용 메소드 (within은 클래스 레벨에서만)
+    @Pointcut("@annotation(org.springframework.scheduling.annotation.Scheduled) && basePack()")
+    public void layerSchedulerAnno() {}
 }

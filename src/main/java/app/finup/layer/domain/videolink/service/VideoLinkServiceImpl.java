@@ -50,6 +50,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
     // 사용 상수
     private static final int SPLIT_DESCRIPTION_LEN = 200;
 
+
     @Override
     @Transactional(readOnly = true)
     public Page<VideoLinkDto.Row> getPagedList(VideoLinkDto.Search rq) {

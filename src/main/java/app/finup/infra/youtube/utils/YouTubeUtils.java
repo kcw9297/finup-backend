@@ -23,11 +23,9 @@ public final class YouTubeUtils {
         유튜브 영상은 아래처럼 다양한 형태의 URL로 접근 가능함
         하지만 고유번호(videoId) 는 11자리로 항상 동일함
         1. https://www.youtube.com/watch?v=dFcDgrYuA9A
-        2. https://www.youtube.com/watch?v=dFcDgrYuA9A&t=379s
-        3. https://youtu.be/dFcDgrYuA9A
-        4. https://youtu.be/dFcDgrYuA9A?si=EFz5teqZUaoOmD0z
-        5. https://m.youtube.com/watch?v=dFcDgrYuA9A
-        6. https://www.youtube.com/embed/dFcDgrYuA9A
+        2. https://youtu.be/dFcDgrYuA9A
+        3. https://m.youtube.com/watch?v=dFcDgrYuA9A
+        4. https://www.youtube.com/embed/dFcDgrYuA9A
 
         그룹(...) 패턴 사용 시, 내부에 마치 OR 처럼 ("|") 패턴을 비교할 수 있음
         패턴 매칭 결과를 "group" 이용하여 추출 가능.
@@ -38,7 +36,7 @@ public final class YouTubeUtils {
             "(?:youtube\\.com/watch\\?v=|youtu\\.be/|youtube\\.com/embed/)([a-zA-Z0-9_-]{11})";
 
     public static final String PATTERN_VIDEO_URL =
-            "^(https?://)?(www\\.|m\\.)?(youtube\\.com/(watch\\?v=|embed/)|youtu\\.be/)[a-zA-Z0-9_-]{11}.*$";
+            "^(https?://)?(www\\.|m\\.)?(youtube\\.com/(watch\\?v=|embed/)|youtu\\.be/)[a-zA-Z0-9_-]{11}";
 
 
     /**
