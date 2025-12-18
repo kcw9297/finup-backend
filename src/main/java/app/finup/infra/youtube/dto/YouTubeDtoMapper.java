@@ -50,12 +50,18 @@ public final class YouTubeDtoMapper {
 
 
     // item 내부에서, 필요 정보를 추출하고
-    private static YouTube.Detail extractItemInfoAndMapToDetail(YouTube.VideosRp.Item item, String videoId) {
+    private static YouTube.Detail extractItemInfoAndMapToDetail(
+            YouTube.VideosRp.Item item,
+            String videoId
+    ) {
 
         // snippet
         YouTube.VideosRp.Item.Snippet snippet = item.getSnippet();
-        YouTube.VideosRp.Item.Snippet.Thumbnails thumbnails = snippet.getThumbnails();
-        YouTube.VideosRp.Item.Snippet.Thumbnails.Thumbnail standard = thumbnails.getStandard();
+        YouTube.VideosRp.Item.Snippet.Thumbnails thumbnails =
+                snippet != null ? snippet.getThumbnails() : null;
+
+        YouTube.VideosRp.Item.Snippet.Thumbnails.Thumbnail standard =
+                thumbnails != null ? thumbnails.getStandard() : null;
 
         // contentDetails
         YouTube.VideosRp.Item.ContentDetails contentDetails = item.getContentDetails();
@@ -63,21 +69,51 @@ public final class YouTubeDtoMapper {
         // statistics
         YouTube.VideosRp.Item.Statistics statistics = item.getStatistics();
 
-        // [3] 응답 데이터 변환
+        // publishedAt (null + blank 보호)
+        Instant publishedAt = null;
+        if (snippet != null && snippet.getPublishedAt() != null && !snippet.getPublishedAt().isBlank()) {
+            publishedAt = Instant.parse(snippet.getPublishedAt());
+        }
+
+        // duration (null + blank 보호)
+        Duration duration = null;
+        if (contentDetails != null && contentDetails.getDuration() != null
+                && !contentDetails.getDuration().isBlank()) {
+            duration = Duration.parse(contentDetails.getDuration());
+        }
+
+        // viewCount (null + blank 보호)
+        Long viewCount = 0L;
+        if (statistics != null && statistics.getViewCount() != null
+                && !statistics.getViewCount().isBlank()) {
+            viewCount = Long.valueOf(statistics.getViewCount());
+        }
+
+        // likeCount (null + blank 보호)
+        Long likeCount = 0L;
+        if (statistics != null && statistics.getLikeCount() != null
+                && !statistics.getLikeCount().isBlank()) {
+            likeCount = Long.valueOf(statistics.getLikeCount());
+        }
+
+        // thumbnailUrl
+        String thumbnailUrl = standard != null ? standard.getUrl() : null;
+
         return YouTube.Detail.builder()
                 .videoUrl(YouTubeUtils.toVideoUrl(videoId))
                 .videoId(item.getId())
-                .publishedAt(Instant.parse(snippet.getPublishedAt()))
-                .title(snippet.getTitle())
-                .description(snippet.getDescription())
-                .channelTitle(snippet.getChannelTitle())
-                .tags(snippet.getTags())
-                .thumbnailUrl(standard.getUrl())
-                .duration(Duration.parse(contentDetails.getDuration()))
-                .viewCount(Long.valueOf(statistics.getViewCount()))
-                .likeCount(Long.valueOf(statistics.getLikeCount()))
+                .publishedAt(publishedAt)
+                .title(snippet != null ? snippet.getTitle() : null)
+                .description(snippet != null ? snippet.getDescription() : null)
+                .channelTitle(snippet != null ? snippet.getChannelTitle() : null)
+                .tags(snippet != null ? snippet.getTags() : null)
+                .thumbnailUrl(thumbnailUrl)
+                .duration(duration)
+                .viewCount(viewCount)
+                .likeCount(likeCount)
                 .build();
     }
+
 
 
 

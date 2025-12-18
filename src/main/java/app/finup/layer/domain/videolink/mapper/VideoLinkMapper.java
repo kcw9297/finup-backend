@@ -2,6 +2,7 @@ package app.finup.layer.domain.videolink.mapper;
 
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,4 +30,11 @@ public interface VideoLinkMapper {
      * @return 검색 파라미터를 적용한 전체 데이터 수
      */
     Integer countForSearch(VideoLinkDto.Search rq);
+
+    /**
+     * 홈 최신 영상
+     * @param limit 갯수 제한
+     * @return 홈에 보여질 영상 데이터 수
+     */
+    List<VideoLinkDto.Row> selectHomeLatest(@Param("limit") Integer limit);
 }
