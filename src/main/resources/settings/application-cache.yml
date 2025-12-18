@@ -35,9 +35,9 @@ spring:
 
       lettuce:
         pool:
-          max-active: 4
-          max-idle: 3
-          min-idle: 1
+          max-active: 8
+          max-idle: 6
+          min-idle: 3
 
 app:
   redis:
@@ -61,9 +61,9 @@ spring:
 
       lettuce:
         pool:
-          max-active: 5
-          max-idle: 5
-          min-idle: 2
+          max-active: 10
+          max-idle: 8
+          min-idle: 5
 
 app:
   redis:

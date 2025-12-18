@@ -22,7 +22,7 @@ public class NoticeScheduler {
 
     private final NoticeService noticeService;
 
-    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.SECONDS)
+    @Scheduled(fixedDelay = 10, initialDelay = 3, timeUnit = TimeUnit.SECONDS)
     @Async("schedulerExecutor")
     public void syncViewCount() {
         noticeService.syncViewCount();

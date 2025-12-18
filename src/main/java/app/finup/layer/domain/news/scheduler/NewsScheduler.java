@@ -24,7 +24,7 @@ public class NewsScheduler {
     private final NewsRedisStorage newsRedisStorage;
     private static final Duration TTL_NEWS = Duration.ofMinutes(120);
 
-    @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Scheduled(fixedRate = 1000 * 60 * 60, initialDelay = 60000)
     @Async("newsExecutor")
     public void updateNewsCache(){
         refresh("date", 50);
