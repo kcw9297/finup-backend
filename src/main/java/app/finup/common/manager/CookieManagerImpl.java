@@ -70,13 +70,15 @@ public class CookieManagerImpl implements CookieManager {
     private ResponseCookie issue(String cookieName, String cookieValue, Duration expires) {
 
         // [1] 기본 설정대로 쿠키 builder 생성
+        boolean isProd = EnvUtils.isProd(env);
+
         ResponseCookie.ResponseCookieBuilder cookieBuilder =
                 ResponseCookie.from(cookieName, cookieValue)
                         .httpOnly(true) // js 접근 불가
-                        .secure(EnvUtils.isProd(env)) // 배포 환경이면 true, 로컬 환경이면 false
+                        .secure(isProd) // 배포 환경이면 true, 로컬 환경이면 false
                         .maxAge(expires) // 만료 시간
                         .path("/")
-                        .sameSite("None");
+                        .sameSite(isProd ? "None" : "Lax");
 
         // [2] domain 정보가 존재하는 경우 삽입
         if (Objects.nonNull(domain) && !domain.isBlank()) cookieBuilder.domain(domain);

@@ -8,6 +8,7 @@ import app.finup.layer.domain.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ public class StockNewsScheduler {
     private final StockService stockService;
 
     @Scheduled(fixedRate = 15 * 60 * 1000)
+    @Async("schedulerExecutor")
     public void updateStockNews() {
 
         List<StockDto.MarketCapRow> marketCapList = stockService.getMarketCapRow();

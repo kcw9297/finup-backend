@@ -7,6 +7,7 @@ import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +22,10 @@ import java.util.List;
 public class NewsScheduler {
     private final NewsProvider newsProvider;
     private final NewsRedisStorage newsRedisStorage;
-    private static final Duration TTL_NEWS = Duration.ofMinutes(30);
+    private static final Duration TTL_NEWS = Duration.ofMinutes(120);
 
-    @Scheduled(fixedRate = 1000 * 60 * 15)
+    @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Async("newsExecutor")
     public void updateNewsCache(){
         refresh("date", 50);
         refresh("sim", 50);

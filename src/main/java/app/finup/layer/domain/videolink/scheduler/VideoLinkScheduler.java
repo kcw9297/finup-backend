@@ -5,6 +5,7 @@ import app.finup.layer.domain.videolink.service.VideoLinkRecommendService;
 import app.finup.layer.domain.videolink.service.VideoLinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ public class VideoLinkScheduler {
      */
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS, initialDelay = 0)
     //@Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
+    @Async("schedulerExecutor")
     public void syncVideoLinks() {
         videoLinkService.sync();
         LogUtils.showInfo(this.getClass(), "학습 영상 동기화 수행 완료");
@@ -39,6 +41,7 @@ public class VideoLinkScheduler {
      * 매 30분마다 유튜브 홈 영상 초기화
      */
     @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
+    @Async("schedulerExecutor")
     public void initHomeVideoLinks() {
         videoLinkRecommendService.recommendForLogoutHome();
         LogUtils.showInfo(this.getClass(), "페이지 홈 추천 영상 조회 완료");

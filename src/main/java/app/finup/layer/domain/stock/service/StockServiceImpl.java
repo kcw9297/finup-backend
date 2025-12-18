@@ -16,6 +16,9 @@ import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 /**
@@ -82,12 +85,41 @@ public class StockServiceImpl implements StockService {
     @Override
     public void importStockName() throws Exception {
 
+        /*
         String KOSPI = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         String KOSDAQ = "src/main/java/app/finup/layer/domain/stock/test/kosdaq_code.xlsx";
 
         saveStock(KOSPI);
         saveStock(KOSDAQ);
+
+         */
+
+
+        log.info("[STOCK] 주식 종목 데이터 Import 시작");
+
+        try {
+            // ClassPath에서 InputStream으로 읽기
+            InputStream kospiStream = getClass().getResourceAsStream("/data/kospi_code.xlsx");
+            InputStream kosdaqStream = getClass().getResourceAsStream("/data/kosdaq_code.xlsx");
+
+            if (kospiStream == null || kosdaqStream == null) {
+                throw new FileNotFoundException("주식 코드 파일을 찾을 수 없습니다.");
+            }
+
+            // Excel 파일 처리
+            saveStockFromStream(kospiStream, "KOSPI");
+            saveStockFromStream(kosdaqStream, "KOSDAQ");
+
+            log.info("[STOCK] 주식 종목 데이터 Import 완료");
+
+        } catch (IOException e) {
+            log.error("[STOCK] 주식 코드 파일 로드 실패", e);
+            throw new RuntimeException("주식 코드 파일 로드 실패", e);
+        }
+
     }
+
+    /*
     private void saveStock(String path) throws Exception {
         FileInputStream fis = new FileInputStream(path);
         if(fis==null){
@@ -115,6 +147,55 @@ public class StockServiceImpl implements StockService {
         }
         workbook.close();
     }
+
+     */
+
+    private void saveStockFromStream(InputStream inputStream, String marketType) throws IOException {
+        if (inputStream == null) {
+            throw new IllegalArgumentException("InputStream이 null입니다.");
+        }
+
+        Workbook workbook = new XSSFWorkbook(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        int savedCount = 0;
+        int skippedCount = 0;
+
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) continue; // 헤더 스킵
+
+            Cell codeCell = row.getCell(0);
+            Cell nameCell = row.getCell(2);
+
+            if (codeCell == null || nameCell == null) {
+                continue;
+            }
+
+            String mkscShrnIscd = codeCell.getStringCellValue();
+            String htsKorIsnm = nameCell.getStringCellValue();
+
+            // 이미 존재하면 스킵
+            if (stockRepository.existsByMkscShrnIscd(mkscShrnIscd)) {
+                skippedCount++;
+                continue;
+            }
+
+            Stock stock = Stock.builder()
+                    .mkscShrnIscd(mkscShrnIscd)
+                    .htsKorIsnm(htsKorIsnm)
+                    .build();
+
+            stockRepository.save(stock);
+            savedCount++;
+        }
+
+        workbook.close();
+        inputStream.close();
+
+        log.info("[STOCK] {} 종목 저장: {}개, 스킵: {}개", marketType, savedCount, skippedCount);
+    }
+
+
 
     // 종목 상세 페이지 데이터 가져오기
     @Override
