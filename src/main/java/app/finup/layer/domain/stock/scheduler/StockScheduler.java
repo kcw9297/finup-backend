@@ -45,7 +45,7 @@ public class StockScheduler {
      * 화수목금토 새벽3시 갱신
      */
     //@Scheduled(cron = "0 0 3 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshMarketCapRow(){
         log.info("[SCHEDULER] 종목+ 시가총액 리스트 스케쥴러 실행");
         stockService.refreshMarketCapRow();
@@ -56,7 +56,7 @@ public class StockScheduler {
      * 화수목금토 새벽 3시 10분 갱신
      */
     //@Scheduled(cron = "0 10 3 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshTradingValueRow(){
         log.info("[SCHEDULER] 종목+ 거래대금 리스트 스케쥴러 실행");
         stockService.refreshTradingValueRow();
@@ -67,7 +67,7 @@ public class StockScheduler {
      * 화수목금토 새벽 3시 20분 갱신
      */
     //@Scheduled(cron = "0 20 3 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshDetail(){
         log.info("[SCHEDULER] 종목 상세 종목 데이터 스케쥴러 실행");
         Set<String> codes = getCodes();
@@ -87,7 +87,7 @@ public class StockScheduler {
      * 화수목금토 새벽 3시 40분 갱신
      */
     //@Scheduled(cron = "0 40 3 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshDetailAi(){
         log.info("[SCHEDULER] 종목 상세 종목 AI 분석 스케쥴러 실행");
         Set<String> codes = getCodes();
@@ -112,7 +112,7 @@ public class StockScheduler {
      * 화수목금토 새벽 4시 갱신
      */
     //@Scheduled(cron = "0 0 4 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshYoutube(){
         log.info("[SCHEDULER] 종목 상세 종목 추천 영상 스케쥴러 실행");
         Set<String> codes = getCodes();
@@ -144,7 +144,7 @@ public class StockScheduler {
      * 화수목금토 새벽 4시 20분 갱신
      */
     //@Scheduled(cron = "0 20 4 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshChart(){
         log.info("[SCHEDULER] 종목 상세 차트 데이터 스케쥴러 실행");
         Set<String> codes = getCodes();
@@ -171,7 +171,7 @@ public class StockScheduler {
      * 화수목금토 새벽 4시 40분 갱신
      */
     //@Scheduled(cron = "0 40 4 * * TUE,WED,THU,FRI,SAT")
-    @Scheduled(cron = "0 30 17 * * TUE,WED,THU,FRI,SAT")
+    @Scheduled(cron = "0 30 20 * * TUE,WED,THU,FRI,SAT")
     public void refreshChartAi(){
         log.info("[SCHEDULER] 종목 상세 차트 AI 분석 스케쥴러 실행");
         Set<String> codes = getCodes();
