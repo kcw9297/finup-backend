@@ -23,6 +23,7 @@ public enum AppStatus {
     AUTH_OK_LOGIN(200, "성공적으로 로그인 되었습니다.", "AUTH_OK_LOGIN"),
     AUTH_OK_LOGOUT(200, "성공적으로 로그아웃 되었습니다.", "AUTH_OK_LOGOUT"),
     AUTH_OK_ISSUE_CSRF(200, "CSRF 토큰을 발급받았습니다.", "AUTH_OK_ISSUE_CSRF"),
+    AUTH_OAUTH2_LOGIN_FAILED(500, "소셜 로그인에 실패했습니다. 잠시 후에 다시 시도해 주세요.", "AUTH_OAUTH2_LOGIN_FAILED"),
 
     /* JWT 인증 정보 */
     TOKEN_NOT_FOUND(401, "로그인이 필요한 서비스입니다.", "TOKEN_NOT_FOUND"),
