@@ -142,14 +142,20 @@ public class StockScheduler {
     public void refreshChart(){
         log.info("[SCHEDULER] 종목 상세 차트 데이터 스케쥴러 실행");
         Set<String> codes = getCodes();
+        List<CandleType> types = List.of(
+                CandleType.fromParam("day"),
+                CandleType.fromParam("week"),
+                CandleType.fromParam("month")
+        );
 
         for (String code : codes) {
-            try {
-                CandleType type = CandleType.fromParam("day");
-                stockChartService.refreshInquireDaily(code, type);
-                Thread.sleep(200);
-            } catch (Exception e) {
-                log.error("[SCHEDULER] 종목 차트 갱신 실패 code={}", code, e);
+            for (CandleType type : types) {
+                try {
+                    stockChartService.refreshInquireDaily(code, type);
+                    Thread.sleep(200);
+                } catch (Exception e) {
+                    log.error("[SCHEDULER] 종목 차트 갱신 실패 code={}", code, e);
+                }
             }
         }
     }
@@ -162,28 +168,40 @@ public class StockScheduler {
     public void refreshChartAi(){
         log.info("[SCHEDULER] 종목 상세 차트 AI 분석 스케쥴러 실행");
         Set<String> codes = getCodes();
+        List<CandleType> types = List.of(
+                CandleType.fromParam("day"),
+                CandleType.fromParam("week"),
+                CandleType.fromParam("month")
+        );
 
         for (String code : codes) {
-            try {
-                CandleType type = CandleType.fromParam("day");
-                StockChartDto.Row chart = stockChartService.getInquireDaily(code, type);
+            for (CandleType type : types) {
+                try {
+                    StockChartDto.Row chart = stockChartService.getInquireDaily(code, type);
 
-                StockChartDto.AiInput input = StockChartDtoMapper.toAiInput(
-                        type.name(),          // DAY / WEEK / MONTH
-                        chart.getOutput()
-                );
+                    if (chart == null || chart.getOutput() == null) {
+                        log.warn("[SCHEDULER] 차트 데이터 없음 – skip code={}, type={}", code, type);
+                        continue;
+                    }
 
-                if (input == null) {
-                    log.warn("[SCHEDULER] input 데이터 없음 – skip code={}", code);
-                    continue;
+                    StockChartDto.AiInput input = StockChartDtoMapper.toAiInput(
+                            type.name(),
+                            chart.getOutput()
+                    );
+
+                    if (input == null) {
+                        log.warn("[SCHEDULER] AI input 없음 – skip code={}, type={}", code, type);
+                        continue;
+                    }
+
+                    stockChartAiService.refreshChartAi(code, type, input);
+                    Thread.sleep(200);
+
+                } catch (Exception e) {
+                    log.error("[SCHEDULER] 종목 차트 AI분석 실패 code={}, type={}", code, type, e);
                 }
-                stockChartAiService.refreshChartAi(code, input);
-                Thread.sleep(300);
-            } catch (Exception e) {
-                log.error("[SCHEDULER] 종목 차트 AI분석 갱신 실패 code={}", code, e);
             }
         }
-
     }
 
     private Set<String> getCodes() {

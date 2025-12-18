@@ -2,6 +2,7 @@ package app.finup.layer.domain.stock.redis;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stockChart.dto.StockChartDto;
+import app.finup.layer.domain.stockChart.enums.CandleType;
 
 import java.util.*;
 
@@ -25,12 +26,12 @@ public interface StockStorage {
     StockDto.Detail getDetail(String code);
 
     // 종목 상세 페이지 차트
-    void setChart(String code, StockChartDto.Row row);
-    StockChartDto.Row getChart(String code);
+    void setChart(String code, CandleType candleType, StockChartDto.Row row);
+    StockChartDto.Row getChart(String code, CandleType candleType);
 
     // 종목 상세 페이지 차트 AI 분석
-    void setChartAi(String code, StockChartDto.ChartAi chartAi);
-    StockChartDto.ChartAi getChartAi(String code);
+    void setChartAi(String code, CandleType candleType, StockChartDto.ChartAi chartAi);
+    StockChartDto.ChartAi getChartAi(String code, CandleType candleType);
 
     // 종목 상세 페이지 종목 AI분석
     void setDetailAi(String code, Map<String, Object> detailAi);

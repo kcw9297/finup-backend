@@ -38,10 +38,10 @@ public class StockChartServiceImpl implements StockChartService {
     @Override
     public StockChartDto.Row getInquireDaily(String code, CandleType candleType) {
 
-        StockChartDto.Row row = stockStorage.getChart(code);
+        StockChartDto.Row row = stockStorage.getChart(code, candleType);
         if(row == null){
             refreshInquireDaily(code, candleType);
-            row = stockStorage.getChart(code);
+            row = stockStorage.getChart(code, candleType);
         }else{
             log.info("차트 상세 정보 Redis에서 가져옴");
         }
@@ -101,7 +101,7 @@ public class StockChartServiceImpl implements StockChartService {
             calculateMA(row.getOutput(), 20, true);
 
             log.info("차트 Redis 갱신함 code={}", code);
-            stockStorage.setChart(code, row);
+            stockStorage.setChart(code, candleType, row);
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
