@@ -57,10 +57,9 @@ public class VideoLinkAiManagerImpl implements VideoLinkAiManager {
 
         // [2] 답변 기반 배열로 변환 및 반환
         String response = chatProvider.query(prompt);
-        log.warn("AI RESPONSE JSON : {}", response);
-
-
-        return StrUtils.fromJson(response, new TypeReference<>(){});
+        String cleanResponse = StrUtils.removeMarkdownBlock(response);
+        log.warn("AI RESPONSE JSON : {}, clean ver : {}", response, cleanResponse);
+        return StrUtils.fromJson(cleanResponse, new TypeReference<>(){});
     }
 
 }

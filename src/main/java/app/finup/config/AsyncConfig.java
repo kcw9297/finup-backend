@@ -18,17 +18,54 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class AsyncConfig {
 
-    // 일반 스케줄러
+    // 일반 스케줄러 - 초기화 작업용
     @Bean(name = "schedulerExecutor")
     public Executor schedulerExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(25);
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(6);
+        executor.setQueueCapacity(30);
         executor.setThreadNamePrefix("scheduler-");
         executor.setRejectedExecutionHandler(
                 new ThreadPoolExecutor.CallerRunsPolicy()
         );
+        executor.setAllowCoreThreadTimeOut(true);  // 유휴 시 코어 스레드도 종료
+        executor.setKeepAliveSeconds(60);
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean(name = "newsExecutor")
+    public Executor newsExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(6);
+        executor.setQueueCapacity(30);
+        executor.setKeepAliveSeconds(120);
+        executor.setThreadNamePrefix("news-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+        executor.setAwaitTerminationSeconds(60);
+        executor.initialize();
+        return executor;
+    }
+
+    @Bean(name = "stockExecutor")
+    public Executor stockExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(20);
+        executor.setKeepAliveSeconds(90);
+        executor.setThreadNamePrefix("stock-");
+        executor.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
         executor.initialize();
         return executor;
     }
@@ -45,40 +82,6 @@ public class AsyncConfig {
         executor.setRejectedExecutionHandler(
                 new ThreadPoolExecutor.CallerRunsPolicy()
         );
-        executor.setAwaitTerminationSeconds(60);
-        executor.initialize();
-        return executor;
-    }
-
-    @Bean(name = "newsExecutor")
-    public Executor newsExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(20);
-        executor.setKeepAliveSeconds(120);
-        executor.setThreadNamePrefix("news-");
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
-        executor.setAwaitTerminationSeconds(60);
-        executor.initialize();
-        return executor;
-    }
-
-    @Bean(name = "stockExecutor")
-    public Executor stockExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(3);
-        executor.setQueueCapacity(15);
-        executor.setKeepAliveSeconds(90);
-        executor.setThreadNamePrefix("stock-");
-        executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
-        executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
         executor.initialize();
         return executor;

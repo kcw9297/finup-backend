@@ -83,7 +83,7 @@ public class RedisCoreConfig {
 
         // Redis 직렬화 설정
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofHours(3))
+                .entryTtl(Duration.ofHours(6))
                 .disableCachingNullValues(); // NULL 캐싱 무효
 
         return RedisCacheManager.builder(redisConnectionFactory())

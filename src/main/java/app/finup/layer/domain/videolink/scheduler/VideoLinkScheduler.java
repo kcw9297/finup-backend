@@ -28,7 +28,7 @@ public class VideoLinkScheduler {
     /**
      * 10분마다 유튜브 영상 동기화
      */
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS, initialDelay = 0)
+    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
     //@Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
     @Async("schedulerExecutor")
     public void syncVideoLinks() {
@@ -40,7 +40,7 @@ public class VideoLinkScheduler {
     /**
      * 매 30분마다 유튜브 홈 영상 초기화
      */
-    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
+    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES)
     @Async("schedulerExecutor")
     public void initHomeVideoLinks() {
         videoLinkRecommendService.recommendForLogoutHome();

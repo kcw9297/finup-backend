@@ -177,4 +177,23 @@ public final class StrUtils {
         return Objects.isNull(text) ? null :
                 text.length() > splitDescriptionLen ? text.substring(0, splitDescriptionLen) : text;
     }
+
+    /**
+     * Markdown 코드 블록 제거
+     */
+    public static String removeMarkdownBlock(String text) {
+
+        if (text == null || text.isBlank()) {
+            return text;
+        }
+
+        // 패턴 1: ```json\n{...}\n```
+        // 패턴 2: ```\n{...}\n```
+        // 패턴 3: `{...}` (단일 백틱)
+
+        return text.trim()
+                .replaceAll("^```(?:json)?\\s*([\\s\\S]*?)\\s*```$", "$1")
+                .replaceAll("^`([\\s\\S]*?)`$", "$1")
+                .trim();
+    }
 }

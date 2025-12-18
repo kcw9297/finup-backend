@@ -27,7 +27,7 @@ public class StockNewsScheduler {
     private static final Duration TTL_STOCK = Duration.ofMinutes(30);
     private final StockService stockService;
 
-    @Scheduled(fixedRate = 15 * 60 * 1000)
+    @Scheduled(fixedRate = 30 * 60 * 1000, initialDelay = 1000 * 60)
     @Async("schedulerExecutor")
     public void updateStockNews() {
 
