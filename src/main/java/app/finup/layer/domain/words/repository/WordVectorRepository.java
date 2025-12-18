@@ -18,12 +18,6 @@ public class WordVectorRepository {
     /**
      * word의 벡터를 word_vector 테이블에 저장
      */
-    public void insert(Long termId, String embeddingJson){
-        jdbcTemplate.update("""
-            INSERT INTO words_vector (term_id, embedding) 
-            VALUES (?, VEC_FromText(?))
-        """,termId, embeddingJson);
-    }
     public void upsert(Long termId, String embeddingJson){
         jdbcTemplate.update("""
             INSERT INTO words_vector (term_id, embedding)
