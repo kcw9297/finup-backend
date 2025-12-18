@@ -18,7 +18,7 @@ import java.util.Set;
 
 @Slf4j
 @Component
-@Profile("prod") //잠깐 비활성화
+//@Profile("prod") //잠깐 비활성화
 @RequiredArgsConstructor
 public class StockNewsScheduler {
     private final NewsProvider newsProvider;
