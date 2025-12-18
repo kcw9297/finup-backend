@@ -22,60 +22,62 @@ public class AsyncConfig {
     @Bean(name = "schedulerExecutor")
     public Executor schedulerExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);          // 동시 실행 가능한 기본 스레드 수
-        executor.setMaxPoolSize(10);          // 최대 스레드 수
-        executor.setQueueCapacity(100);       // 대기 큐 크기
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(25);
         executor.setThreadNamePrefix("scheduler-");
+        executor.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
         executor.initialize();
         return executor;
     }
 
-    /**
-     * 퀴즈 생성 전용 ThreadPool (무거운 작업)
-     */
     @Bean(name = "quizExecutor")
     public Executor quizExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(25);
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(10);
         executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix("quiz-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
         executor.setAwaitTerminationSeconds(60);
         executor.initialize();
         return executor;
     }
 
-    /**
-     * 뉴스 수집 전용 ThreadPool
-     */
     @Bean(name = "newsExecutor")
     public Executor newsExecutor() {
-
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(20);
         executor.setKeepAliveSeconds(120);
         executor.setThreadNamePrefix("news-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
         executor.setAwaitTerminationSeconds(60);
         executor.initialize();
         return executor;
     }
 
-    /**
-     * 주식 데이터 수집 전용 ThreadPool
-     */
     @Bean(name = "stockExecutor")
     public Executor stockExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(6);
-        executor.setMaxPoolSize(12);
-        executor.setQueueCapacity(50);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(3);
+        executor.setQueueCapacity(15);
         executor.setKeepAliveSeconds(90);
         executor.setThreadNamePrefix("stock-");
+        executor.setRejectedExecutionHandler(
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
         executor.initialize();
