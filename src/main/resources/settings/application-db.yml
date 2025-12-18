@@ -65,10 +65,11 @@ spring:
     hikari:
       maximum-pool-size: 50
       minimum-idle: 10 # 최소 10개 커넥션은 늘 유지
-      connection-timeout: 20000
+      connection-timeout: 30000
       leak-detection-threshold: 60000
       max-lifetime: 1800000 # 최대 30분동안 커넥션 보존
+      idle-timeout: 600000
 
   jpa:
     hibernate:
-      ddl-auto: create #update
+      ddl-auto: update #update
