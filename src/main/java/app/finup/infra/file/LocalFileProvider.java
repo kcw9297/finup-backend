@@ -57,7 +57,7 @@ public class LocalFileProvider implements FileProvider {
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());
-            throw new ProviderException(AppStatus.UTILS_LOGIC_FAILED, e);
+            throw new ProviderException(AppStatus.FILE_UPLOAD_FAILED, e);
         }
     }
 
@@ -74,7 +74,7 @@ public class LocalFileProvider implements FileProvider {
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());
-            throw new ProviderException(AppStatus.UTILS_LOGIC_FAILED, e);
+            throw new ProviderException(AppStatus.FILE_DOWNLOAD_FAILED, e);
         }
     }
 
@@ -91,7 +91,7 @@ public class LocalFileProvider implements FileProvider {
 
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "로컬 스토리지 파일 업로드에 실패! 오류 : %s", e.getMessage());
-            throw new ProviderException(AppStatus.UTILS_LOGIC_FAILED, e);
+            throw new ProviderException(AppStatus.FILE_DOWNLOAD_FAILED, e);
         }
     }
 

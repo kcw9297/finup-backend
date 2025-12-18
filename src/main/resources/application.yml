@@ -30,6 +30,9 @@ app:
     domain: ${FILE_DOMAIN} # 파일 접근 도메인
     handler: ${FILE_HANDLER:} # 로컬 핸들러 경로 (기본값 설정)
 
+    s3:
+      bucket-name: ${S3_BUCKET_NAME:}
+
 ### 외부 API 호출을 위한 상수 ###
 
 api:

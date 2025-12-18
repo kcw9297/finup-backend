@@ -39,6 +39,9 @@ public enum AppStatus {
     /* Infra - File */
     FILE_NOT_EXIST(500, "파일이 업로드되지 않았습니다. 잠시 후에 다시 시도해 주세요.", "FILE_NOT_EXIST"),
     FILE_EMPTY(500, "잘못된 업로드 요청입니다. 올바른 파일로 다시 시도해 주세요.", "FILE_EMPTY"),
+    FILE_UPLOAD_FAILED(500, "파일 업로드에 실패했습니다.", "FILE_UPLOAD_FAILED"),
+    FILE_REMOVE_FAILED(500, "파일 삭제에 실패했습니다.", "FILE_REMOVE_FAILED"),
+    FILE_DOWNLOAD_FAILED(500, "파일 다운로드에 실패했습니다.", "FILE_DOWNLOAD_FAILED"),
 
     /* Infra - YouTube */
     YOUTUBE_URL_NOT_VALID(400, "유효하지 않은 YouTube URL 입니다. 다시 시도해 주세요.", "YOUTUBE_URL_NOT_VALID"),
