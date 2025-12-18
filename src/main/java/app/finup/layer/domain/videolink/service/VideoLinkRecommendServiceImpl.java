@@ -11,13 +11,16 @@ import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.videolink.constant.VideoLinkCache;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import app.finup.layer.domain.videolink.dto.VideoLinkDtoMapper;
+import app.finup.layer.domain.videolink.entity.VideoLink;
 import app.finup.layer.domain.videolink.manager.VideoLinkAiManager;
+import app.finup.layer.domain.videolink.mapper.VideoLinkMapper;
 import app.finup.layer.domain.videolink.redis.VideoLinkRedisStorage;
 import app.finup.layer.domain.videolink.repository.VideoLinkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +48,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
     private final VideoLinkAiManager videoLinkAiManager;
     private final EmbeddingProvider embeddingProvider;
     private final StudyRepository studyRepository;
+    private final VideoLinkMapper videoLinkMapper;
 
     // 사용 상수
     private static final int RECOMMEND_AMOUNT_REQUEST = 20; // DB에 요청하는 추천 영상 개수
@@ -180,6 +184,17 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
         // [4] 영상 추천 수행 및 결과 반환
         return candidates.isEmpty() ? List.of() : doRecommend(memberId, study, candidates, latestVideoLinkIds);
     }
+
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<VideoLinkDto.Row> getHomeLatestList(Integer size) {
+
+        Integer limit = (size == null || size <= 0) ? 20 : size;
+
+        return videoLinkMapper.selectHomeLatest(limit);
+    }
+
 
     // 추천 수행
     private List<VideoLinkDto.Row> doRecommend(Long memberId, Study study, Map<Long, VideoLinkDto.Row> candidates, List<Long> latestVideoLinkIds) {

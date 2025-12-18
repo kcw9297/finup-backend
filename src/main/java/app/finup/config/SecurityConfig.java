@@ -146,9 +146,9 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        //config.setAllowedOrigins(List.of("*")); // 허용할 도메인 설정
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
-        //config.setAllowedMethods(List.of(("*"))); // 허용할 HTTP 메소드 설정
+        config.setAllowedOrigins(List.of("*")); // 허용할 도메인 설정
+        //config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedMethods(List.of(("*"))); // 허용할 HTTP 메소드 설정
         config.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE", "PATCH")); // 허용 method
         config.setAllowedHeaders(List.of(("*")));   // 허용 Header
         config.setAllowCredentials(true);           // 인증 요청을 포함한 쿠키 정보 허용

@@ -27,7 +27,7 @@ import javax.sql.DataSource;
  */
 @Slf4j
 @MapperScan(basePackages = "app.finup.layer.domain.*.mapper")
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableJpaAuditing
 @RequiredArgsConstructor
 public class DatabaseConfig {

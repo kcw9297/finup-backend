@@ -47,10 +47,8 @@ public class WordsVectorServiceImpl implements WordsVectorService {
                     continue;
                 }
                 wordVectorRepository.upsert(word.getTermId(), embeddingJson);
-                log.info("wordId={} 저장됨", word.getTermId());
             }
             page++;
-            log.info("=== batch {} 처리 완료 (누적 {}) ===",page, page * BATCH_SIZE);
         }
 
     }
