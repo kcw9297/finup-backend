@@ -9,6 +9,7 @@ import app.finup.layer.domain.news.redis.NewsRedisStorage;
 import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.service.WordsVectorService;
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NewsAiServiceImpl implements NewsAiService {
 
     private final AiManager aiManager;
