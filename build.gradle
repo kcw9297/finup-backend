@@ -36,6 +36,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // OAuth2
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA
+    implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient
 
     // util - .env 환경설정 파일
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
