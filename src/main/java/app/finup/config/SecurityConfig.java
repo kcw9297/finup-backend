@@ -10,6 +10,7 @@ import app.finup.security.handler.CustomAccessDeniedHandler;
 import app.finup.security.handler.CustomAuthenticationEntryPoint;
 import app.finup.security.service.NormalUserDetailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -50,6 +51,11 @@ public class SecurityConfig {
     private final CsrfVerificationFilter csrfVerificationFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    // 사용 상수
+    @Value("${app.origin}")
+    private String origin;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -146,9 +152,9 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("*")); // 허용할 도메인 설정
+        config.setAllowedOrigins(List.of(origin)); // 허용할 도메인 설정
         //config.setAllowedOrigins(List.of("http://localhost:5173"));
-        config.setAllowedMethods(List.of(("*"))); // 허용할 HTTP 메소드 설정
+        //config.setAllowedMethods(List.of(("*"))); // 허용할 HTTP 메소드 설정
         config.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PUT", "DELETE", "PATCH")); // 허용 method
         config.setAllowedHeaders(List.of(("*")));   // 허용 Header
         config.setAllowCredentials(true);           // 인증 요청을 포함한 쿠키 정보 허용

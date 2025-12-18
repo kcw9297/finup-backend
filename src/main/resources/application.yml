@@ -24,6 +24,7 @@ server:
 
 app:
   domain: ${APP_DOMAIN} # 백엔드 도메인
+  origin: ${APP_ORIGIN}
 
   file:
     dir: ${FILE_DIR} # 파일 경로
