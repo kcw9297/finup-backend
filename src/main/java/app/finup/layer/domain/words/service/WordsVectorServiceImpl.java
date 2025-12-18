@@ -17,13 +17,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class WordsVectorServiceImpl implements WordsVectorService {
     private final AiManager aiManager;
     private final WordVectorRepository wordVectorRepository;
     private final WordsRepository wordsRepository;
 
-    @Transactional
     @Override
     public void ingestAll() {
         final int BATCH_SIZE = 50;

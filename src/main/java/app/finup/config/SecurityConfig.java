@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -45,6 +46,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    // 사용 의존성
     private final Environment env;
     private final MemberRepository memberRepository;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -56,7 +58,6 @@ public class SecurityConfig {
     @Value("${app.origin}")
     private String origin;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -65,7 +66,11 @@ public class SecurityConfig {
 
                 // ▶ CSRF 설정 - 만약 Cookie에 AccessToken을 담는 경우 설정 권장 (방어 강화)
                 //.csrf(customer -> customer
-                //        .ignoringRequestMatchers(Url.LOGIN, Url.PATTERN_AUTH, Url.PATTERN_OAUTH, Url.LOGOUT, Url.PATTERN_PUBLIC) // 일반&소셜 로그인, 로그아웃
+                //        .ignoringRequestMatchers(
+                //                Url.LOGIN, Url.PATTERN_AUTH, Url.PATTERN_OAUTH, Url.LOGOUT, Url.PATTERN_PUBLIC,
+                //                "/", "/index.html", "/favicon.ico", "/assets/**"
+//
+                //        ) // 일반&소셜 로그인, 로그아웃
                 //        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                 //        .csrfTokenRepository(csrfTokenRepository()) // JS 접근이 가능한 'XSRF-TOKEN' 값을 포함한 쿠키를 전달함
                 //)
@@ -74,7 +79,7 @@ public class SecurityConfig {
                 // ▶ 필터 설정 - 커스텀 필터 추가
                 // UsernamePasswordAuthenticationFilter 는 세션기반 인증 시에만 동작)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(csrfVerificationFilter, CsrfFilter.class) // 요청 시 토큰 값 자동 생성
+                //.addFilterAfter(csrfVerificationFilter, CsrfFilter.class) // 요청 시 토큰 값 자동 생성
 
 
                 // ▶ URL 접근 통제
@@ -84,6 +89,7 @@ public class SecurityConfig {
                         .requestMatchers(Url.LOGIN).anonymous() // 로그인
 
                         // 모두 허용
+                        //.requestMatchers("/", "/index.html", "/favicon.ico", "/assets/**").permitAll()
                         .requestMatchers(Url.PATTERN_PUBLIC).permitAll() // 공용 API
                         .requestMatchers(Url.PATTERN_AUTH).permitAll() // 인증 API
                         .requestMatchers(Url.LOGOUT).permitAll() // 로그아웃
@@ -165,4 +171,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config); // 모든 경로에 CORS 설정 등록
         return source;
     }
+
 }

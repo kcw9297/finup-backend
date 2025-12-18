@@ -1,6 +1,7 @@
 package app.finup.layer.domain.news.service;
 
 import app.finup.layer.domain.news.dto.NewsDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.similarity.LevenshteinDistance;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NewsRemoveDuplicateServiceImpl implements NewsRemoveDuplicateService {
     @Override
     public List<NewsDto.Row> removeDuplicate(List<NewsDto.Row> list) {

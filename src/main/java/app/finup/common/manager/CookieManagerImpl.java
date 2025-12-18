@@ -76,7 +76,7 @@ public class CookieManagerImpl implements CookieManager {
                         .secure(EnvUtils.isProd(env)) // 배포 환경이면 true, 로컬 환경이면 false
                         .maxAge(expires) // 만료 시간
                         .path("/")
-                        .sameSite("Lax");
+                        .sameSite("None");
 
         // [2] domain 정보가 존재하는 경우 삽입
         if (Objects.nonNull(domain) && !domain.isBlank()) cookieBuilder.domain(domain);
