@@ -74,5 +74,24 @@
             </choose>
         </if>
     </select>
+    <!-- 홈 화면 최신 영상 목록 -->
+    <select id="selectHomeLatest" resultType="VideoLinkRow">
+        SELECT
+            vl.video_link_id,
+            vl.video_url,
+            vl.video_id,
+            vl.title,
+            vl.thumbnail_url,
+            vl.channel_title,
+            vl.duration,
+            vl.published_at,
+            vl.last_synced_at,
+            vl.view_count,
+            vl.like_count,
+            vl.tags
+        FROM video_link vl
+        ORDER BY vl.cdate DESC
+        LIMIT #{limit}
+    </select>
 
 </mapper>
