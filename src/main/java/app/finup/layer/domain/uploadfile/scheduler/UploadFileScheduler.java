@@ -8,6 +8,7 @@ import app.finup.layer.domain.uploadfile.service.UploadFileService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,7 @@ public class UploadFileScheduler {
      * 고아 파일 삭제 스케줄링 로직
      */
     @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
+    @Async("schedulerExecutor")
     public void removeOrphanFiles() {
 
         // [1] 고아 파일을 기록할 리스트

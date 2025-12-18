@@ -3,6 +3,7 @@ package app.finup.layer.domain.stock.scheduler;
 import app.finup.layer.domain.stock.api.AuthStockApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,7 @@ public class AuthScheduler {
     private final AuthStockApiClient authStockApiClient;
 
     @Scheduled(fixedRate = 1000 * 60 * 60 * 23)
+    @Async("schedulerExecutor")
     public void refreshAuth() {
         log.info("[SCHEDULER] kis 접근 토큰 스케쥴러 실행");
         authStockApiClient.refreshToken();

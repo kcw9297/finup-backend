@@ -4,6 +4,7 @@ import app.finup.common.utils.LogUtils;
 import app.finup.layer.domain.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ public class NoticeScheduler {
     private final NoticeService noticeService;
 
     @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.SECONDS)
+    @Async("schedulerExecutor")
     public void syncViewCount() {
         noticeService.syncViewCount();
     }

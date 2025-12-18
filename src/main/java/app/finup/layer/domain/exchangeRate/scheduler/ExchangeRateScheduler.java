@@ -4,6 +4,7 @@ import app.finup.layer.domain.exchangeRate.service.ExchangeRateService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +23,7 @@ public class ExchangeRateScheduler {
 
     // 평일 오전 11시 5분 환율 자동 갱신
     @Scheduled(cron = "0 5 11 ? * MON-FRI")
+    @Async("schedulerExecutor")
     public void updateExchangeRate() {
         log.info("환율 자동 갱신 시작");
         exchangeRateService.updateRates();
