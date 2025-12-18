@@ -169,7 +169,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<NewsDto.Row> getStockNews(String stockName) {
-        return newsProvider.getStockNews(stockName, "date", 10);
+        return newsProvider.getStockNews(stockName, "sim", 30);
     }
 }
 
