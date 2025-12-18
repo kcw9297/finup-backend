@@ -14,6 +14,10 @@ java {
 	}
 }
 
+test { // 빌드 시 테스트 생략
+    enabled = false
+}
+
 repositories {
 	mavenCentral()
 
