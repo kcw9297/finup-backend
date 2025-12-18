@@ -33,15 +33,4 @@ public class PublicVideoLinkController {
         return Api.ok(videoLinkRecommendService.recommendForLogoutHome());
     }
 
-    /**
-     * 홈 화면 영상 목록
-     * [GET] /video-links/home
-     */
-    @GetMapping("/home")
-    public ResponseEntity<?> getHomeVideoList(
-            @RequestParam(defaultValue = "20") Integer size
-    ) {
-        return Api.ok(videoLinkRecommendService.getHomeLatestList(size));
-    }
-
 }
