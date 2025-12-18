@@ -32,7 +32,7 @@ public class StockStorageImpl implements StockStorage {
     //시가총액 리스트
     @Override
     public void setMarketCapRow(List<StockDto.MarketCapRow> marketCapRowList) {
-        rt.opsForValue().set("marketCapRowList", marketCapRowList, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set("marketCapRowList", marketCapRowList, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
@@ -54,13 +54,13 @@ public class StockStorageImpl implements StockStorage {
 
     @Override
     public void setTradingValueRow(List<StockDto.TradingValueRow> tradingValueRowList) {
-        rt.opsForValue().set("tradingValueRowList", tradingValueRowList, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set("tradingValueRowList", tradingValueRowList, Duration.ofHours(72).plusMinutes(30));
     }
 
     //종목 상세 데이터
     @Override
     public void setDetail(String code, StockDto.Detail detail) {
-        rt.opsForValue().set(DETAIL_KEY+code, detail, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(DETAIL_KEY+code, detail, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class StockStorageImpl implements StockStorage {
     //차트 탭
     @Override
     public void setChart(String code, StockChartDto.Row row) {
-        rt.opsForValue().set(CHART_KEY+code, row, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(CHART_KEY+code, row, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
@@ -85,7 +85,7 @@ public class StockStorageImpl implements StockStorage {
 
     @Override
     public void setChartAi(String code, StockChartDto.ChartAi chartAi) {
-        rt.opsForValue().set(CHART_AI_KEY+code, chartAi, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(CHART_AI_KEY+code, chartAi, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
@@ -98,7 +98,7 @@ public class StockStorageImpl implements StockStorage {
     //종목 탭
     @Override
     public void setDetailAi(String code, Map<String, Object> detailAi) {
-        rt.opsForValue().set(DETAIL_AI_KEY+code, detailAi, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(DETAIL_AI_KEY+code, detailAi, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
@@ -108,7 +108,7 @@ public class StockStorageImpl implements StockStorage {
 
     @Override
     public void setYoutube(String keyword, List<StockDto.YoutubeVideo> youtube) {
-        rt.opsForValue().set(YOUTUBE_KEY+keyword, youtube, Duration.ofHours(24).plusMinutes(30));
+        rt.opsForValue().set(YOUTUBE_KEY+keyword, youtube, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override

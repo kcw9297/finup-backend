@@ -38,4 +38,28 @@ public interface StudyWordRepository extends JpaRepository<StudyWord, Long> {
         order by function('rand')
     """)
     List<StudyWord> findRandomWords(Pageable pageable);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM study_word
+        WHERE embedding IS NOT NULL
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<StudyWord> findSimilar(byte[] embedding, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM study_word sw
+        LEFT JOIN upload_file uf ON uf.upload_file_id = sw.word_image_id
+        WHERE sw.embedding IS NOT NULL AND VEC_DISTANCE_COSINE(sw.embedding, :embedding) < :threshold
+        ORDER BY VEC_DISTANCE_COSINE(sw.embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<StudyWord> findSimilarWithThreshold(byte[] embedding, int lim, double threshold);
+
 }

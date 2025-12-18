@@ -17,11 +17,11 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(name = "upload_file")
 @DynamicUpdate
 @Getter
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class UploadFile extends BaseEntity {
+public class UploadFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

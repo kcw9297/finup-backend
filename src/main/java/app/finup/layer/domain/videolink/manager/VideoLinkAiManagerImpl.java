@@ -1,10 +1,14 @@
 package app.finup.layer.domain.videolink.manager;
 
+import app.finup.common.utils.StrUtils;
 import app.finup.infra.ai.provider.ChatProvider;
 import app.finup.layer.domain.videolink.constant.VideoLinkPrompt;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 
 /**
@@ -45,17 +49,18 @@ public class VideoLinkAiManagerImpl implements VideoLinkAiManager {
 
 
     @Override
-    public String recommendSentenceForStudy(String studyName, String studySummary, String studyDetail, Integer studyLevel, String latestSentences) {
+    public List<Long> recommendForStudy(String json) {
 
-        // [1] 프롬프트 생성
-        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_SENTENCE_STUDY
-                .replace("${TARGET_STUDY_NAME}", studyName)
-                .replace("${TARGET_STUDY_SUMMARY}", studySummary)
-                .replace("${TARGET_STUDY_DETAIL}", studyDetail)
-                .replace("${TARGET_STUDY_LEVEL}", String.valueOf(studyLevel))
-                .replace("${LATEST_SENTENCES}", latestSentences);
+        // [1] 사용 프롬포트
+        String prompt = VideoLinkPrompt.PROMPT_RECOMMEND_VIDEO_STUDY
+                .replace("${INPUT}", json);
 
-        // [2] 프롬프트 생성 및, 생성된 추천 문자열 반환
-        return chatProvider.query(prompt);
+        // [2] 답변 기반 배열로 변환 및 반환
+        String response = chatProvider.query(prompt);
+        log.warn("AI RESPONSE JSON : {}", response);
+
+
+        return StrUtils.fromJson(response, new TypeReference<>(){});
     }
+
 }

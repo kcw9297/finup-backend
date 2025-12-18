@@ -3,11 +3,13 @@ package app.finup.layer.domain.videolink.dto;
 
 import app.finup.layer.base.dto.SearchRequest;
 import app.finup.layer.base.validation.annotation.YouTubeUrl;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 학습용 비디오 링크 DTO 클래스
@@ -35,6 +37,7 @@ public final class VideoLinkDto {
         private String videoUrl;
         private String title;
         private String duration;
+        private String description;
         private String thumbnailUrl;
         private String channelTitle;
         private LocalDateTime publishedAt;
@@ -91,4 +94,40 @@ public final class VideoLinkDto {
         private String videoUrl;
     }
 
+
+    /**
+     * 영상 추천 요청을 담을 DTO (JSON 변환용)
+     */
+    @Getter
+    @Builder
+    public static class Recommendation {
+
+        @JsonProperty("study")
+        private StudyInfo study;
+
+        @JsonProperty("candidates")
+        private List<VideoCandidate> candidates;
+
+        @JsonProperty("latestVideoLinkIds")
+        private List<Long> latestVideoLinkIds;
+
+        @Getter
+        @Builder
+        public static class StudyInfo {
+            private String name;
+            private String summary;
+            private String detail;
+            private int level;
+        }
+
+        @Getter
+        @Builder
+        public static class VideoCandidate {
+            private Long videoLinkId;
+            private String title;
+            private String channelTitle;
+            private String description;
+            private String tags;
+        }
+    }
 }

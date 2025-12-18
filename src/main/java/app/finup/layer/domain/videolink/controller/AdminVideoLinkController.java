@@ -28,7 +28,7 @@ public class AdminVideoLinkController {
 
     /**
      * 학습 영상 검색
-     * [GET /video-links/search
+     * [GET] /video-links/search
      * @param rq 영상 검색요청 DTO
      */
     @GetMapping("/search")
@@ -59,7 +59,7 @@ public class AdminVideoLinkController {
 
 
     /**
-     * 학습 영상 추가
+     * 학습 영상 수정 갱신
      * [PUT] /video-links/{videoLinkId}
      * @param rq 영상 갱신요청 DTO
      */

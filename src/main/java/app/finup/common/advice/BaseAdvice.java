@@ -129,7 +129,10 @@ public class BaseAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = BusinessException.class)
     public ResponseEntity<?> handleBusinessEx(BusinessException e) {
         log.error("비즈니스 로직 실패! : {}", e.getAppStatus().getInfo());
-        return Api.fail(e.getAppStatus(), e.getInputErrors());
+
+        return Objects.isNull(e.getInputErrors()) ?
+                Api.fail(e.getAppStatus()) :
+                Api.fail(e.getAppStatus(), e.getInputErrors());
     }
 
 
