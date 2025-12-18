@@ -17,7 +17,7 @@ import java.time.Duration;
  * @since 2025-12-10
  */
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class XmlConfig {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {

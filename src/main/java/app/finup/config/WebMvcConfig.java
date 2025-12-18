@@ -18,7 +18,7 @@ import app.finup.common.utils.EnvUtils;
  * @since 2025-11-26
  */
 @Slf4j
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
