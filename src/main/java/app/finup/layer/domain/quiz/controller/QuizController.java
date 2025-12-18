@@ -40,7 +40,7 @@ public class QuizController {
      * [POST] quiz/result
      */
     @PostMapping("/result")
-    public ResponseEntity<?> result(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody QuizDto.Add rq) {
+    public ResponseEntity<?> saveResult(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody QuizDto.Add rq) {
         Long memberId = userDetails.getMemberId();
         int score = rq.getScore();
         log.info("memberId 잘 가져와지냐?: {}", memberId.toString());
