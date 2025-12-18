@@ -65,7 +65,15 @@ public class StocksController {
      */
     @GetMapping("/detail/{code}")
     public ResponseEntity<?> getDetail(@PathVariable String code) {
-        return Api.ok(stockService.getDetail(code));
+        try {
+            return Api.ok(stockService.getDetail(code)); // 정상 데이터
+        } catch (RuntimeException e) {
+            return Api.fail(
+                    "종목 조회 중 오류가 발생했습니다.",
+                    "SERVER_ERROR",
+                    500
+            );
+        }
     }
 
     /**

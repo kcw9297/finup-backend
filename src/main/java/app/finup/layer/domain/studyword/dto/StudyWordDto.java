@@ -43,7 +43,7 @@ public final class StudyWordDto {
      * 리스트 조회 결과
      */
     @Data
-    @Builder
+    @Builder(toBuilder = true)
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Row implements Serializable {

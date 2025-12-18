@@ -12,6 +12,7 @@ import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.manager.StudyWordAiManager;
 import app.finup.layer.domain.studyword.redis.StudyWordRedisStorage;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
+import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -38,6 +39,7 @@ public class StudyWordRecommendServiceImpl implements StudyWordRecommendService 
     private final StudyRepository studyRepository;
     private final StudyWordAiManager studyWordAiManager;
     private final StudyWordRedisStorage studyWordRedisStorage;
+    private final UploadFileManager uploadFileManager;
 
     // 사용 상수
     private static final int RECOMMEND_AMOUNT_REQUEST = 20; // DB에 요청하는 추천 단어 개수
@@ -127,13 +129,27 @@ public class StudyWordRecommendServiceImpl implements StudyWordRecommendService 
             Collections.shuffle(validIds); // 순서 섞기
             return validIds.stream()
                     .map(candidates::get)
+                    .map(this::enrichImageUrl)
                     .toList();
 
 
             // AI가 JSON 이외의 문자열을 반환하는 등 예기치 않은 반환으로 실패
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "AI 분석 실패. 유사도 분석 상위 6개 반환");
-            return candidates.values().stream().limit(6).toList();
+            return candidates.values().stream().limit(6)
+                    .map(this::enrichImageUrl)
+                    .toList();
         }
+    }
+    
+    // StudyWordDto.Row ImageUrl 가공 전용 메소드
+    private StudyWordDto.Row enrichImageUrl(StudyWordDto.Row row) {
+        if (row.getImageUrl() == null) {
+            return row;
+        }
+
+        return row.toBuilder()
+                .imageUrl(uploadFileManager.getFullUrl(row.getImageUrl()))
+                .build();
     }
 }

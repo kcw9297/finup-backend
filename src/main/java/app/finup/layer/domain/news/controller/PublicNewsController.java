@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class PublicNewsController {
     private final NewsService newsService;
 
+    @GetMapping("/list")
+    public ResponseEntity<?> getNews(String category) {
+        return Api.ok(newsService.getNews(category));
+
+    }
     @GetMapping("/latest")
     public ResponseEntity<?> getLatestNews(@RequestParam(defaultValue = "date") String category,
                                            @RequestParam(defaultValue = "10") int limit)
