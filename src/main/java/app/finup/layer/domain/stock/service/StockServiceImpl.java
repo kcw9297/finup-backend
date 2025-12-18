@@ -2,7 +2,6 @@ package app.finup.layer.domain.stock.service;
 
 import app.finup.infra.news.provider.NewsProvider;
 import app.finup.layer.domain.news.dto.NewsDto;
-import app.finup.layer.domain.news.service.StockNewsAiService;
 import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
@@ -82,15 +81,9 @@ public class StockServiceImpl implements StockService {
     // kospi_code.xlsx에서 종목코드, 종목명 읽어 DB 저장
     @Override
     public void importStockName() throws Exception {
-        /*
-        * 개발 중이라면 프로젝트 안 폴더에 두고 상대경로로 테스트
-        * 운영/배포용이라면 외부 경로 + 환경변수로 관리하는 것이 안전
-        * */
+
         String KOSPI = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
         String KOSDAQ = "src/main/java/app/finup/layer/domain/stock/test/kosdaq_code.xlsx";
-        //String path = "src/main/java/app/finup/layer/domain/stock/test/kospi_code.xlsx";
-        //String path = "D:/GOLD/FinUp/data/kospi_code.xlsx"; // 이거 나중에 공통 파일 저장 경로로 바꾸고 파일도 거기에 옮겨두기
-        //String path = "C:/Users/컴퓨터/Desktop/FinUp/data/kospi_code.xlsx";
 
         saveStock(KOSPI);
         saveStock(KOSDAQ);
@@ -108,6 +101,10 @@ public class StockServiceImpl implements StockService {
 
             String mkscShrnIscd = row.getCell(0).getStringCellValue();
             String htsKorIsnm = row.getCell(2).getStringCellValue();
+
+            if (stockRepository.existsByMkscShrnIscd(mkscShrnIscd)) {
+                continue;
+            }
 
             Stock stock = Stock.builder()
                     .mkscShrnIscd(mkscShrnIscd)
@@ -135,26 +132,27 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public void refreshDetail(String code){
-        //System.out.println("요청 종목코드: [" + code + "]");
-
         //[1] 종목코드(String code)로 DB에서 한글 종목명 가져오기
         Stock stock;
         try {
             if (stockRepository.count() == 0) importStockName();
             stock = stockRepository.findByMkscShrnIscd(code)
-                    .orElseThrow(() -> new RuntimeException("종목 없음: " + code));
+                    .orElseGet(() -> {
+                        log.warn("종목 없음 갱신 시도: {}", code);
+                        try {
+                            importStockName();
+                        } catch (Exception e) {
+                            throw new RuntimeException("종목 갱신 실패", e);
+                        }
+                        return stockRepository.findByMkscShrnIscd(code)
+                                .orElseThrow(() ->
+                                        new RuntimeException("종목 없음(갱신 후): " + code));
+                    });
         } catch (Exception e) {
             log.error("종목 상세 refresh 실패 - code={}", code, e);
             throw new RuntimeException("종목 정보 조회/갱신 실패", e);
         }
         String htsKorIsnm = stock.getHtsKorIsnm();
-
-        /*
-        Stock stock = stockRepository.findByMkscShrnIscd(code)
-                .orElseThrow(() -> new RuntimeException("종목 없음!"));
-        String htsKorIsnm = stock.getHtsKorIsnm();*/
-
-        //System.out.println("종목이름: " + htsKorIsnm);
 
         //[2] api 호출, parsing
         JsonNode jsonNode = stockApiClient.fetchDetail(code);

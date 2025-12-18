@@ -2,8 +2,6 @@ package app.finup.layer.domain.stock.service;
 
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.stock.dto.StockDto;
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.List;
 
 public interface StockService {
@@ -21,10 +19,5 @@ public interface StockService {
     void refreshDetail(String code);
 
     List<NewsDto.Row> getStockNews(String stockName);
-
-
-
-
-
 
 }

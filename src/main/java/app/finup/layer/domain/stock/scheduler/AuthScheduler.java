@@ -3,7 +3,6 @@ package app.finup.layer.domain.stock.scheduler;
 import app.finup.layer.domain.stock.api.AuthStockApiClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

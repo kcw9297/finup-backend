@@ -2,7 +2,6 @@ package app.finup.layer.domain.stock.api;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.List;
 
 /**

@@ -5,6 +5,7 @@ import app.finup.infra.ai.PromptTemplates;
 import app.finup.layer.domain.stock.redis.StockStorage;
 import app.finup.layer.domain.stockChart.dto.StockChartDto;
 import app.finup.layer.domain.stockChart.dto.StockChartDtoMapper;
+import app.finup.layer.domain.stockChart.enums.CandleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,11 +68,11 @@ public class StockChartAiServiceImpl implements StockChartAiService {
     }
 
     @Override
-    public StockChartDto.ChartAi getChartAi(String code, StockChartDto.AiInput input) {
-        StockChartDto.ChartAi chartAi = stockStorage.getChartAi(code);
+    public StockChartDto.ChartAi getChartAi(String code, CandleType candleType, StockChartDto.AiInput input) {
+        StockChartDto.ChartAi chartAi = stockStorage.getChartAi(code, candleType);
         if (chartAi == null) {
-            refreshChartAi(code, input);
-            chartAi = stockStorage.getChartAi(code);
+            refreshChartAi(code, candleType, input);
+            chartAi = stockStorage.getChartAi(code, candleType);
         }else{
             log.info("종목 차트 AI분석 Redis에서 가져옴");
         }
@@ -80,7 +81,7 @@ public class StockChartAiServiceImpl implements StockChartAiService {
     }
 
     @Override
-    public void refreshChartAi(String code, StockChartDto.AiInput input) {
+    public void refreshChartAi(String code, CandleType candleType, StockChartDto.AiInput input) {
         try {
             // 1) AiInput → JSON 문자열
             String candlesJson = objectMapper
@@ -99,7 +100,7 @@ public class StockChartAiServiceImpl implements StockChartAiService {
             // 4) Map → ChartAi DTO 변환
             StockChartDto.ChartAi chartAi = StockChartDtoMapper.toChartAi(result, input.getTimeframe());
             log.info("종목 차트 AI분석 갱신함 code={}", code);
-            stockStorage.setChartAi(code, chartAi);
+            stockStorage.setChartAi(code, candleType, chartAi);
 
         } catch (Exception e) {
             log.error("차트 AI 분석 실패", e);

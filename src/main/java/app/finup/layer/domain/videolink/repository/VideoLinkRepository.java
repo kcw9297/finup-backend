@@ -1,6 +1,7 @@
 package app.finup.layer.domain.videolink.repository;
 
 import app.finup.layer.domain.videolink.entity.VideoLink;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -49,4 +50,16 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
         WHERE vl.videoId IN :videoIds
     """)
     void deleteByVideoIds(Collection<String> videoIds);
+
+    /**
+     * 최신 등록 영상 N개 조회
+     */
+    @Query("""
+        SELECT v
+        FROM VideoLink v
+        ORDER BY v.videoLinkId DESC
+    """)
+    List<VideoLink> findLatest(Pageable pageable);
+
+
 }

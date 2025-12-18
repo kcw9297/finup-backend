@@ -98,7 +98,13 @@ dependencies {
     // google-guava (batch 처리)
     implementation 'com.google.guava:guava:33.3.1-jre'
 
+    // AWS S3 (SDK v2)
+    implementation 'software.amazon.awssdk:s3:2.20.28'
+    implementation 'software.amazon.awssdk:secretsmanager:2.20.28'
+
     implementation 'commons-codec:commons-codec:1.15'
+
+
 }
 
 dependencyManagement {

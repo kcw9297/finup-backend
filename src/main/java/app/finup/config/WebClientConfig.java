@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2025-12-05
  */
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class WebClientConfig {
 
     // API URL
