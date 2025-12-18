@@ -6,9 +6,11 @@ import app.finup.layer.domain.news.component.NewsContentExtractor;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.dto.NewsDtoMapper;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
+import app.finup.layer.domain.news.util.PromptUtils;
 import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.service.WordsVectorService;
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class NewsAiServiceImpl implements NewsAiService {
 
     private final AiManager aiManager;
@@ -37,6 +40,7 @@ public class NewsAiServiceImpl implements NewsAiService {
         if(article.isBlank()){
             return null;
         }
+        article = PromptUtils.trimHeadTail(article);
         //기사 임베딩
         String articleEmbedding = aiManager.embedJson(article);
 
@@ -70,6 +74,7 @@ public class NewsAiServiceImpl implements NewsAiService {
 
     @Override
     public NewsDto.Summary analyzeLight(String summary) {
+        summary = PromptUtils.trimForAi(summary);
         //기사 임베딩
         String articleEmbedding = aiManager.embedJson(summary);
 
