@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class QuizScheduler {
-/*
     private final QuizAiService quizAiService;
 
     @PostConstruct
@@ -29,5 +28,5 @@ public class QuizScheduler {
     public void refresh() {
         log.info("[SCHEDULER] 수준테스트 AI 문제 생성");
         quizAiService.refreshQuizAi();
-    }*/
+    }
 }

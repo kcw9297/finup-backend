@@ -43,7 +43,7 @@ public class StockChartController {
                 chart.getOutput()
         );
 
-        StockChartDto.ChartAi ai = stockChartAiService.getChartAi(code, input);
+        StockChartDto.ChartAi ai = stockChartAiService.getChartAi(code, type, input);
 
         return Api.ok(ai);
     }

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(Url.STOCKS)
 @RequiredArgsConstructor
 public class StocksController {
-    //private final StocksService stocksService;
     private final StockService stockService;
     private final StockAiService stockAiService;
     private final StockNewsAiService stockNewsAiService;

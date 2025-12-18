@@ -72,25 +72,25 @@ public class StockStorageImpl implements StockStorage {
 
     //차트 탭
     @Override
-    public void setChart(String code, StockChartDto.Row row) {
-        rt.opsForValue().set(CHART_KEY+code, row, Duration.ofHours(72).plusMinutes(30));
+    public void setChart(String code, CandleType candleType, StockChartDto.Row row) {
+        rt.opsForValue().set(CHART_KEY+candleType+code, row, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
-    public StockChartDto.Row getChart(String code) {
-        Object object  = rt.opsForValue().get(CHART_KEY+code);
+    public StockChartDto.Row getChart(String code, CandleType candleType) {
+        Object object  = rt.opsForValue().get(CHART_KEY+candleType+code);
         if (object == null) return null;
         return objectMapper.convertValue(object, StockChartDto.Row.class);
     }
 
     @Override
-    public void setChartAi(String code, StockChartDto.ChartAi chartAi) {
-        rt.opsForValue().set(CHART_AI_KEY+code, chartAi, Duration.ofHours(72).plusMinutes(30));
+    public void setChartAi(String code, CandleType candleType, StockChartDto.ChartAi chartAi) {
+        rt.opsForValue().set(CHART_AI_KEY+candleType+code, chartAi, Duration.ofHours(72).plusMinutes(30));
     }
 
     @Override
-    public StockChartDto.ChartAi getChartAi(String code) {
-        Object object  = rt.opsForValue().get(CHART_AI_KEY+code);
+    public StockChartDto.ChartAi getChartAi(String code, CandleType candleType) {
+        Object object  = rt.opsForValue().get(CHART_AI_KEY+candleType+code);
         if (object == null) return null;
         return objectMapper.convertValue(object, StockChartDto.ChartAi.class);
     }

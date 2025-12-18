@@ -28,6 +28,7 @@ public class VideoLinkScheduler {
      * 10분마다 유튜브 영상 동기화
      */
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS, initialDelay = 0)
+    //@Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
     public void syncVideoLinks() {
         videoLinkService.sync();
         LogUtils.showInfo(this.getClass(), "학습 영상 동기화 수행 완료");
