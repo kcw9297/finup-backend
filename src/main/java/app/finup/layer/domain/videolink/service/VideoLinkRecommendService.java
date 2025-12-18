@@ -53,11 +53,4 @@ public interface VideoLinkRecommendService {
     List<VideoLinkDto.Row> retryRecommendForStudy(Long studyId, Long memberId);
 
 
-    /**
-     * 홈 화면 기본 영상 목록 조회 (관리자 등록 기준)
-     * @param size 조회 개수
-     * @return 영상 목록
-     */
-    List<VideoLinkDto.Row> getHomeLatestList(Integer size);
-
 }

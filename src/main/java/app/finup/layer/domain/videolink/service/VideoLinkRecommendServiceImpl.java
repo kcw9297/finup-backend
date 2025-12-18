@@ -74,10 +74,10 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
         // [3] embedded 기반 영상 추천 후, 결과 반환
         return videoLinkRepository
-                .findSimilarWithThreshold(embedding, RECOMMEND_AMOUNT_LOGOUT, RECOMMEND_THRESHOLD)
+                .findSimilar(embedding, RECOMMEND_AMOUNT_REQUEST)
                 .stream()
                 .map(VideoLinkDtoMapper::toRow)
-                .toList();
+                .collect(Collectors.toList()); // 가변 배열로 저장
     }
 
 
@@ -116,21 +116,19 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
         // [4] 임베딩 기반 영상 추천
         List<VideoLinkDto.Row> candidates = videoLinkRepository
-                .findSimilarWithThreshold(embedding, RECOMMEND_AMOUNT_REQUEST, RECOMMEND_THRESHOLD)
+                .findSimilarWithExcluding(embedding, RECOMMEND_AMOUNT_REQUEST, recommendedIds)
                 .stream()
-                .filter(videoLink -> !recommendedIds.contains(videoLink.getVideoLinkId()))
                 .map(VideoLinkDtoMapper::toRow)
                 .collect(Collectors.toList()); // 가변 배열로 저장
 
         // 재시도인 경우 목록 셔플
         if (retry) Collections.shuffle(candidates);
-        List<VideoLinkDto.Row> results = candidates.stream().limit(RECOMMEND_AMOUNT_RESPONSE).toList();
 
         // [5] 현재 추천 결과 정보들을 저장
-        if (!results.isEmpty()) {
+        if (!candidates.isEmpty()) {
             videoLinkRedisStorage.storeLatestSentenceForHome(sentence, memberId);
             videoLinkRedisStorage.storeLatestRecommendedIds(
-                    results.stream().map(row -> String.valueOf(row.getVideoLinkId())).toList(), memberId
+                    candidates.stream().map(row -> String.valueOf(row.getVideoLinkId())).toList(), memberId
             );
         }
         return candidates;
@@ -183,16 +181,6 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
         // [4] 영상 추천 수행 및 결과 반환
         return candidates.isEmpty() ? List.of() : doRecommend(memberId, study, candidates, latestVideoLinkIds);
-    }
-
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<VideoLinkDto.Row> getHomeLatestList(Integer size) {
-
-        Integer limit = (size == null || size <= 0) ? 20 : size;
-
-        return videoLinkMapper.selectHomeLatest(limit);
     }
 
 
