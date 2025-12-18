@@ -2,7 +2,6 @@ package app.finup.layer.domain.stock.redis;
 
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stockChart.dto.StockChartDto;
-import app.finup.layer.domain.stockChart.enums.CandleType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
