@@ -37,6 +37,17 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
     @Query(value = """
         SELECT *
         FROM video_link
+        WHERE embedding IS NOT NULL AND video_link_id NOT IN (:excludeIds)
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<VideoLink> findSimilarWithExcluding(byte[] embedding, int lim, List<Long> excludeIds);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM video_link
         WHERE embedding IS NOT NULL AND VEC_DISTANCE_COSINE(embedding, :embedding) < :threshold
         ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
         LIMIT :lim
