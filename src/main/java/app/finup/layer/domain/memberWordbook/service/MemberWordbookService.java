@@ -32,4 +32,13 @@ public interface MemberWordbookService {
      */
 
     boolean isAdded(Long termId);
+
+    /**
+     * 단어 암기 상태 변경
+     *
+     * @param termId 대상 금융 용어 ID
+     * @param rq 암기 상태 변경 요청 DTO
+     * @return 변경된 암기 상태 정보
+     */
+    MemberWordbookDto.MemorizedWord memorize(Long termId, MemberWordbookDto.Memorize rq);
 }

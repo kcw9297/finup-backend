@@ -1,5 +1,6 @@
 package app.finup.layer.domain.memberWordbook.dto;
 
+import app.finup.layer.domain.memberWordbook.enums.MemorizeStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -45,10 +46,21 @@ public final class MemberWordbookDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Builder
     public static class MemorizedWord {
         private Long termId;
         private LocalDateTime memorizedAt;
-        private String memorizeStatus;
+        private MemorizeStatus memorizeStatus;
+    }
+
+    /**
+     * 암기 상태 변경 요청 DTO
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Memorize {
+        private boolean memorized;
     }
 }
 

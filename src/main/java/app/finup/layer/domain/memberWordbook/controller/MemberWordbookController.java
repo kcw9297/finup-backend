@@ -1,6 +1,7 @@
 package app.finup.layer.domain.memberWordbook.controller;
 
 import app.finup.common.constant.Url;
+import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.memberWordbook.dto.MemberWordbookDto;
 import app.finup.layer.domain.memberWordbook.service.MemberWordbookService;
@@ -63,4 +64,23 @@ public class MemberWordbookController {
         return Api.ok(memberWordbookService.isAdded(termId));
     }
 
+
+    /**
+     * 단어장 암기 상태 변경 API
+     * - 단어를 암기 완료 또는 암기 취소 상태로 변경한다.
+     * - 로그인한 사용자 본인의 단어장에 대해서만 처리된다.
+     *
+     * [PATCH] /wordbooks/{termId}/memorize
+     */
+
+    @PatchMapping("/{termId:[0-9]+}/memorize")
+    public ResponseEntity<?> memorize(
+            @PathVariable Long termId,
+            @RequestBody MemberWordbookDto.Memorize rq
+    ) {
+        return Api.ok(
+                AppStatus.WORD_MEMORIZE_OK
+                , memberWordbookService.memorize(termId, rq)
+        );
+    }
 }

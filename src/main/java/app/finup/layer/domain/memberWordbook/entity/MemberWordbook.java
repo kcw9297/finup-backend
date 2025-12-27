@@ -46,4 +46,21 @@ public class MemberWordbook {
         this.member = member;
         this.word = word;
     }
+
+    /**
+     * 암기 완료 처리
+     */
+    public void memorize() {
+        this.memorizeStatus = MemorizeStatus.MEMORIZED;
+        this.memorizedAt = LocalDateTime.now();
+    }
+
+    /**
+     * 암기 취소 처리
+     */
+    public void cancelMemorize() {
+        this.memorizeStatus = MemorizeStatus.NONE;
+        this.memorizedAt = null;
+    }
+
 }
