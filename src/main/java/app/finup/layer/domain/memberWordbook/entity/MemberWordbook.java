@@ -1,10 +1,12 @@
 package app.finup.layer.domain.memberWordbook.entity;
 
 import app.finup.layer.domain.member.entity.Member;
+import app.finup.layer.domain.memberWordbook.enums.MemorizeStatus;
 import app.finup.layer.domain.words.entity.Words;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -31,6 +33,13 @@ public class MemberWordbook {
 
     @CreatedDate
     private LocalDateTime createdDate;
+
+    @UpdateTimestamp
+    private LocalDateTime memorizedAt;
+
+    @Enumerated
+    @Column(nullable = false)
+    private MemorizeStatus memorizeStatus;
 
     @Builder
     public MemberWordbook(Member member, Words word) {
