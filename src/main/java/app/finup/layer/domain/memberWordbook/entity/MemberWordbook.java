@@ -37,7 +37,7 @@ public class MemberWordbook {
     @UpdateTimestamp
     private LocalDateTime memorizedAt;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MemorizeStatus memorizeStatus;
 
@@ -45,6 +45,7 @@ public class MemberWordbook {
     public MemberWordbook(Member member, Words word) {
         this.member = member;
         this.word = word;
+        this.memorizeStatus = MemorizeStatus.NONE;
     }
 
     /**
