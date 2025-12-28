@@ -34,5 +34,13 @@ public interface MemberWordbookRepository extends JpaRepository<MemberWordbook, 
     );
 
     // 단어장 암기 항목 조회
-    Optional<MemberWordbook> findByMemberIdAndTermId(Long memberId, Long termId);
+    @Query("""
+        SELECT mw
+        FROM MemberWordbook mw
+        WHERE mw.member.memberId = :memberId
+          AND mw.word.termId = :termId
+    """)
+    Optional<MemberWordbook> findByMemberIdAndTermId(
+            @Param("memberId") Long memberId,
+            @Param("termId") Long termId);
 }
