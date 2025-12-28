@@ -87,6 +87,8 @@ public enum AppStatus {
     /* 내 단어장 MemberWordbook */
     WORD_NOT_FOUND(400, "존재하지 않는 단어입니다.", "WORD_NOT_FOUND"),
     MEMBER_WORDBOOK_ALREADY_EXISTS(400, "이미 존재하는 단어입니다.", "MEMBER_WORDBOOK_ALREADY_EXISTS"),
+    WORD_MEMORIZE_OK(200, "단어 암기를 완료했습니다.", "WORD_MEMORIZE_OK"),
+
 
     /* 영상 정보 VideoLink */
     VIDEO_LINK_NOT_FOUND(500, "영상 목록이 갱신되었습니다. 새로고침 후 다시 시도해 주세요.", "VIDEO_LINK_NOT_FOUND"),

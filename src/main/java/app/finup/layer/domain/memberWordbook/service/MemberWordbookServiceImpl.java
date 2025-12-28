@@ -72,7 +72,6 @@ public class MemberWordbookServiceImpl implements MemberWordbookService {
                         .word(word)
                         .build()
         );
-
     }
 
     @Override
@@ -97,5 +96,30 @@ public class MemberWordbookServiceImpl implements MemberWordbookService {
 
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    public MemberWordbookDto.MemorizedWord memorize(Long termId, MemberWordbookDto.Memorize rq) {
+        // [1] 로그인 사용자 조회
+        Long memberId = SecurityUtil.getLoginMemberId();
+
+        // [2] 단어장 엔티티 조회
+        MemberWordbook wordbook = memberWordbookRepository.findByMemberIdAndTermId(memberId, termId)
+                .orElseThrow(() -> new BusinessException(AppStatus.WORD_NOT_FOUND));
+
+        // [3] 암기 상태 변경
+        if (rq.isMemorized()) {
+            wordbook.memorize();
+        } else {
+            wordbook.cancelMemorize();
+        }
+
+        // [4] 변경 결과 반환
+        return MemberWordbookDto.MemorizedWord.builder()
+                .termId(termId)
+                .memorizedAt(wordbook.getMemorizedAt())
+                .memorizeStatus(wordbook.getMemorizeStatus())
+                .build();
+
     }
 }
