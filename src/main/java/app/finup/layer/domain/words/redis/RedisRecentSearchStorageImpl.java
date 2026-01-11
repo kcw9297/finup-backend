@@ -1,4 +1,4 @@
-package app.finup.infra.words.redis;
+package app.finup.layer.domain.words.redis;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

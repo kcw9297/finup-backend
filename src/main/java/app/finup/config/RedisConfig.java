@@ -3,6 +3,7 @@ package app.finup.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.lettuce.core.api.StatefulConnection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -35,7 +37,7 @@ import java.util.Objects;
 @Configuration
 @EnableCaching // SpringCache 활성화 (Redis)
 @RequiredArgsConstructor
-public class RedisConfig {
+public class RedisCoreConfig {
 
     // Redis
     @Value("${spring.data.redis.host}")
@@ -84,6 +86,7 @@ public class RedisConfig {
     @Value("${app.redis.redisson.retry-delay-max}")
     private long redissonRetryDelayMax;
 
+
     @Bean // 원활한 캐싱을 위한 커스텀
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -99,18 +102,70 @@ public class RedisConfig {
         config.setPort(port);
         if (Objects.nonNull(password) && !password.isBlank()) config.setPassword(password);
 
-        // SSL 설정 추가
-        if (ssl) {
-            LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                    .useSsl()  // ssl 활성화
-                    .build();
+        // Lettuce 설정
+        // connection pool 설정
+        GenericObjectPoolConfig<StatefulConnection<?, ?>> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setMaxTotal(maxActive);
+        poolConfig.setMaxIdle(maxIdle);
+        poolConfig.setMinIdle(minIdle);
+        poolConfig.setMaxWait(maxWait);
+        poolConfig.setTestOnBorrow(true);
+        poolConfig.setTestOnReturn(true);
+        poolConfig.setTestWhileIdle(true);
 
-            return new LettuceConnectionFactory(config, clientConfig);
+        // lettuce pooling client 설정
+        LettucePoolingClientConfiguration.LettucePoolingClientConfigurationBuilder builder =
+                LettucePoolingClientConfiguration.builder()
+                        .commandTimeout(Duration.ofMillis(timeout))
+                        .poolConfig(poolConfig);
 
-        } else {
-            return new LettuceConnectionFactory(config);
-        }
+        // ssl 설정
+        if (ssl) builder.useSsl();
+
+        // 설정 완료
+        LettuceClientConfiguration clientConfig = builder.build();
+        return new LettuceConnectionFactory(config, clientConfig);
     }
+
+
+    @Bean(destroyMethod = "shutdown") // redisson 설정
+    public RedissonClient redissonClient() {
+
+        // Redisson 설정 객체
+        Config config = new Config();
+
+        // Redis 주소 설정
+        String protocol = ssl ? "rediss" : "redis"; // SSL 사용 시 rediss://
+        String address = "%s://%s:%d".formatted(protocol, host, port);
+
+        // 서버 기본 설정
+        SingleServerConfig serverConfig = config.useSingleServer()
+
+                // 서버 주소
+                .setAddress(address)
+
+                // Connection Pool 설정
+                .setConnectionPoolSize(redissonPoolSize) // 최대 커넥션 수
+                .setConnectionMinimumIdleSize(redissonMinIdle) // 최소 유휴 연결 수 (항상 유지할 커넥션 수)
+                .setIdleConnectionTimeout(redissonIdleTimeout) // 사용하지 않는 연결 타임아웃
+
+                // Timeout 설정
+                .setConnectTimeout(timeout) // Redis 서버 연결 타임아웃
+                .setTimeout(timeout) // Redis 명령 응답 타임아웃
+
+                // Retry 설정
+                .setRetryAttempts(redissonRetryAttempts) // 최대 재시도 횟수
+                .setRetryDelay(new EqualJitterDelay(
+                        Duration.ofMillis(redissonRetryDelayMin), // 최소 대기
+                        Duration.ofMillis(redissonRetryDelayMax)  // 최대 대기
+                ));
+
+        // 비밀번호 설정 (있는 경우만)
+        if (Objects.nonNull(password) && !password.isBlank()) serverConfig.setPassword(password);
+        return Redisson.create(config);
+    }
+
+
 
 
     @Bean // RedisCacheManager 설정
@@ -148,4 +203,5 @@ public class RedisConfig {
     public static ConfigureRedisAction configureRedisAction() {
         return ConfigureRedisAction.NO_OP;
     }
+
 }

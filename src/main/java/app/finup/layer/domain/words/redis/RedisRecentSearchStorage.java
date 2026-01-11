@@ -1,4 +1,4 @@
-package app.finup.infra.words.redis;
+package app.finup.layer.domain.words.redis;
 
 import java.util.List;
 

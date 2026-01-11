@@ -13,10 +13,6 @@ import java.util.List;
 
 public interface WordsService {
 
-    /**
-    * 금융 용어 사전 초기 적재 및 갱신
-    */
-    void refreshTerms();  // 외부 Provider -> 내부 DB 갱신
 
     /**
      * 금융 용어 검색
@@ -25,11 +21,13 @@ public interface WordsService {
      */
     Page<WordsDto.Row> search(WordsDto.Search rq, Long memberId);
 
+
     /**
      * 단어장 홈 관련 서비스 메소드
      * @return 페이징된 검색 결과(용어 목록) DTO 리스트
      */
     List<WordsDto.Row> getHomeWords();
+
 
     /**
      * 초기 적재 여부 확인
@@ -38,11 +36,6 @@ public interface WordsService {
      */
     Boolean isInitialized();
 
-    /**
-    * KB Think 용어 사전 전체 크롤링
-    */
-    void crawlAllFromKbThink();
-
 
     /**
      * 단어 상세 조회
@@ -50,15 +43,19 @@ public interface WordsService {
      * @return 단어 상세 정보
      */
     WordsDto.Row getDetail(Long termId);
+
+
     /**
      * Redis 최근 단어 추가 메소드
      */
     List<String> getRecent(Long memberId);
 
+
     /**
      * Redis 최근 단어 기록 delete 메소드
      */
     void clear(Long memberId);
+
 
     /**
      * Redis 최근 검색 단어 삭제 메소드
