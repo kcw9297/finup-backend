@@ -6,6 +6,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.lettuce.core.api.StatefulConnection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.redisson.config.EqualJitterDelay;
+import org.redisson.config.SingleServerConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -37,7 +43,7 @@ import java.util.Objects;
 @Configuration
 @EnableCaching // SpringCache 활성화 (Redis)
 @RequiredArgsConstructor
-public class RedisCoreConfig {
+public class RedisConfig {
 
     // Redis
     @Value("${spring.data.redis.host}")
@@ -87,7 +93,7 @@ public class RedisCoreConfig {
     private long redissonRetryDelayMax;
 
 
-    @Bean // 원활한 캐싱을 위한 커스텀
+    @Bean // ObjectMapper 설정 (원활한 직렬화, 역직렬화 목적으로 커스텀)
     public ObjectMapper objectMapper() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -166,8 +172,6 @@ public class RedisCoreConfig {
     }
 
 
-
-
     @Bean // RedisCacheManager 설정
     public CacheManager cacheManager() {
 
@@ -182,13 +186,13 @@ public class RedisCoreConfig {
     }
 
 
-    @Bean
+    @Bean // StringRedisTemplate Bean
     public StringRedisTemplate stringRedisTemplate() {
         return new StringRedisTemplate(redisConnectionFactory());
     }
 
 
-    @Bean // RedisTemplate customize
+    @Bean // RedisTemplate Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
@@ -198,6 +202,7 @@ public class RedisCoreConfig {
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper()));
         return redisTemplate;
     }
+
 
     @Bean // CONFIG 비활성화
     public static ConfigureRedisAction configureRedisAction() {

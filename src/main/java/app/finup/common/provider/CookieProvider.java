@@ -1,12 +1,17 @@
-package app.finup.common.manager;
+package app.finup.common.provider;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.time.Duration;
 
+/**
+ * 쿠키 관리 기능 제공 Provider 인터페이스
+ * @author kcw
+ * @since 2025-11-29
+ */
 
-public interface CookieManager {
+public interface CookieProvider {
 
     /**
      * 특정 쿠키 내 값 조회

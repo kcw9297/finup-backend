@@ -1,5 +1,6 @@
 package app.finup.config;
 
+import app.finup.common.constant.AsyncMode;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -18,72 +19,61 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class AsyncConfig {
 
+    // 사용 상수
+    private static final String PREFIX = "SCHEDULER-";
+    private static final String PREFIX_NEWS = "NEWS-";
+    private static final String PREFIX_NEWS_NAVER_API = PREFIX_NEWS + "NAVER_API-";
+    private static final String PREFIX_NEWS_CRAWLING = PREFIX_NEWS + "CRAWLER-";
+    private static final String PREFIX_STOCK = "STOCK-";
+    private static final String PREFIX_STOCK_SEARCH = PREFIX_STOCK + "SEARCH-";
+
+
     // 일반 스케줄러 - 초기화 작업용
-    @Bean(name = "schedulerExecutor")
-    public Executor schedulerExecutor() {
+    @Bean(name = AsyncMode.NORMAL)
+    public Executor normalScheduler() {
+
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(3);
         executor.setMaxPoolSize(6);
         executor.setQueueCapacity(30);
-        executor.setThreadNamePrefix("scheduler-");
-        executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
         executor.setAllowCoreThreadTimeOut(true);  // 유휴 시 코어 스레드도 종료
         executor.setKeepAliveSeconds(60);
+        executor.setThreadNamePrefix(PREFIX);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }
 
-    @Bean(name = "newsExecutor")
-    public Executor newsExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(6);
-        executor.setQueueCapacity(30);
-        executor.setKeepAliveSeconds(120);
-        executor.setThreadNamePrefix("news-");
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
-        executor.setAwaitTerminationSeconds(60);
-        executor.initialize();
-        return executor;
-    }
+    @Bean(name = AsyncMode.NEWS_ASYNC)
+    public Executor newsCrawlingScheduler() {
 
-    @Bean(name = "stockExecutor")
-    public Executor stockExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(5);
-        executor.setQueueCapacity(20);
-        executor.setKeepAliveSeconds(90);
-        executor.setThreadNamePrefix("stock-");
-        executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(60);
-        executor.initialize();
-        return executor;
-    }
-
-    @Bean(name = "quizExecutor")
-    public Executor quizExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(1);
-        executor.setMaxPoolSize(2);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
         executor.setQueueCapacity(10);
         executor.setKeepAliveSeconds(60);
-        executor.setThreadNamePrefix("quiz-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.CallerRunsPolicy()
-        );
         executor.setAwaitTerminationSeconds(60);
+        executor.setThreadNamePrefix(PREFIX_NEWS_CRAWLING);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }
+
+    @Bean(name = AsyncMode.STOCK_ASYNC)
+    public Executor stockSearchScheduler() {
+
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(10);
+        executor.setKeepAliveSeconds(60);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.setThreadNamePrefix(PREFIX_STOCK_SEARCH);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+
 }

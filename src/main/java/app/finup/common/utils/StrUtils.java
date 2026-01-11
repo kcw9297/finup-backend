@@ -17,6 +17,12 @@ import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.*;
 
+/**
+ * 문자열 관련 조작 기능 제공 유틸 클래스
+ * @author kcw
+ * @since 2025-11-21
+ */
+
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StrUtils {
@@ -174,26 +180,49 @@ public final class StrUtils {
 
 
     public static String splitWithStart(String text, int splitDescriptionLen) {
+
         return Objects.isNull(text) ? null :
-                text.length() > splitDescriptionLen ? text.substring(0, splitDescriptionLen) : text;
+                text.length() > splitDescriptionLen ? text.substring(0, splitDescriptionLen) + "..." : text;
     }
 
-    /**
-     * Markdown 코드 블록 제거
-     */
+    // Markdown 코드 블록 제거
     public static String removeMarkdownBlock(String text) {
 
-        if (text == null || text.isBlank()) {
-            return text;
+        if (Objects.isNull(text) || text.isBlank()) {
+            return "";
         }
 
-        // 패턴 1: ```json\n{...}\n```
-        // 패턴 2: ```\n{...}\n```
-        // 패턴 3: `{...}` (단일 백틱)
+        return text
+                // [1] Markdown 코드블록 제거 (```언어\n내용\n``` 형태)
+                .replaceAll("```[a-z]*\\n?", "")
+                .replaceAll("```", "")
 
-        return text.trim()
-                .replaceAll("^```(?:json)?\\s*([\\s\\S]*?)\\s*```$", "$1")
-                .replaceAll("^`([\\s\\S]*?)`$", "$1")
+                // [2] 단일 백틱 제거 (`내용` 형태)
+                .replaceAll("^`|`$", "")
+
+                // [3] JSON 따옴표 제거 (전체가 "내용" 형태)
+                .replaceAll("^\"", "")
+                .replaceAll("\"$", "")
+
+                // [4] 불필요한 접두어 제거
+                .replaceAll("^(분석|결과|답변|응답|해설)\\s*:\\s*", "")
+
+                // [5] 앞뒤 공백 제거
                 .trim();
     }
+
+
+    public static String fillPlaceholder(String text, Map<String, String> placeholders) {
+
+        // 결과 탬플릿
+        String result = text;
+
+        // 탬플릿 내 Placeholder($) 값 채움
+        for (Map.Entry<String, String> entry : placeholders.entrySet())
+            result = result.replace(entry.getKey(), entry.getValue());
+
+        // 결과 반환
+        return result;
+    }
+
 }

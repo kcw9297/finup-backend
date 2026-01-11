@@ -8,7 +8,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import app.finup.common.manager.CookieManager;
+import app.finup.common.provider.CookieProvider;
 import app.finup.common.utils.LogUtils;
 import app.finup.infra.jwt.dto.JwtClaims;
 import app.finup.infra.jwt.provider.JwtProvider;
@@ -41,7 +41,7 @@ import java.util.Objects;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final CookieManager cookieManager;
+    private final CookieProvider cookieProvider;
 
     @Value("${jwt.cookie-name}")
     private String jwtCookieName;
@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
 
             // [1] Cookie 내 포함된 AT 조회
-            String at = cookieManager.getValue(request, jwtCookieName);
+            String at = cookieProvider.getValue(request, jwtCookieName);
             String xsrfToken = request.getHeader("X-XSRF-TOKEN");
             //LogUtils.showInfo(this.getClass(), "\nCOOKIE JWT TOKEN : %s\nHEADER XSRF-TOKEN : %s", at, xsrfToken);
 
@@ -75,14 +75,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰 인증에 실패하거나, 재발급 실패 시 실패 응답 반환
         } catch (JwtVerifyException e) {
             LogUtils.showWarn(this.getClass(), "JWT 인증 실패 - 미인증 상태로 처리: %s", e.getAppStatus().getInfo());
-            cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
+            cookieProvider.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
             request.setAttribute(AppStatus.TOKEN_EXPIRED.name(), true); // 토큰이 만료되었음을 안내하는 속성 추가
             filterChain.doFilter(request, response); // 미인증 상태로 그대로 통과
 
             // 예기치 않은 오류가 발생한 경우
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "JWT 인증 실패 - 요청 중단 : %s", e.getMessage());
-            cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
+            cookieProvider.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
             Api.writeFail(response, AppStatus.TOKEN_INVALID); // 필터 처리 중단 (로직 실행하지 않음)
         }
     }
@@ -132,7 +132,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String reissuedAt = jwtProvider.reissue(at);
 
             // [2] 새 쿠키 생성
-            cookieManager.createCookie(response, jwtCookieName, reissuedAt, jwtCookieExpiration);
+            cookieProvider.createCookie(response, jwtCookieName, reissuedAt, jwtCookieExpiration);
 
             // [3] 재발급된 토큰에서 Claims 조회 및 반환
             return jwtProvider.getClaims(reissuedAt);

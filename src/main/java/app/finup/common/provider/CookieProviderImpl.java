@@ -1,4 +1,4 @@
-package app.finup.common.manager;
+package app.finup.common.provider;
 
 import app.finup.common.utils.EnvUtils;
 import jakarta.servlet.http.Cookie;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * CookieManager 구현 클래스
+ * CookieProvider 구현 클래스
  * @author kcw
  * @since 2025-11-26
  */
@@ -25,7 +25,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CookieManagerImpl implements CookieManager {
+public class CookieProviderImpl implements CookieProvider {
 
     // 현재 환경 변수
     private final Environment env;
