@@ -35,8 +35,9 @@ import java.util.Objects;
 @Configuration
 @EnableCaching // SpringCache 활성화 (Redis)
 @RequiredArgsConstructor
-public class RedisCoreConfig {
+public class RedisConfig {
 
+    // Redis
     @Value("${spring.data.redis.host}")
     private String host;
 
@@ -48,6 +49,40 @@ public class RedisCoreConfig {
 
     @Value("${spring.data.redis.ssl.enabled}")
     private boolean ssl;
+
+    @Value("${spring.data.redis.timeout}")
+    private int timeout;
+
+    @Value("${spring.data.redis.lettuce.pool.max-active}")
+    private int maxActive;
+
+    @Value("${spring.data.redis.lettuce.pool.min-idle}")
+    private int minIdle;
+
+    @Value("${spring.data.redis.lettuce.pool.max-idle}")
+    private int maxIdle;
+
+    @Value("${spring.data.redis.lettuce.pool.max-wait}")
+    private Duration maxWait;
+
+    // Redisson
+    @Value("${app.redis.redisson.connection-pool-size}")
+    private int redissonPoolSize;
+
+    @Value("${app.redis.redisson.connection-minimum-idle}")
+    private int redissonMinIdle;
+
+    @Value("${app.redis.redisson.idle-connection-timeout}")
+    private int redissonIdleTimeout;
+
+    @Value("${app.redis.redisson.retry-attempts}")
+    private int redissonRetryAttempts;
+
+    @Value("${app.redis.redisson.retry-delay-min}")
+    private long redissonRetryDelayMin;
+
+    @Value("${app.redis.redisson.retry-delay-max}")
+    private long redissonRetryDelayMax;
 
     @Bean // 원활한 캐싱을 위한 커스텀
     public ObjectMapper objectMapper() {

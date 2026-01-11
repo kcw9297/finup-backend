@@ -51,7 +51,6 @@ api:
       id: ${API_NAVER_NEWS_CLIENT_ID}
       secret: ${API_NAVER_NEWS_CLIENT_SECRET}
 
-
   youtube:
     endpoint: ${API_YOUTUBE_ENDPOINT}
     key: ${API_YOUTUBE_KEY}
@@ -59,3 +58,11 @@ api:
   finance-dict:
     endpoint: ${API_FINANCE_DICT_ENDPOINT}
     key: ${API_FINANCE_DICT_KEY}
+
+  kexim:
+    endpoint: ${API_KEXIM_ENDPOINT}
+    key: ${API_KEXIM_KEY}
+
+  open-portal:
+    endpoint: ${API_OPENPORTAL_ENDPOINT}
+    key: ${API_OPENPORTAL_KEY}

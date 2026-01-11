@@ -31,13 +31,13 @@ public class WebClientConfig {
     @Value("${api.naver-news.endpoint}")
     private String naverEndPoint;
 
-    @Value(("${api.finance-dict.endpoint}"))
+    @Value("${api.finance-dict.endpoint}")
     private String dataPortalEndPoint;
 
-    @Value("${API_KEXIM_ENDPOINT}")
+    @Value("${api.kexim.endpoint}")
     private String keximEndpoint;
 
-    @Value("${API_OPENPORTAL_ENDPOINT}")
+    @Value("${api.open-portal.endpoint}")
     private String openPortalEndpoint;
 
     // 필요 상수
@@ -47,23 +47,17 @@ public class WebClientConfig {
     @Value("${api.naver-news.client.secret}")
     private String naverClientSecret;
 
-    @Value(("${api.kis.endpoint}"))
+    @Value("${api.kis.endpoint}")
     private String kisEndPoint;
 
-    @Value(("${api.kis.client.id}"))
+    @Value("${api.kis.client.id}")
     private String kisAppKey;
 
-    @Value(("${api.kis.client.secret}"))
+    @Value("${api.kis.client.secret}")
     private String kisAppSecret;
 
-    @Value(("${api.finance-dict.key}"))
+    @Value("${api.finance-dict.key}")
     private String dataPortalSecret;
-
-    @Value("${API_KEXIM_KEY}")
-    private String keximKey;
-
-    @Value("${API_OPENPORTAL_KEY}")
-    private String openPortalKey;
 
 
     @Bean(name = "youTubeClient") // 유튜브 API 사용을 위한 Client

@@ -28,7 +28,7 @@ public class StockNewsScheduler {
     private final StockService stockService;
 
     @Scheduled(fixedRate = 30 * 60 * 1000, initialDelay = 1000 * 60)
-    @Async("schedulerExecutor")
+    @Async("stockExecutor")
     public void updateStockNews() {
 
         List<StockDto.MarketCapRow> marketCapList = stockService.getMarketCapRow();
