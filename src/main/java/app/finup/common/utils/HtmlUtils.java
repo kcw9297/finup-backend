@@ -56,17 +56,13 @@ public class HtmlUtils {
                 .toList();
     }
 
+
     /**
      * HTML 태그를 제거한 문자열만 추출
      * @param text 원문 문자열
      * @return 사용자가 작성한 "순수" 문자열 반환
      */
-    public static String removeHtmlTags(String text) {
-        return Objects.isNull(text) ? null : Jsoup.parse(text).text();
-    }
-
-
     public static String getText(String text) {
-        return Jsoup.parse(text).text();
+        return Objects.isNull(text) ? null : Jsoup.parse(text).text();
     }
 }

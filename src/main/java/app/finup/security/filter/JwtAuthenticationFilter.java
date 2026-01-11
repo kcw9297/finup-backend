@@ -115,7 +115,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtVerifyException e) {
 
             // [2] AT만료 이외의 사유인 경우 그대로 던짐 (RT 만료인 경우도 던짐)
-            if (!StrUtils.equalsStatus(e.getAppStatus(), AppStatus.TOKEN_EXPIRED))
+            if (!Objects.equals(e.getAppStatus(), AppStatus.TOKEN_EXPIRED))
                 throw e;
 
             // [3] Claims 조회 시도
