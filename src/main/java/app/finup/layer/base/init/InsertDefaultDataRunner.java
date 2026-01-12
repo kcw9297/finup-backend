@@ -1,4 +1,4 @@
-package app.finup.layer.base.runner;
+package app.finup.layer.base.init;
 
 
 import app.finup.common.constant.Env;
