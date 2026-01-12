@@ -1,4 +1,4 @@
-package app.finup.infra.ai.provider;
+package app.finup.infra.ai;
 
 /**
  * AI 모델에게 질문을 전달하는 기능을 제공하는 인터페이스

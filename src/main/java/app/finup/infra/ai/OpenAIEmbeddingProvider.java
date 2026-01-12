@@ -1,7 +1,7 @@
-package app.finup.infra.ai.provider;
+package app.finup.infra.ai;
 
 
-import app.finup.infra.ai.utils.AiUtils;
+import app.finup.common.utils.AiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
@@ -27,10 +27,12 @@ public class OpenAIEmbeddingProvider implements EmbeddingProvider {
     // embedding에 사용할 model 의존성
     private final OpenAiEmbeddingModel embeddingModel;
 
+
     @Override
     public byte[] generate(String text) {
         return AiUtils.convertToByteArray(embeddingModel.embed(text));
     }
+
 
     @Override
     public <T> Map<T, byte[]> generate(Map<T, String> idTextMap) {

@@ -1,4 +1,4 @@
-package app.finup.infra.ai.provider;
+package app.finup.infra.ai;
 
 
 import app.finup.common.enums.AppStatus;

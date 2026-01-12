@@ -1,4 +1,4 @@
-package app.finup.infra.ai.utils;
+package app.finup.common.utils;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -46,5 +46,36 @@ public final class AiUtils {
         // [2] 변환 수행
         for (float value : embedded) buffer.putFloat(value);
         return buffer.array();
+    }
+
+
+    /**
+     * AI 프롬포트 결과에 포함된 불필요한 텍스트 제거 (마크다운 블록 등)
+     * @param text AI 생성결과 문자열
+     * @return 불필요한 텍스트를 제거한 문자열
+     */
+    public static String removeMarkdown(String text) {
+
+        if (Objects.isNull(text) || text.isBlank()) {
+            return "";
+        }
+
+        return text
+                // [1] Markdown 코드블록 제거 (```언어\n내용\n``` 형태)
+                .replaceAll("```[a-z]*\\n?", "")
+                .replaceAll("```", "")
+
+                // [2] 단일 백틱 제거 (`내용` 형태)
+                .replaceAll("^`|`$", "")
+
+                // [3] JSON 따옴표 제거 (전체가 "내용" 형태)
+                .replaceAll("^\"", "")
+                .replaceAll("\"$", "")
+
+                // [4] 불필요한 접두어 제거
+                .replaceAll("^(분석|결과|답변|응답|해설)\\s*:\\s*", "")
+
+                // [5] 앞뒤 공백 제거
+                .trim();
     }
 }

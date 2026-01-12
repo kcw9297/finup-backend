@@ -1,4 +1,4 @@
-package app.finup.infra.ai.provider;
+package app.finup.infra.ai;
 
 import java.util.Map;
 
@@ -18,9 +18,9 @@ public interface EmbeddingProvider {
 
 
     /**
-     * 제공 텍스트 기반 Embedding 배열 생성 (batch 처리. 최대 50개만 가능)
-     * @param idTextMap "고유번호" - "텍스트" 쌍의 Map 요청 (다수 요청을 동시 처리)
-     * @return "고유번호" - "임베딩 배열" 쌍 (각 번호마다 텍스트를 처리한 결과)
+     * 제공 텍스트 기반 Embedding 배열 생성 (다수 처리)
+     * @param idTextMap Map<고유번호, 임베딩요청 텍스트>
+     * @return Map<고유번호, 임베딩배열>
      */
     <T> Map<T, byte[]> generate(Map<T, String> idTextMap);
 

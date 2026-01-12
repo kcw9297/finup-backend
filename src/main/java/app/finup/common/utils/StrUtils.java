@@ -238,40 +238,4 @@ public final class StrUtils {
 
 
 
-
-
-
-
-
-
-
-
-
-    // Markdown 코드 블록 제거
-
-    public static String removeMarkdownBlock(String text) {
-
-        if (Objects.isNull(text) || text.isBlank()) {
-            return "";
-        }
-
-        return text
-                // [1] Markdown 코드블록 제거 (```언어\n내용\n``` 형태)
-                .replaceAll("```[a-z]*\\n?", "")
-                .replaceAll("```", "")
-
-                // [2] 단일 백틱 제거 (`내용` 형태)
-                .replaceAll("^`|`$", "")
-
-                // [3] JSON 따옴표 제거 (전체가 "내용" 형태)
-                .replaceAll("^\"", "")
-                .replaceAll("\"$", "")
-
-                // [4] 불필요한 접두어 제거
-                .replaceAll("^(분석|결과|답변|응답|해설)\\s*:\\s*", "")
-
-                // [5] 앞뒤 공백 제거
-                .trim();
-    }
-
 }
