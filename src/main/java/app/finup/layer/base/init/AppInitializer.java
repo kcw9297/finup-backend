@@ -1,9 +1,9 @@
 package app.finup.layer.base.init;
 
 
-import com.example.demo.common.utils.LogUtils;
-import com.example.demo.layer.domain.stock.service.StockService;
-import com.example.demo.layer.domain.words.service.WordsService;
+import app.finup.common.utils.LogUtils;
+import app.finup.layer.domain.stock.service.StockService;
+import app.finup.layer.domain.words.service.WordsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

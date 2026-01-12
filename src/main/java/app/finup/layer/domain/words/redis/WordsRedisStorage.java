@@ -2,7 +2,7 @@ package app.finup.layer.domain.words.redis;
 
 import java.util.List;
 
-public interface RedisRecentSearchStorage {
+public interface WordsRedisStorage {
 
     void add(Long memberId, String keyword);
 

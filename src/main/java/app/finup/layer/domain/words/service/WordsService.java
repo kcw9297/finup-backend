@@ -13,6 +13,11 @@ import java.util.List;
 
 public interface WordsService {
 
+    /**
+     * 학습 단어 초기화 (존재하지 않을 시 최초 1회)
+     */
+    void initWords();
+
 
     /**
      * 금융 용어 검색
@@ -27,14 +32,6 @@ public interface WordsService {
      * @return 페이징된 검색 결과(용어 목록) DTO 리스트
      */
     List<WordsDto.Row> getHomeWords();
-
-
-    /**
-     * 초기 적재 여부 확인
-     * @return true  → DB 비어 있음(초기화 가능)
-     *         false → 이미 초기화 완료됨
-     */
-    Boolean isInitialized();
 
 
     /**

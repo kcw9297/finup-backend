@@ -1,11 +1,13 @@
 package app.finup.layer.domain.words.repository;
 
 import app.finup.layer.domain.words.entity.Words;
+import app.finup.layer.domain.words.enums.WordsLevel;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,4 +48,16 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
 
     @Query("select w from Words w order by w.termId asc")
     List<Words> findTop10(Pageable pageable);
+
+
+    @Query("""
+        SELECT w
+        FROM Words w
+        WHERE
+            w.wordsLevel = :wordsLevel AND
+            w.termId NOT IN :excludeIds
+        ORDER BY FUNCTION('RAND')
+        LIMIT :lim
+    """)
+    List<Words> findRandomByWordLevelWithExcludeIds(WordsLevel wordsLevel, Collection<Long> excludeIds, int lim);
 }

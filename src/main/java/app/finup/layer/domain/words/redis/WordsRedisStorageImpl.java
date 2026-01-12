@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RedisRecentSearchStorageImpl implements RedisRecentSearchStorage {
+public class WordsRedisStorageImpl implements WordsRedisStorage {
 
     private final StringRedisTemplate srt;
 
