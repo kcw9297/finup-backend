@@ -1,4 +1,4 @@
-package app.finup.infra.file;
+package app.finup.infra.file.storage;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author kcw
  * @since 2025-11-26
  */
-public interface FileProvider {
+public interface FileStorage {
 
     /**
      * 파일 업로드

@@ -49,6 +49,19 @@ public enum AppStatus {
     FILE_DOWNLOAD_FAILED(500, "파일 다운로드에 실패했습니다.", "FILE_DOWNLOAD_FAILED"),
     FILE_EXTRACT_FAILED(500, "파일 정보 추출에 실패했습니다.", "FILE_EXTRACT_FAILED"),
 
+    /* Infra - File (xml) */
+    XLSX_FILE_NOT_EXIST(500, "엑셀 파일이 존재하지 않습니다!", "XLSX_FILE_NOT_EXIST"),
+    XLSX_HEADER_NOT_EXIST(500, "엑셀 파일의 헤더가 존재하지 않습니다!", "XLSX_HEADER_NOT_EXIST"),
+    XLSX_HEADER_COLUMN_NOT_EXIST(500, "엑셀 파일의 특정 헤더 컬럼이 존재하지 않습니다!", "XLSX_HEADER_NOT_EXIST"),
+    XLSX_COLUMN_NOT_EXIST(500, "엑셀 파일의 컬럼이 존재하지 않습니다!", "XLSX_COLUMN_NOT_EXIST"),
+    XLSX_CELL_VALUE_NOT_EXIST(500, "엑셀 파일의 컬럼 값이 존재하지 않습니다!", "XLSX_CELL_VALUE_NOT_EXIST"),
+    XLSX_DUPLICATION_HEADER(500, "중복되는 헤더 값이 존재합니다!", "XLSX_DUPLICATION_HEADER"),
+    XLSX_INVALID_COLUMN_INDEX(500, "유효하지 않은 엑셀 인덱스입니다!", "XLSX_INVALID_COLUMN_INDEX"),
+    XLSX_INVALID_HEADER(500, "유효하지 않은 엑셀 헤더입니다!", "XLSX_INVALID_HEADER"),
+    XLSX_INVALID_ROW(500, "유효하지 않은 엑셀 행입니다!", "XLSX_INVALID_ROW"),
+    XLSX_EXTRACT_FAILED(500, "엑셀 파일 추출에 실패했습니다!", "XLSX_EXTRACT_FAILED"),
+    XLSX_CREATE_FAILED(500, "엑셀 파일 생성에 실패했습니다!", "XLSX_CREATE_FAILED"),
+
     /* Infra - YouTube */
     YOUTUBE_URL_NOT_VALID(400, "유효하지 않은 YouTube URL 입니다. 다시 시도해 주세요.", "YOUTUBE_URL_NOT_VALID"),
     YOUTUBE_ID_NOT_VALID(400, "유효하지 않은 YouTube 번호 입니다. 다시 시도해 주세요.", "YOUTUBE_ID_NOT_VALID"),

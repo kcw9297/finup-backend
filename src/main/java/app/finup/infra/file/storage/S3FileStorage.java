@@ -1,4 +1,4 @@
-package app.finup.infra.file;
+package app.finup.infra.file.storage;
 
 import app.finup.common.constant.Env;
 import app.finup.common.enums.AppStatus;
@@ -19,7 +19,7 @@ import java.util.Objects;
 
 
 /**
- * AWS S3 스토리지 조작 메소드 처리 클래스
+ * AWS S3 스토리지 파일 조작 기능 제공 FileStorage 구현체
  * @author kcw
  * @since 2025-12-18
  */
@@ -28,7 +28,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class S3FileProvider implements FileProvider {
+public class S3FileStorage implements FileStorage {
 
     // 사용 의존성
     private final S3Client s3;

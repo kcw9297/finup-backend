@@ -1,4 +1,4 @@
-package app.finup.infra.file;
+package app.finup.infra.file.storage;
 
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import app.finup.common.constant.Env;
 import app.finup.common.enums.AppStatus;
-import app.finup.common.exception.ManagerException;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -18,7 +17,7 @@ import java.util.Objects;
 
 
 /**
- * 파일의 저장, 삭제, 다운로드 메소드 처리
+ * 로컬 파일 조작 기능을 제공하는 FileStorage 구현체
  * @author kcw
  * @since 2025-11-26
  */
@@ -26,7 +25,7 @@ import java.util.Objects;
 @Profile(Env.PROFILE_LOCAL)
 @Slf4j
 @Component
-public class LocalFileProvider implements FileProvider {
+public class LocalFileStorage implements FileStorage {
 
     @Override
     public void upload(MultipartFile file, String storePath) {
