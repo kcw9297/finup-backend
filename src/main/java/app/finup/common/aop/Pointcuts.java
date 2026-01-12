@@ -1,4 +1,4 @@
-package app.finup.infra.aop;
+package app.finup.common.aop;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;

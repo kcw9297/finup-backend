@@ -1,4 +1,4 @@
-package app.finup.infra.aop;
+package app.finup.common.aop;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -28,8 +28,7 @@ public class PrintLogAspect {
          @RestController 한정
      */
 
-    @Around("app.finup.infra.aop.Pointcuts.restCtlAnno() ||" +
-            "app.finup.infra.aop.Pointcuts.layerSchedulerAnno()")
+    @Around("app.finup.common.aop.Pointcuts.restCtlAnno()")
     public Object printSuccessLog(ProceedingJoinPoint joinPoint) throws Throwable {
 
         // [1] 로직 시작 시점 기록
@@ -71,7 +70,7 @@ public class PrintLogAspect {
         예외 발생 근원지에서만 출력 (프로젝트 내 모든 클래스 범위)
      */
     @AfterThrowing(
-            pointcut = "app.finup.infra.aop.Pointcuts.basePack()",
+            pointcut = "app.finup.common.aop.Pointcuts.basePack()",
             throwing = "e"
     )
     public void printErrorLog(JoinPoint joinPoint, Exception e) {
@@ -137,7 +136,7 @@ public class PrintLogAspect {
 
         StackTraceElement[] stackTrace = root.getStackTrace();
         if (stackTrace == null || stackTrace.length == 0) {
-            // ✅ 스택이 비었을 때 방어
+            // 스택이 비었을 때 방어
             return null;
         }
 
