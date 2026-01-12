@@ -1,17 +1,13 @@
 package app.finup.layer.domain.news.service;
 
-import app.finup.infra.news.provider.NewsProvider;
-import app.finup.layer.domain.news.api.NewsApiClient;
+import app.finup.infra.api.news.provider.NewsProvider;
 import app.finup.layer.domain.news.component.NewsContentExtractor;
 import app.finup.layer.domain.news.dto.NewsDto;
-import app.finup.layer.domain.news.redis.NewsRedisStorage;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.util.*;
 /**
  * NewsService 구현 클래스

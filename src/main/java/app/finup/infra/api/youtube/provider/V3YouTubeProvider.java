@@ -1,14 +1,12 @@
-package app.finup.infra.youtube.provider;
+package app.finup.infra.api.youtube.provider;
 
-import app.finup.common.constant.Const;
 import app.finup.common.enums.AppStatus;
-import app.finup.common.exception.AppException;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.youtube.dto.YouTube;
-import app.finup.infra.youtube.dto.YouTubeDtoMapper;
-import app.finup.infra.youtube.utils.YouTubeUtils;
+import app.finup.infra.api.youtube.dto.YouTube;
+import app.finup.infra.api.youtube.dto.YouTubeDtoMapper;
+import app.finup.infra.api.youtube.utils.YouTubeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -193,7 +191,7 @@ public class V3YouTubeProvider implements YouTubeProvider {
 
                 // 조작 가능한 설정 (정렬, 검색할 영상 길이)
                 .queryParam("order", "viewCount") // 정렬 기준 (상단 주석 참고)
-                .queryParam("videoDuration", "long") // 20분 이상 긴 영상만 (보통 유익한 분석영상이 많음)
+                .queryParam("videoDuration", "medium")
 
                 // 영상 검색어 (AI 혹은 사용자가 조작해야 함)
                 .queryParam("q", q)

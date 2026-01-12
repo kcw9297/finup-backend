@@ -1,8 +1,8 @@
 package app.finup.layer.domain.video.service;
 
-import app.finup.infra.youtube.dto.YouTube;
-import app.finup.infra.youtube.provider.YouTubeProvider;
-import app.finup.infra.youtube.utils.YouTubeUtils;
+import app.finup.infra.api.youtube.dto.YouTube;
+import app.finup.infra.api.youtube.provider.YouTubeProvider;
+import app.finup.infra.api.youtube.utils.YouTubeUtils;
 import app.finup.layer.domain.video.dto.VideoDto;
 import app.finup.layer.domain.video.dto.VideoDtoMapper;
 import lombok.RequiredArgsConstructor;

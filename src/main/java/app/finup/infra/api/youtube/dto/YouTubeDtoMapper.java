@@ -1,12 +1,11 @@
-package app.finup.infra.youtube.dto;
+package app.finup.infra.api.youtube.dto;
 
-import app.finup.infra.youtube.utils.YouTubeUtils;
+import app.finup.infra.api.youtube.utils.YouTubeUtils;
 import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 

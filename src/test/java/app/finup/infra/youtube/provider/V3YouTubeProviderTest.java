@@ -1,13 +1,12 @@
 package app.finup.infra.youtube.provider;
 
-import app.finup.infra.youtube.dto.YouTube;
-import app.finup.infra.youtube.utils.YouTubeUtils;
+import app.finup.infra.api.youtube.dto.YouTube;
+import app.finup.infra.api.youtube.provider.YouTubeProvider;
+import app.finup.infra.api.youtube.utils.YouTubeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest

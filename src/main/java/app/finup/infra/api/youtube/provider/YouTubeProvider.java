@@ -1,6 +1,6 @@
-package app.finup.infra.youtube.provider;
+package app.finup.infra.api.youtube.provider;
 
-import app.finup.infra.youtube.dto.YouTube;
+import app.finup.infra.api.youtube.dto.YouTube;
 
 import java.util.List;
 

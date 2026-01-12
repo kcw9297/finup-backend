@@ -1,6 +1,6 @@
 package app.finup.layer.domain.stock.service;
 
-import app.finup.infra.news.provider.NewsProvider;
+import app.finup.infra.api.news.provider.NewsProvider;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.stock.api.StockApiClient;
 import app.finup.layer.domain.stock.dto.StockDto;
@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.io.FileInputStream;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

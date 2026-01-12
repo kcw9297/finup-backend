@@ -1,4 +1,4 @@
-package app.finup.infra.youtube.dto;
+package app.finup.infra.api.youtube.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;

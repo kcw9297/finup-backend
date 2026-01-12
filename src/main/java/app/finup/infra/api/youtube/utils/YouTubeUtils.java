@@ -1,4 +1,4 @@
-package app.finup.infra.youtube.utils;
+package app.finup.infra.api.youtube.utils;
 
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.UtilsException;

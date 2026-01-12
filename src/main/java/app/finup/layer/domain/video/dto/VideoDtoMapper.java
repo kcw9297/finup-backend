@@ -1,7 +1,7 @@
 package app.finup.layer.domain.video.dto;
 
 import app.finup.common.utils.FormatUtils;
-import app.finup.infra.youtube.dto.YouTube;
+import app.finup.infra.api.youtube.dto.YouTube;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

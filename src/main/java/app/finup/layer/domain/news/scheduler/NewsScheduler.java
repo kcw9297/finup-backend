@@ -1,12 +1,10 @@
 package app.finup.layer.domain.news.scheduler;
 
-import app.finup.infra.news.provider.NewsProvider;
+import app.finup.infra.api.news.provider.NewsProvider;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
-import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

@@ -1,7 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
-import app.finup.common.utils.StrUtils;
-import app.finup.infra.youtube.utils.YouTubeUtils;
+import app.finup.infra.api.youtube.utils.YouTubeUtils;
 import app.finup.layer.base.utils.ValidationUtils;
 import app.finup.layer.base.validation.annotation.YouTubeUrl;
 import jakarta.validation.ConstraintValidator;
