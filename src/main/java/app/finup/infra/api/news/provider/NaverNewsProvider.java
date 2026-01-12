@@ -32,7 +32,6 @@ public class NaverNewsProvider implements NewsProvider {
 
     // 사용 상수
     private static final String PATH_SEARCH = "/v1/search/news.json";
-    private static final int DISPLAY_SEARCH = 50;
     private static final Random RANDOM = new Random();
 
     // API 요청 관련 상수
@@ -43,14 +42,14 @@ public class NaverNewsProvider implements NewsProvider {
 
 
     @Override
-    public List<NewsApi.Row> getLatest(String query) {
+    public List<NewsApi.Row> getLatest(String query, int amount) {
 
         try {
             // 일정 시간 대기 (jitter 외 추가 대기)
             delay();
 
             // 실제 API 호출
-            return callApi(query);
+            return callApi(query, amount);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -69,10 +68,10 @@ public class NaverNewsProvider implements NewsProvider {
 
 
     // API 호출
-    private List<NewsApi.Row> callApi(String query) {
+    private List<NewsApi.Row> callApi(String query, int amount) {
 
         return naverClient.get()
-                .uri(uriBuilder -> buildSearchURI(uriBuilder, query))
+                .uri(uriBuilder -> buildSearchURI(uriBuilder, query, amount))
                 .retrieve()
                 .bodyToMono(String.class) // JSON 문자열로 변환
                 .timeout(TIMEOUT) // API 요청 + 응답 역직렬화까지 걸리는 시간 Timeout
@@ -84,14 +83,14 @@ public class NaverNewsProvider implements NewsProvider {
 
 
     // URL builder - 검색에 필요한 파라미터 첨가
-    private URI buildSearchURI(UriBuilder uriBuilder, String query) {
+    private URI buildSearchURI(UriBuilder uriBuilder, String query, int amount) {
 
         return uriBuilder
                 // 기본 설정 (건들면 안 되는 옵션)
                 .path(PATH_SEARCH) // 유튜브 영상 상세 API
                 .queryParam("query", query) // 검색어
                 .queryParam("sort", "date") // 최신순
-                .queryParam("display", DISPLAY_SEARCH) // 최대 표시 개수 (최대 50개까지 가능)
+                .queryParam("display", amount) // 최대 표시 개수 (최대 50개까지 가능)
                 .build();
     }
 

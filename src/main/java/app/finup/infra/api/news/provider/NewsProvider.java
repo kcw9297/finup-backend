@@ -14,8 +14,9 @@ public interface NewsProvider {
 
     /**
      * 뉴스 API - 가장 최근 뉴스목록 조회
-     * @param query 검색어 (쿼리)
+     * @param query  검색어 (쿼리)
+     * @param amount 검색 기사 최대 수량
      * @return API 요청 결과 DTO 리스트
      */
-    List<NewsApi.Row> getLatest(String query);
+    List<NewsApi.Row> getLatest(String query, int amount);
 }
