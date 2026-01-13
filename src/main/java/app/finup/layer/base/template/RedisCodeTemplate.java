@@ -1,6 +1,6 @@
 package app.finup.layer.base.template;
 
-import com.example.demo.common.utils.StrUtils;
+import app.finup.common.utils.StrUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
