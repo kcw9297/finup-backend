@@ -1,4 +1,4 @@
-package app.finup.api.external.indicator.dto;
+package app.finup.api.external.financialindex.dto;
 
 import app.finup.common.deserializer.CommaRemovingBigDecimalDeserializer;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * @since 2025-12-11
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class IndicatorApiDto {
+public class FinancialIndexApiDto {
 
     @Data
     @AllArgsConstructor

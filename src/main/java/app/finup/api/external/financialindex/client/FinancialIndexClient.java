@@ -1,6 +1,6 @@
-package app.finup.api.external.indicator.client;
+package app.finup.api.external.financialindex.client;
 
-import app.finup.api.external.indicator.dto.IndicatorApiDto;
+import app.finup.api.external.financialindex.dto.FinancialIndexApiDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * @author kcw
  * @since 2026-01-14
  */
-public interface IndicatorClient {
+public interface FinancialIndexClient {
 
 
     /**
@@ -19,5 +19,5 @@ public interface IndicatorClient {
      * @param date 검색 기준일
      * @return 검색일 기준 환율 조회 결과 DTO 목록
      */
-    List<IndicatorApiDto.ExchangeRateRow> getExchangeRates(LocalDate date);
+    List<FinancialIndexApiDto.ExchangeRateRow> getExchangeRates(LocalDate date);
 }

@@ -1,4 +1,4 @@
-package app.finup.api.external.indicator.dto;
+package app.finup.api.external.financialindex.dto;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -7,14 +7,14 @@ import java.util.List;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class IndicatorApiDtoMapper {
+public final class FinancialIndexApiDtoMapper {
 
 
-    public static List<IndicatorApiDto.ExchangeRateRow> toExchangeRateRows(
-            List<IndicatorApiDto.ExchangeRateRp> rp) {
+    public static List<FinancialIndexApiDto.ExchangeRateRow> toExchangeRateRows(
+            List<FinancialIndexApiDto.ExchangeRateRp> rp) {
 
         return rp.stream()
-                .map(exchangeRateRp -> IndicatorApiDto.ExchangeRateRow.builder()
+                .map(exchangeRateRp -> FinancialIndexApiDto.ExchangeRateRow.builder()
                         .currencyCode(exchangeRateRp.getCurrencyCode())
                         .currencyName(exchangeRateRp.getCurrencyName())
                         .baseRate(exchangeRateRp.getBaseRate())

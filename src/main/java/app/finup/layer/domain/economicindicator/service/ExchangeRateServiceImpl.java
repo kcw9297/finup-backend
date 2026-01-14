@@ -1,6 +1,6 @@
 package app.finup.layer.domain.economicindicator.service;
 
-import app.finup.api.external.indicator.client.IndicatorClient;
+import app.finup.api.external.financialindex.client.FinancialIndexClient;
 import app.finup.layer.domain.economicindicator.dto.ExchangeRateDto;
 import app.finup.layer.domain.economicindicator.dto.ExchangeRateDtoMapper;
 import app.finup.layer.domain.economicindicator.entity.ExchangeRate;
@@ -17,7 +17,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ExchangeRateServiceImpl implements ExchangeRateService {
 
-    private final IndicatorClient indicatorClient;
+    private final FinancialIndexClient financialIndexClient;
     private final ExchangeRateRepository repository;
     private static final int MAX_FALLBACK_DAYS = 10;
 

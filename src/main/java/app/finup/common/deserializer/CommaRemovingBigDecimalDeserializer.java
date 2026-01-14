@@ -19,11 +19,12 @@ public class CommaRemovingBigDecimalDeserializer extends JsonDeserializer<BigDec
     @Override
     public BigDecimal deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 
-        // [1] 값 추출 후 검증 (0이거나 비어있는 경우, 혹은 유효하지 않은 숫자는 ZERO)
+        // 값 조회
         String value = p.getText();
-        if (Objects.isNull(value) || value.trim().isEmpty() || "0".equals(value)) return BigDecimal.ZERO;
 
-        // [2] 추출한 값에서 콤마(,) 를 제거하고 반환
-        return new BigDecimal(value.replace(",", ""));
+        // 역직렬화 수행
+        return Objects.isNull(value) || value.trim().isEmpty() || "0".equals(value) ?
+                BigDecimal.ZERO : // 유효하지 않은 입력은 ZERO
+                new BigDecimal(value.replace(",", "")); // 값 사이 콤마 제거
     }
 }

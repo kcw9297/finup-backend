@@ -1,12 +1,23 @@
 package app.finup.api.external.marketindex.client;
 
+import app.finup.api.external.marketindex.dto.MarketIndexApiDto;
 import app.finup.layer.domain.indexMarket.dto.IndexMarketDto;
+
+import java.time.LocalDate;
+import java.util.List;
 
 
 /**
- * 주식 시장 지수 정보 API
+ * 주식 시장 지수 API Client 클래스
+ * @author kcw
+ * @since 2026-01-14
  */
 public interface MarketIndexClient {
-    // 특정 지수와 기준일의 시세 조회
-    IndexMarketDto.ApiRow fetchIndex(String indexName, String baseDate);
+
+    /**
+     * 주식 시장 지수 일괄 조회 (단일)
+     * @param date 기준일
+     * @return API에서 제공하는 모든 지수 정보 목록
+     */
+    List<MarketIndexApiDto.Row> getIndexList(LocalDate date);
 }

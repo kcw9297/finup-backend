@@ -97,7 +97,7 @@ public class IndexMarketServiceImpl implements IndexMarketService {
         IndexMarketDto.ApiRow todayRow = null;
 
         for (int i = 0; i < 7; i++) {
-            todayRow = apiClient.fetchIndex(indexName, baseDate.format(FMT));
+            todayRow = apiClient.getIndex(indexName, , baseDate.format(FMT));
             if (todayRow != null) break;
             baseDate = baseDate.minusDays(1);
         }
@@ -108,7 +108,7 @@ public class IndexMarketServiceImpl implements IndexMarketService {
         IndexMarketDto.ApiRow prevRow = null;
 
         for (int i = 0; i < 7; i++) {
-            prevRow = apiClient.fetchIndex(indexName, prevDate.format(FMT));
+            prevRow = apiClient.getIndex(indexName, , prevDate.format(FMT));
             if (prevRow != null) break;
             prevDate = prevDate.minusDays(1);
         }

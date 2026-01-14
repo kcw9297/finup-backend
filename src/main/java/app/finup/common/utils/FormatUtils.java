@@ -31,6 +31,10 @@ public final class FormatUtils {
         return FORMATTER_DATE.format(time);
     }
 
+    public static String formatDateNoHyphen(TemporalAccessor time) {
+        return FORMATTER_DATE_NO_HYPHEN.format(time);
+    }
+
 
     /**
      * 시간 포메팅 (00:00:00)
