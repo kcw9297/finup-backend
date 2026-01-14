@@ -1,7 +1,7 @@
 package app.finup.layer.domain.stock.service;
 
-import app.finup.infra.api.stock.dto.StockApiDto;
-import app.finup.infra.api.stock.provider.StockProvider;
+import app.finup.api.external.stock.dto.StockApiDto;
+import app.finup.api.external.stock.client.StockClient;
 import app.finup.infra.file.provider.XlsxProvider;
 import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.domain.stock.dto.StockDto;
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class StockServiceImpl implements StockService {
 
     // 사용 의존성
-    private final StockProvider stockProvider;
+    private final StockClient stockClient;
     private final StockRedisStorage stockRedisStorage;
     private final FileStorage fileStorage;
     private final XlsxProvider xlsxProvider;
@@ -46,7 +46,7 @@ public class StockServiceImpl implements StockService {
         if (stockRedisStorage.isExistApiAccessToken()) return null;
 
         // [2] 주식 실시간 정보를 받기 위한 AT 발급 후, REDIS 내 저장
-        StockApiDto.Issue rp = stockProvider.issueToken();
+        StockApiDto.Issue rp = stockClient.issueToken();
         stockRedisStorage.storeApiAccessToken(rp.getAccessToken(), rp.getTtl());
         return rp.getAccessToken();
     }

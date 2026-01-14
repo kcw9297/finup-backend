@@ -1,6 +1,6 @@
 package app.finup.layer.domain.news.utils;
 
-import app.finup.infra.api.news.dto.NewsApi;
+import app.finup.api.external.news.dto.NewsApi;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.text.similarity.LevenshteinDistance;

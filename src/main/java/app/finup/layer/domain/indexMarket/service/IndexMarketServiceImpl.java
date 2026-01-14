@@ -1,6 +1,6 @@
 package app.finup.layer.domain.indexMarket.service;
 
-import app.finup.layer.domain.indexMarket.api.IndexMarketApiClient;
+import app.finup.api.external.marketindex.client.MarketIndexClient;
 import app.finup.layer.domain.indexMarket.dto.IndexMarketDto;
 import app.finup.layer.domain.indexMarket.dto.IndexMarketDtoMapper;
 import app.finup.layer.domain.indexMarket.entity.IndexMarket;
@@ -9,10 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -21,7 +19,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class IndexMarketServiceImpl implements IndexMarketService {
-    private final IndexMarketApiClient apiClient;
+    private final MarketIndexClient apiClient;
     private final IndexMarketRepository repository;
     private static final DateTimeFormatter FMT = DateTimeFormatter.BASIC_ISO_DATE;
 

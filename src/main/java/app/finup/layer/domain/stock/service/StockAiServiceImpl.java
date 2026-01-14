@@ -5,8 +5,8 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.StrUtils;
 import app.finup.infra.ai.ChatProvider;
-import app.finup.infra.api.youtube.dto.YouTube;
-import app.finup.infra.api.youtube.provider.YouTubeProvider;
+import app.finup.api.external.youtube.dto.YouTubeApiDto;
+import app.finup.api.external.youtube.client.YouTubeClient;
 import app.finup.layer.base.template.AiCodeTemplate;
 import app.finup.layer.base.template.YouTubeCodeTemplate;
 import app.finup.layer.domain.stock.constant.StockPrompt;
@@ -47,7 +47,7 @@ public class StockAiServiceImpl implements StockAiService {
     // 사용 의존성
     private final ChatProvider chatProvider;
     private final StockRedisStorage stockRedisStorage;
-    private final YouTubeProvider youTubeProvider;
+    private final YouTubeClient youTubeClient;
 
     // 사용 상수
     private static final int MAX_DESCRIPTION_LENGTH = 150;
@@ -195,14 +195,14 @@ public class StockAiServiceImpl implements StockAiService {
         String stockName = stockInfo.getDetail().getStockName();
 
         // [2] 유튜브 검색 수행 후, 검색 결과 영상으로 다시 한번 상세 조회 수행
-        List<YouTube.Detail> searchResponses =
-                YouTubeCodeTemplate.searchAndGetDetails(youTubeProvider, stockName);
+        List<YouTubeApiDto.Detail> searchResponses =
+                YouTubeCodeTemplate.searchAndGetDetails(youTubeClient, stockName);
 
         // [3] AI 프롬포트 생성
         // Map<VideoId, YouTube.Detail>
-        Map<String, YouTube.Detail> candidates = searchResponses.stream()
+        Map<String, YouTubeApiDto.Detail> candidates = searchResponses.stream()
                 .collect(Collectors.toConcurrentMap(
-                        YouTube.Detail::getVideoId,
+                        YouTubeApiDto.Detail::getVideoId,
                         Function.identity()
                 ));
 
@@ -256,7 +256,7 @@ public class StockAiServiceImpl implements StockAiService {
             Duration duration,
             Instant publishedAt
     ) {
-        public static VideoRecommendRequest from(YouTube.Detail detail) {
+        public static VideoRecommendRequest from(YouTubeApiDto.Detail detail) {
             return new VideoRecommendRequest(
                     detail.getVideoId(),
                     detail.getTitle(),

@@ -2,8 +2,8 @@ package app.finup.layer.domain.news.service;
 
 import app.finup.common.utils.HtmlUtils;
 import app.finup.common.utils.ParallelUtils;
-import app.finup.infra.api.news.dto.NewsApi;
-import app.finup.infra.api.news.provider.NewsProvider;
+import app.finup.api.external.news.dto.NewsApi;
+import app.finup.api.external.news.client.NewsClient;
 import app.finup.layer.domain.news.constant.NewsRedisKey;
 import app.finup.layer.domain.news.entity.News;
 import app.finup.layer.domain.news.enums.NewsType;
@@ -40,7 +40,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
     // 사용 의존성
     private final NewsRepository newsRepository;
-    private final NewsProvider newsProvider;
+    private final NewsClient newsClient;
     private final StockRedisStorage stockRedisStorage;
 
     // 병렬 로직을 제어할 의존성
@@ -75,7 +75,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
         // [3] 뉴스 검색 수행 및 필터링 결과 기반 엔티티 생성 및 저장
         // API 뉴스 기사 및 현재 기사 목록 일괄 조회 후, 유사도 및 중복 기사 필터링
-        List<NewsApi.Row> rows = newsProvider.getLatest(QUERY_SEARCH_MAIN, AMOUNT_NEWS);
+        List<NewsApi.Row> rows = newsClient.getLatest(QUERY_SEARCH_MAIN, AMOUNT_NEWS);
         List<NewsApi.Row> filteredRows = NewsFilterUtils.filter(rows);
 
         // [4] 필터된 결과 기반 Entity 생성 및 저장
@@ -124,7 +124,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
         Map<String, List<NewsApi.Row>> responses = ParallelUtils.doParallelTask(
                 "네이버 뉴스 검색 API 호출",
                 requests,
-            request -> new StockNewsResponse(newsProvider.getLatest(request.stockName, AMOUNT_NEWS), request.stockCode(), request.stockName()),
+            request -> new StockNewsResponse(newsClient.getLatest(request.stockName, AMOUNT_NEWS), request.stockCode(), request.stockName()),
                 ParallelUtils.SEMAPHORE_API_NAVER_NEWS,
                 newsApiExecutor
         ).stream()

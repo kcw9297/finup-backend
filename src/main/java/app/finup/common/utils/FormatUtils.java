@@ -16,6 +16,7 @@ public final class FormatUtils {
 
     // 시간 포메팅
     public static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 2025-01-01
+    public static final DateTimeFormatter FORMATTER_DATE_NO_HYPHEN = DateTimeFormatter.ofPattern("yyyyMMdd");
     public static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern("HH:mm:ss"); // 00:00:00
     public static final DateTimeFormatter FORMATTER_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 

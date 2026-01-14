@@ -4,9 +4,9 @@ package app.finup.layer.domain.stock.service;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.ParallelUtils;
-import app.finup.infra.api.stock.dto.StockApiDto;
-import app.finup.infra.api.stock.enums.CandleType;
-import app.finup.infra.api.stock.provider.StockProvider;
+import app.finup.api.external.stock.dto.StockApiDto;
+import app.finup.api.external.stock.enums.CandleType;
+import app.finup.api.external.stock.client.StockClient;
 import app.finup.layer.domain.stock.constant.StockRedisKey;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class StockSchedulerServiceImpl implements StockSchedulerService {
 
     // 사용 의존성
-    private final StockProvider stockProvider;
+    private final StockClient stockClient;
     private final StockRedisStorage stockRedisStorage;
 
     // 병렬 처리를 위한 의존성
@@ -48,7 +48,7 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
         if (stockRedisStorage.isExistApiAccessToken()) return null;
 
         // [2] 주식 실시간 정보를 받기 위한 AT 발급 후, REDIS 내 저장
-        StockApiDto.Issue rp = stockProvider.issueToken();
+        StockApiDto.Issue rp = stockClient.issueToken();
         stockRedisStorage.storeApiAccessToken(rp.getAccessToken(), rp.getTtl());
         return rp.getAccessToken();
     }
@@ -81,10 +81,10 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
         // [1] 주식 조회 (시가총액 / 거래량 각각 상위 30개 씩)
         // 이후 효율적 조회를 위해 Map으로 변환
         Map<String, StockApiDto.MarketCapRow> marketCapRows =
-                toMap(stockProvider.getMarketCapRankList(accessToken), StockApiDto.MarketCapRow::getStockCode);
+                toMap(stockClient.getMarketCapRankList(accessToken), StockApiDto.MarketCapRow::getStockCode);
 
         Map<String, StockApiDto.TradingValueRow> tradingValueRows =
-                toMap(stockProvider.getTradingValueList(accessToken), StockApiDto.TradingValueRow::getStockCode);
+                toMap(stockClient.getTradingValueList(accessToken), StockApiDto.TradingValueRow::getStockCode);
 
         // [2] 조회된 주식 정보에서 주식코드만 중복 없이 추출하여, 중복 없는 코드정보 Set 생성
         Set<String> stockCodes = toCodeSet(marketCapRows, tradingValueRows);
@@ -92,17 +92,17 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
         // [3] 주식 상세, 차트정보 조회를 모두 병렬로 수행
         // Map<StockCode, DTO>
         Map<String, StockApiDto.Detail> details =
-                callAsyncStockApi(stockCodes, stockCode -> stockProvider.getDetail(stockCode, accessToken));
+                callAsyncStockApi(stockCodes, stockCode -> stockClient.getDetail(stockCode, accessToken));
 
         // Map<StockCode, List<DTO>>
         Map<String, List<StockApiDto.Candle>> dayCandles =
-                callAsyncStockApi(stockCodes, stockCode -> stockProvider.getCandleList(stockCode, accessToken, CandleType.DAY));
+                callAsyncStockApi(stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.DAY));
 
         Map<String, List<StockApiDto.Candle>> weekCandles =
-                callAsyncStockApi(stockCodes, stockCode -> stockProvider.getCandleList(stockCode, accessToken, CandleType.WEEK));
+                callAsyncStockApi(stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.WEEK));
 
         Map<String, List<StockApiDto.Candle>> monthCandles =
-                callAsyncStockApi(stockCodes, stockCode -> stockProvider.getCandleList(stockCode, accessToken, CandleType.MONTH));
+                callAsyncStockApi(stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.MONTH));
 
         // [4] 결과 기반 InfoDTO 생성 및 반환
         return stockCodes.stream()

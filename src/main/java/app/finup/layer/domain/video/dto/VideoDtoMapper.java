@@ -1,7 +1,7 @@
 package app.finup.layer.domain.video.dto;
 
 import app.finup.common.utils.FormatUtils;
-import app.finup.infra.api.youtube.dto.YouTube;
+import app.finup.api.external.youtube.dto.YouTubeApiDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VideoDtoMapper {
 
-   public static VideoDto.Detail toDetail(YouTube.Detail video) {
+   public static VideoDto.Detail toDetail(YouTubeApiDto.Detail video) {
 
        return VideoDto.Detail.builder()
                .videoId(video.getVideoId())
@@ -29,7 +29,7 @@ public final class VideoDtoMapper {
    }
 
 
-    public static VideoDto.Row toRow(YouTube.Row video) {
+    public static VideoDto.Row toRow(YouTubeApiDto.Row video) {
 
         return VideoDto.Row.builder()
                 .title(video.getTitle())

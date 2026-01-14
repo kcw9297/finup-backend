@@ -1,7 +1,7 @@
 package app.finup.layer.domain.stock.dto;
 
-import app.finup.infra.api.stock.dto.StockApiDto;
-import app.finup.infra.api.youtube.dto.YouTube;
+import app.finup.api.external.stock.dto.StockApiDto;
+import app.finup.api.external.youtube.dto.YouTubeApiDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -213,7 +213,7 @@ public class StockDtoMapper {
 
 
     // 주식 상세정보 조회 API 결과 DTO 변환
-    public static StockAiDto.YouTubeRecommendation toYouTubeRecommend(YouTube.Detail detail) {
+    public static StockAiDto.YouTubeRecommendation toYouTubeRecommend(YouTubeApiDto.Detail detail) {
 
         return StockAiDto.YouTubeRecommendation.builder()
                 .videoId(detail.getVideoId())
