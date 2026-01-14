@@ -1,23 +1,39 @@
 package app.finup.layer.domain.stock.service;
 
-import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.stock.dto.StockDto;
 import java.util.List;
 
+/**
+ * 주식 핵심 기능 제공 인터페이스
+ * @author kcw
+ * @since 2025-12-25
+ */
 public interface StockService {
-    // 종목+탭 시가총액 순위 가져오기
-    List<StockDto.MarketCapRow> getMarketCapRow();
-    void refreshMarketCapRow();
 
-    // 종목+탭 거래대금 순위 가져오기
-    List<StockDto.TradingValueRow> getTradingValueRow();
-    void refreshTradingValueRow();
+    /**
+     * 주식 정보 제공을 위한 토큰 발급
+     * @return 발급받은 API AccessToken 문자열
+     */
+    String issueToken();
 
-    //List<StocksDto> getStocks();
-    void importStockName() throws Exception;
-    StockDto.Detail getDetail(String code);
-    void refreshDetail(String code);
 
-    List<NewsDto.Row> getStockNews(String stockName);
+    /**
+     * 주식 파일 초기화
+     */
+    void initStockFile();
+
+
+    /**
+     * 시가 총액 순 주식목록 조회 (상위 30개)
+     * @return 시가총액 순 상위 30개 주식 종목 DTO 목록
+     */
+    List<StockDto.Info> getMarketCapList();
+
+
+    /**
+     * 거래량 순 주식목록 조회 (상위 30개)
+     * @return 거래량 순 상위 30개 주식 종목 DTO 목록
+     */
+    List<StockDto.Info> getTradingValueList();
 
 }

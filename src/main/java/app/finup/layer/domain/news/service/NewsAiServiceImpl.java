@@ -12,6 +12,7 @@ import app.finup.layer.domain.news.redis.NewsRedisStorage;
 import app.finup.layer.domain.news.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +45,21 @@ public class NewsAiServiceImpl implements NewsAiService {
     )
     @Override
     public String analyze(Long newsId, Long memberId) {
+        return doAnalyze(newsId, memberId);
+    }
 
+
+    @CachePut(
+            value = NewsRedisKey.CACHE_ANALYZE,
+            key = "#newsId + ':' + #memberId"
+    )
+    @Override
+    public String retryAnalyze(Long newsId, Long memberId) {
+        return doAnalyze(newsId, memberId);
+    }
+
+
+    private String doAnalyze(Long newsId, Long memberId) {
         // [1] 기존 뉴스 정보 조회
         News news = newsRepository
                 .findById(newsId)

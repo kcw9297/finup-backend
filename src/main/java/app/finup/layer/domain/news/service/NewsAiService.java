@@ -17,4 +17,13 @@ public interface NewsAiService {
      */
     String analyze(Long newsId, Long memberId);
 
+
+    /**
+     * AI 뉴스 재 분석 (기존 캐시를 무효하고 다시 분석)
+     * @param newsId 분석 대상 뉴스번호
+     * @param memberId 분석 요청 회원번호
+     * @return 뉴스 AI 분석 결과 DTO
+     */
+    String retryAnalyze(Long newsId, Long memberId);
+
 }

@@ -44,13 +44,4 @@ public class VideoServiceImpl implements VideoService {
         return video.stream().map(VideoDtoMapper::toRow).toList();
     }
 
-    @Override
-    public List<VideoDto.Row> recommendForHome() {
-        return List.of();
-    }
-
-    @Override
-    public List<VideoDto.RecommendRow> recommendForStock(String stockId, String stockName) {
-        return List.of();
-    }
 }

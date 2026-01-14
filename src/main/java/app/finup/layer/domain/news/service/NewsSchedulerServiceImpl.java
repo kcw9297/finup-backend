@@ -48,9 +48,10 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
     private final ExecutorService crawlingExecutor;
 
     // 사용 상수
+    private static final String QUERY_SEARCH_MAIN = "국내+주식";
     private static final Duration THRESHOLD_SAVE = Duration.ofDays(7); // 가져온 기사는 7일간 지속
     private static final int THRESHOLD_DESCRIPTION_MIN_LENGTH = 100; // 기사 본문 최소 길이
-    private static final String QUERY_SEARCH_MAIN = "국내+주식";
+    private static final int AMOUNT_NEWS = 50; // 기사 본문 최소 길이
 
 
     @CacheEvict( // 기존 캐시 삭제
@@ -65,7 +66,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
         // [2] 현재 뉴스 엔티티 조회
         Map<String, News> curEntityMap = // "뉴스 제목" - "News Entity" Map (뉴스 이름으로 중복 판단)
-                newsRepository.findByNewsTypeWithPaging(NewsType.MAIN, )
+                newsRepository.findByNewsType(NewsType.MAIN)
                         .stream()
                         .collect(Collectors.toConcurrentMap(
                                 News::getTitle,
@@ -74,7 +75,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
         // [3] 뉴스 검색 수행 및 필터링 결과 기반 엔티티 생성 및 저장
         // API 뉴스 기사 및 현재 기사 목록 일괄 조회 후, 유사도 및 중복 기사 필터링
-        List<NewsApi.Row> rows = newsProvider.getLatest(QUERY_SEARCH_MAIN, );
+        List<NewsApi.Row> rows = newsProvider.getLatest(QUERY_SEARCH_MAIN, AMOUNT_NEWS);
         List<NewsApi.Row> filteredRows = NewsFilterUtils.filter(rows);
 
         // [4] 필터된 결과 기반 Entity 생성 및 저장
@@ -102,7 +103,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
         // [2] 현재 뉴스 엔티티 조회
         // Map<종목코드, Map<뉴스제목, News>>
         Map<String, Map<String, News>> curEntityMap = newsRepository
-                .findByNewsTypeWithPaging(NewsType.STOCK, )
+                .findByNewsType(NewsType.STOCK)
                 .stream()
                 .collect(Collectors.groupingBy(
                         News::getStockCode,  // 종목코드로 그룹화
@@ -121,11 +122,11 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
         // API 검색 수행
         Map<String, List<NewsApi.Row>> responses = ParallelUtils.doParallelTask(
-                    "네이버 뉴스 검색 API 호출",
-                    requests,
-                    request -> new StockNewsResponse(newsProvider.getLatest(request.stockName, ), request.stockCode(), request.stockName()),
-                    ParallelUtils.SEMAPHORE_API_NAVER_NEWS,
-                    newsApiExecutor
+                "네이버 뉴스 검색 API 호출",
+                requests,
+            request -> new StockNewsResponse(newsProvider.getLatest(request.stockName, AMOUNT_NEWS), request.stockCode(), request.stockName()),
+                ParallelUtils.SEMAPHORE_API_NAVER_NEWS,
+                newsApiExecutor
         ).stream()
             .map(response -> Map.entry(response.stockCode, NewsFilterUtils.filter(response.stocks))) // 검색 결과 필터링
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

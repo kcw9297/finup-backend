@@ -16,6 +16,14 @@ public interface NewsRepository extends JpaRepository<News, Long> {
         SELECT n
         FROM News n
         WHERE n.newsType = :newsType
+    """)
+    List<News> findByNewsType(NewsType newsType);
+
+
+    @Query("""
+        SELECT n
+        FROM News n
+        WHERE n.newsType = :newsType
         ORDER BY n.publishedAt DESC
     """)
     List<News> findByNewsTypeWithPaging(NewsType newsType, Pageable pageable);

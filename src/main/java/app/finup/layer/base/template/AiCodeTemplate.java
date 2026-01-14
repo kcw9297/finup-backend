@@ -17,6 +17,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
+/**
+ * AI 로직 중, 공용 코드를 제공하는 탬플릿 클래스
+ * @author kcw
+ * @since 2026-01-05
+ */
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AiCodeTemplate {
 

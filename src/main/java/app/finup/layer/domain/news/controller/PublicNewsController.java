@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -27,7 +28,8 @@ public class PublicNewsController {
      * [GET] /news/main
      */
     @GetMapping("/main")
-    public ResponseEntity<?> getPagedMainNewsList(int pageNum, int pageSize) {
+    public ResponseEntity<?> getPagedMainNewsList(@RequestParam int pageNum,
+                                                  @RequestParam int pageSize) {
 
         // [1] 페이징 수행
         Page<NewsDto.Row> page = newsService.getPagedMainNewsList(pageNum, pageSize);
@@ -42,7 +44,9 @@ public class PublicNewsController {
      * [GET] /news/stock
      */
     @GetMapping("/stock")
-    public ResponseEntity<?> getPagedStockNewsList(String stockCode, int pageNum, int pageSize) {
+    public ResponseEntity<?> getPagedStockNewsList(@RequestParam String stockCode,
+                                                   @RequestParam int pageNum,
+                                                   @RequestParam int pageSize) {
 
         // [1] 페이징 수행
         Page<NewsDto.Row> page = newsService.getPagedStockNewsList(stockCode, pageNum, pageSize);
