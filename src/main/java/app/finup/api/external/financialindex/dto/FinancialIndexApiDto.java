@@ -9,9 +9,9 @@ import lombok.*;
 import java.math.BigDecimal;
 
 /**
- * 화
+ * 경제 지표정보 API 결과를 저장하는 DTO 클래스
  * @author kcw
- * @since 2025-12-11
+ * @since 2025-01-14
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FinancialIndexApiDto {

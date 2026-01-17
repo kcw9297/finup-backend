@@ -2,11 +2,11 @@ package app.finup.api.external.marketindex.client;
 
 import app.finup.api.external.marketindex.dto.MarketIndexApiDto;
 import app.finup.api.external.marketindex.dto.MarketIndexApiDtoMapper;
+import app.finup.api.utils.ApiUtils;
 import app.finup.api.utils.ApiError;
 import app.finup.api.utils.ApiRetry;
 import app.finup.common.enums.AppStatus;
-import app.finup.common.exception.ProviderException;
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.common.utils.StrUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.Duration;
@@ -55,13 +54,13 @@ public class OpenPortalMarketIndexClient implements MarketIndexClient {
                         .loggingMessage("OPEN PORTAL 시장 지수 목록 조회")
                         .apiFailedStatus(AppStatus.API_MARKET_INDEX_REQUEST_FAILED)
                         .build().toRetrySpec())
-
-                // 실패 시 처리
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_MARKET_INDEX_REQUEST_EMPTY))) // 결과가 빈 경우 처리
+                .flatMap(ApiUtils::validateResult) // API 요청 결과 검증
 
                 // [3] API에서 얻은 모든 정보를 담은 DTO로 변환 후 결과 검증 (result 값 기반)
                 .map(json -> StrUtils.fromJson(json, MarketIndexApiDto.IndexListRp.class)) // JSON 형태 그대로 DTO로 변환
-                .flatMap(this::checkResult) // 결과 코드 검증
+                .flatMap(rp -> ApiUtils.validateCode( // 결과 코드 검증
+                        rp, dto -> Objects.equals(dto.getResponse().getHeader().getResultCode(), "00")
+                ))
 
                 // [4] 최종적으로 제공할 DTO로 변환 (필요 데이터만 추출)
                 .map(MarketIndexApiDtoMapper::toRows)
@@ -91,16 +90,8 @@ public class OpenPortalMarketIndexClient implements MarketIndexClient {
                 .queryParam("resultType", "json")
                 .queryParam("numOfRows", 1000) // 모든 데이터를 받도록 큰 숫자
                 //.queryParam("pageNo", 1)
-                .queryParam("basDt", FormatUtils.formatDateNoHyphen(date))
+                .queryParam("basDt", TimeUtils.formatDateNoHyphen(date))
                 .build();
-    }
-
-
-    // API 결과 "result" 값 검증 (00이 아닌 경우 예외 던짐)
-    private Mono<MarketIndexApiDto.IndexListRp> checkResult(MarketIndexApiDto.IndexListRp rp) {
-        boolean hasError = !Objects.equals(rp.getResponse().getHeader().getResultCode(), "00");
-        if (hasError) return Mono.error(new ProviderException(AppStatus.API_MARKET_INDEX_REQUEST_FAILED));
-        else return Mono.just(rp);
     }
 
 }

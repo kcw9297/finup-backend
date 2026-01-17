@@ -1,14 +1,18 @@
 package app.finup.layer.base.template;
 
 import app.finup.common.utils.StrUtils;
+import app.finup.layer.domain.stock.constant.StockRedisKey;
+import app.finup.layer.domain.stock.dto.StockDto;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 /**
@@ -124,5 +128,80 @@ public class RedisCodeTemplate {
                 List.of() :
                 values.stream().map(castingMethod).toList();
     }
+
+
+    /**
+     * 이전 데이터 목록 저장 (이전 데이터 목록을 Redis 리스트에 삽입)
+     * @param srt StringRedisTemplate Bean
+     * @param key 저장할 Redis Key
+     * @param keyValueMap Hash에 저장할 key-value 정보
+     * @param ttl Redis Key 만료 시간 (TimeToLive)
+     */
+    public static void putAllHash (
+            StringRedisTemplate srt,
+            String key,
+            Map<String, String> keyValueMap,
+            Duration ttl
+    ) {
+
+        // [1] HashOps 조회
+        HashOperations<String, Object, Object> hashOps = srt.opsForHash();
+
+        // [2] Hash 자료구조에 key-value 값 일괄 삽입 후 ttl 갱신
+        hashOps.putAll(key, keyValueMap);
+        srt.expire(key, ttl);
+    }
+
+
+    /**
+     * 이전 데이터 목록 저장 (이전 데이터 목록을 Redis 리스트에 삽입)
+     * @param srt StringRedisTemplate Bean
+     * @param key Hash 자료구조 Redis Key
+     * @param hashKeys Hash에 저장된 key 목록 (조회 대상)
+     * @param dtoClass 변환할 DTO 클래스 정보
+     */
+    public static <T> List<T> getMultiHash(
+            StringRedisTemplate srt,
+            String key,
+            Collection<?> hashKeys,
+            Class<T> dtoClass
+    ) {
+
+        // [1] 일괄 조회
+        List<Object> values = srt.opsForHash().multiGet(key, new ArrayList<>(hashKeys));
+
+        // [2] DTO로 변환 및 반환
+        return values.stream()
+                .filter(Objects::nonNull)
+                .map(value -> StrUtils.fromJson((String) value, dtoClass))
+                .toList();
+    }
+
+
+    /**
+     * 이전 데이터 목록 저장 (이전 데이터 목록을 Redis 리스트에 삽입)
+     * @param srt StringRedisTemplate Bean
+     * @param key Hash 자료구조 Redis Key
+     * @param dtoClass 변환할 DTO 클래스 정보
+     */
+    public static <T> List<T> getAllHash(
+            StringRedisTemplate srt,
+            String key,
+            Class<T> dtoClass
+    ) {
+
+        return srt.opsForHash().entries(key)
+                .entrySet()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(entry -> StrUtils.fromJson((String) entry.getValue(), dtoClass))
+                .toList();
+    }
+
+
+
+
+
+
 
 }

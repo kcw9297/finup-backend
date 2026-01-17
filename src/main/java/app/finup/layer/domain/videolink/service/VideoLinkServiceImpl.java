@@ -4,7 +4,7 @@ import app.finup.common.constant.Const;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
 import app.finup.infra.ai.EmbeddingProvider;
@@ -60,7 +60,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
         Integer count = videoLinkMapper.countForSearch(rq);
 
         // [2] 페이징 객체 매핑 및 반환
-        rows.forEach(row -> row.setDuration(FormatUtils.formatDuration(row.getDuration()))); // mybatis에서 문자열로 제공됨
+        rows.forEach(row -> row.setDuration(TimeUtils.formatDuration(row.getDuration()))); // mybatis에서 문자열로 제공됨
         return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
     }
 

@@ -1,7 +1,6 @@
 package app.finup.api.external.marketindex.client;
 
 import app.finup.api.external.marketindex.dto.MarketIndexApiDto;
-import app.finup.layer.domain.indexMarket.dto.IndexMarketDto;
 
 import java.time.LocalDate;
 import java.util.List;

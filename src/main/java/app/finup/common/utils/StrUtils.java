@@ -27,9 +27,16 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StrUtils {
 
-    private static final ObjectMapper objectMapper =
-            new ObjectMapper().registerModule(new JavaTimeModule());
+    // 외부에서 주입받는 상수
+    @lombok.Getter
+    private static ObjectMapper objectMapper;
 
+    // 외부의 ObjectMapper 빈 등록 시점에 삽입
+    public static void injectObjectMapperBean(ObjectMapper mapper) {
+        if (Objects.isNull(objectMapper)) objectMapper = mapper; // 최초 초기화만 가능
+    }
+
+    // 내부 상수
     private static final Random random = new Random();
     private static final Base64.Encoder urlEncoder = Base64.getUrlEncoder();
 

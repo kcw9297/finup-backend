@@ -5,6 +5,9 @@ import lombok.NoArgsConstructor;
 
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
@@ -12,7 +15,7 @@ import java.util.Objects;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class FormatUtils {
+public final class TimeUtils {
 
     // 시간 포메팅
     public static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 2025-01-01
@@ -20,17 +23,48 @@ public final class FormatUtils {
     public static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern("HH:mm:ss"); // 00:00:00
     public static final DateTimeFormatter FORMATTER_DATE_TIME = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    // ZoneId 상수 (런타임용)
+    public static final ZoneId ZONE_ID_KOREA = ZoneId.of("Asia/Seoul");
+    public static final ZoneId ZONE_ID_UTC = ZoneId.of("UTC");
+
+    // 문자열 상수 (애노테이션용)
+    public static final String ZONE_KOREA = "Asia/Seoul";
+    public static final String ZONE_UTC = "UTC";
+
+
+    /**
+     * 현재 사용하는 시간대의 LocalDate 제공 (현재 : KR)
+     * @return 현재 시간대의 LocalDate
+     */
+    public static LocalDate getNowLocalDate() {
+        return LocalDate.now(ZONE_ID_KOREA);
+    }
+
+
+    /**
+     * 현재 사용하는 시간대의 LocalDateTime 제공 (현재 : KR)
+     * @return 현재 시간대의 LocalDateTime
+     */
+    public static LocalDateTime getNowLocalDateTime() {
+        return LocalDateTime.now(ZONE_ID_KOREA);
+    }
+
 
     /**
      * 시간 포메팅 (2025-01-01)
      * @param time 문자열 변환 대상 시간 객체
      * @return 포메팅 처리된 문자열
      */
-
     public static String formatDate(TemporalAccessor time) {
         return FORMATTER_DATE.format(time);
     }
 
+
+    /**
+     * 시간 포메팅 (20250101)
+     * @param time 문자열 변환 대상 시간 객체
+     * @return 포메팅 처리된 문자열
+     */
     public static String formatDateNoHyphen(TemporalAccessor time) {
         return FORMATTER_DATE_NO_HYPHEN.format(time);
     }
@@ -67,6 +101,7 @@ public final class FormatUtils {
     public static String formatKoreaNumber(Number value) {
         return NumberFormat.getNumberInstance(Locale.KOREA).format(value);
     }
+
 
     /**
      * Duration 시간, 분, 초 포메팅

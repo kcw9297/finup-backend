@@ -1,8 +1,8 @@
 package app.finup.api.external.financialindex.client;
 
+import app.finup.api.utils.ApiUtils;
 import app.finup.common.enums.AppStatus;
-import app.finup.common.exception.ProviderException;
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.common.utils.StrUtils;
 import app.finup.api.utils.ApiError;
 import app.finup.api.utils.ApiRetry;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
-import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.Duration;
@@ -62,13 +61,11 @@ public class KeximFinancialIndexClient implements FinancialIndexClient {
                         .loggingMessage("KEXIM 환율 데이터 목록 조회")
                         .apiFailedStatus(AppStatus.API_INDICATOR_REQUEST_FAILED)
                         .build().toRetrySpec())
-
-                // 실패 시 처리
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_INDICATOR_RESPONSE_EMPTY))) // 결과가 빈 경우 처리
+                .flatMap(ApiUtils::validateResult) // API 요청 결과 검증
 
                 // [3] API에서 얻은 모든 정보를 담은 DTO로 변환 후 결과 검증 (result 값 기반)
                 .map(json -> StrUtils.fromJson(json, new TypeReference<List<FinancialIndexApiDto.ExchangeRateRp>>() {})) // JSON 형태 그대로 DTO로 변환
-                .flatMap(this::checkResult) // 결과 코드 검증
+                .flatMap(rpList -> ApiUtils.validateAllCode(rpList, rp -> rp.getResult() != 1)) // 결과 코드 검증
 
                 // [4] 최종적으로 제공할 DTO로 변환 (필요 데이터만 추출)
                 .map(FinancialIndexApiDtoMapper::toExchangeRateRows)
@@ -94,17 +91,9 @@ public class KeximFinancialIndexClient implements FinancialIndexClient {
     private URI buildURL(LocalDate date, UriBuilder uri) {
         return uri
                 .queryParam("authkey", keximKey)
-                .queryParam("searchdate", FormatUtils.formatDate(date))
+                .queryParam("searchdate", TimeUtils.formatDate(date))
                 .queryParam("data", "AP01")
                 .build();
-    }
-
-
-    // API 결과 "result" 값 검증 (1이 아닌 경우 예외 던짐)
-    private Mono<List<FinancialIndexApiDto.ExchangeRateRp>> checkResult(List<FinancialIndexApiDto.ExchangeRateRp> list) {
-        boolean hasError = list.stream().anyMatch(rp -> rp.getResult() != 1);
-        if (hasError) return Mono.error(new ProviderException(AppStatus.API_INDICATOR_REQUEST_FAILED));
-        else return Mono.just(list);
     }
 
 

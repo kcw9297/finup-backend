@@ -1,6 +1,6 @@
 package app.finup.layer.domain.video.dto;
 
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.api.external.youtube.dto.YouTubeApiDto;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -20,7 +20,7 @@ public final class VideoDtoMapper {
                .videoId(video.getVideoId())
                .videoUrl(video.getVideoUrl())
                .title(video.getTitle())
-               .duration(FormatUtils.formatDuration(video.getDuration()))
+               .duration(TimeUtils.formatDuration(video.getDuration()))
                .thumbnailUrl(video.getThumbnailUrl())
                .channelTitle(video.getChannelTitle())
                .viewCount(video.getViewCount())

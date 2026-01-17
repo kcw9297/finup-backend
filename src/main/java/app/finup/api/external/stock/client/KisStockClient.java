@@ -98,12 +98,12 @@ public class KisStockClient implements StockClient {
                 .bodyToMono(String.class)
                 .timeout(TIMEOUT_ISSUE) // 요청 Timeout
                 .retryWhen(setRetrySpec("KIS API AccessToken 발급 시도")) // 실패 시 재시도 로직
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_RESPONSE_EMPTY))) // 결과가 빈 경우 처리
+                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_AT_ISSUE_FAILED))) // 결과가 빈 경우 처리
 
                 // [3] 토큰 존재 검증
                 .map(json -> StrUtils.fromJson(json, StockApiDto.IssueRp.class)) // JSON 형태 그대로 DTO로 변환
                 .filter(rp -> Objects.nonNull(rp.getAccessToken()) && !rp.getAccessToken().isBlank()) // 토큰 정보가 없는 경우 필터
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_RESPONSE_EMPTY))) // 토큰 결과가 없는 경우 예외 처리
+                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_AT_ISSUE_FAILED))) // 토큰 결과가 없는 경우 예외 처리
 
                 // [4] 최종적으로 제공할 DTO로 변환 (필요 데이터만 추출)
                 .map(StockApiDtoMapper::toIssue)
@@ -250,7 +250,7 @@ public class KisStockClient implements StockClient {
                 .bodyToMono(String.class)
                 .timeout(TIMEOUT_GET) // 요청 Timeout
                 .retryWhen(setRetrySpec("KIS API 주식 정보 조회 시도")) // 실패 시 재시도 로직
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_RESPONSE_EMPTY)))
+                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_AT_ISSUE_FAILED)))
 
                 // [3] JSON 응답 그대로 첫 번째 DTO 반환 (JSON 구조 그대로) -> 이후 필요한 데이터만 추출하여 최종 반환 DTO로 변환
                 .map(json -> StrUtils.fromJson(json, firstDtoClass)) // JSON 형태 그대로 DTO로 변환

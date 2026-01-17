@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -140,7 +139,7 @@ public final class ParallelUtils {
         │ Worker 수\t\t\t{}
         │ 시작 시간\t\t\t{}
         └───────────────────────────────────────────────────────────────────────────────
-        """, workName, items.size(), maxWorkers, FormatUtils.formatDateTime(LocalDateTime.now()));
+        """, workName, items.size(), maxWorkers, TimeUtils.formatDateTime(LocalDateTime.now()));
 
         // [3] 작업 시작 전 필요 값 정의
         long startTime = System.currentTimeMillis(); // 시작 시간
@@ -168,7 +167,7 @@ public final class ParallelUtils {
             └───────────────────────────────────────────────────────────────────────────────
             """, workName,totalProcessed.get(), items.size(),
                     totalProcessed.get(), failedItems.size(),
-                    LogUtils.calculateCost(startTime), FormatUtils.formatDateTime(LocalDateTime.now()));
+                    LogUtils.calculateCost(startTime), TimeUtils.formatDateTime(LocalDateTime.now()));
 
 
         } catch (TimeoutException e) {

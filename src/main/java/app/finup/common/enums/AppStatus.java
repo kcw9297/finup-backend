@@ -64,6 +64,9 @@ public enum AppStatus {
 
     /* Infra - API */
     API_REQUEST_FAILED(500, "API 요청에 실패했습니다.", "API_REQUEST_FAILED"),
+    API_RESPONSE_EMPTY(500, "API 요청 결과를 받아오지 못했습니다. (EMPTY)", "API_RESPONSE_EMPTY"),
+    API_INVALID_RESPONSE(500, "유효하지 않은 API 응답 형태입니다.", "API_INVALID_RESPONSE"),
+    API_RESPONSE_CODE_ERROR(500, "API 오류 응답이 발생했습니다.", "API_RESPONSE_CODE_ERROR"),
     API_REQUEST_CHECK_FAILED(500, "API 요청 응답 검증에 실패했습니다.", "API_REQUEST_CHECK_FAILED"),
     API_YOUTUBE_URL_NOT_VALID(400, "유효하지 않은 YouTube URL 입니다. 다시 시도해 주세요.", "YOUTUBE_URL_NOT_VALID"),
     API_YOUTUBE_ID_NOT_VALID(400, "유효하지 않은 YouTube 번호 입니다. 다시 시도해 주세요.", "YOUTUBE_ID_NOT_VALID"),
@@ -71,10 +74,8 @@ public enum AppStatus {
     API_YOUTUBE_REQUEST_FAILED(500, "유튜브 영상 조회에 실패했습니다.", "YOUTUBE_REQUEST_FAILED"),
     API_NEWS_REQUEST_FAILED(500, "뉴스 조회에 실패했습니다.", "API_NEWS_REQUEST_FAILED"),
     API_STOCK_REQUEST_FAILED(500, "주식 정보 조회에 실패했습니다.", "API_STOCK_REQUEST_FAILED"),
-    API_STOCK_RESPONSE_EMPTY(500, "주식 정보 조회에 실패했습니다.", "API_STOCK_RESPONSE_EMPTY"),
-    API_INDICATOR_RESPONSE_EMPTY(500, "환율 정보 조회 결과가 비어있습니다.", "API_STOCK_RESPONSE_EMPTY"),
+    API_STOCK_AT_ISSUE_FAILED(500, "주식 API AccessToken 발급에 실패했습니다.", "API_STOCK_AT_ISSUE_FAILED"),
     API_INDICATOR_REQUEST_FAILED(500, "환율 정보 조회에 실패했습니다.", "API_ECONOMIC_INDICATOR_REQUEST_FAILED"),
-    API_MARKET_INDEX_REQUEST_EMPTY(500, "시장 지수 조회 결과가 비어있습니다.", "API_MARKET_INDEX_REQUEST_EMPTY"),
     API_MARKET_INDEX_REQUEST_FAILED(500, "시장 지수 조회 실패했습니다.", "API_MARKET_INDEX_REQUEST_FAILED"),
 
     /* Infra - AI */
@@ -147,6 +148,8 @@ public enum AppStatus {
     /* 단어 퀴즈 WordQuiz */
     WORD_QUIZ_NOT_FOUND(500, "퀴즈 단어가 존재하지 않습니다.", "WORD_QUIZ_NOT_FOUND"),
 
+    /* 지표 Indicator */
+    INDICATOR_FALLBACK_FAILED(500, "지표 Fallback 처리에 실패했습니다", "INDICATOR_FALLBACK_FAILED"),
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* 범용 상태 */
