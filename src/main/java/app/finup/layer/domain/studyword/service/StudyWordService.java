@@ -30,10 +30,9 @@ public interface StudyWordService {
     /**
      * 학습 단어 내 이미지 업로드 (학습용 이미지)
      * 이미 업로드한 이미지가 있는 경우, 새로운 이미지로 대체
-     *
      * @param studyWordId 학습단어번호
-     * @param file        업로드 이미지 파일
-     * @return
+     * @param file 업로드 이미지 파일
+     * @return 업로드에 성공한 파일 URL
      */
     String uploadImage(Long studyWordId, MultipartFile file);
 
@@ -58,8 +57,5 @@ public interface StudyWordService {
      */
     void removeImage(Long studyWordId);
 
-    /**
-     * Quiz 데이터용 단어 랜덤 30개 가져오기
-     */
-    List<StudyWordDto.Quiz> getQuizData();
+
 }

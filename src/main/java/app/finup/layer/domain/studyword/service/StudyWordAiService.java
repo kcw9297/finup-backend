@@ -5,11 +5,11 @@ import app.finup.layer.domain.studyword.dto.StudyWordDto;
 import java.util.List;
 
 /**
- * 학습 단어 추천 로직을 취급하는 인터페이스 (메인 비즈니스 로직과 분리)
+ * 학습 단어 AI 로직을 취급하는 인터페이스 (메인 비즈니스 로직과 분리)
  * @author kcw
  * @since 2025-12-17
  */
-public interface StudyWordRecommendService {
+public interface StudyWordAiService {
 
     /**
      * 학습 단어 추천 (학습 페이지)

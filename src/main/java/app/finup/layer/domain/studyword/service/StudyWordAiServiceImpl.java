@@ -4,6 +4,7 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
+import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
 import app.finup.layer.domain.studyword.constant.StudyWordCache;
@@ -12,7 +13,6 @@ import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.manager.StudyWordAiManager;
 import app.finup.layer.domain.studyword.redis.StudyWordRedisStorage;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
-import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -32,14 +32,14 @@ import java.util.stream.Stream;
 @Component
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class StudyWordRecommendServiceImpl implements StudyWordRecommendService {
+public class StudyWordAiServiceImpl implements StudyWordAiService {
 
     // 사용 의존성
     private final StudyWordRepository studyWordRepository;
     private final StudyRepository studyRepository;
     private final StudyWordAiManager studyWordAiManager;
     private final StudyWordRedisStorage studyWordRedisStorage;
-    private final UploadFileManager uploadFileManager;
+    private final FileStorage fileStorage;
 
     // 사용 상수
     private static final int RECOMMEND_AMOUNT_REQUEST = 20; // DB에 요청하는 추천 단어 개수
@@ -149,7 +149,7 @@ public class StudyWordRecommendServiceImpl implements StudyWordRecommendService 
         }
 
         return row.toBuilder()
-                .imageUrl(uploadFileManager.getFullUrl(row.getImageUrl()))
+                .imageUrl(fileStorage.getUrl(row.getImageUrl()))
                 .build();
     }
 }

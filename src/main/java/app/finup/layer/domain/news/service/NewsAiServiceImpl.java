@@ -80,7 +80,7 @@ public class NewsAiServiceImpl implements NewsAiService {
         String prompt = StrUtils.fillPlaceholder(NewsPrompt.PROMPT_ANALYZE, promptParams);
 
         // [3] AI분석 수행
-        return AiCodeTemplate.analyzeWithPrev(
+        return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
                 chatProvider, prompt,
                 result -> newsRedisStorage.storePrevAnalyze(newsId, memberId, result)
         );

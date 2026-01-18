@@ -11,24 +11,31 @@ public interface FileStorage {
 
     /**
      * 파일 업로드
-     * @param file      저장 대상 파일
-     * @param storePath 저장 주소
+     * @param file 저장 대상 파일
+     * @param filePath 파일 상대 주소
      */
-    void upload(MultipartFile file, String storePath);
+    void upload(MultipartFile file, String filePath);
 
 
     /**
      * 파일 다운로드 (바이트 문자열 추출)
-     * @param storePath 저장 주소
+     * @param filePath 파일 상대 주소
      * @return 파일 바이트 문자열
      */
-    byte[] download(String storePath);
+    byte[] download(String filePath);
 
 
     /**
      * 파일 삭제
-     * @param storePath 저장 파일 주소
+     * @param filePath 파일 상대 주소
      */
-    void remove(String storePath);
+    void remove(String filePath);
 
+
+    /**
+     * 프론트엔드에 사용할 파일 URL 조회
+     * @param filePath 파일 상대 주소
+     * @return 실제 프론트엔드에 제공할 파일 URL 문자열
+     */
+    String getUrl(String filePath);
 }

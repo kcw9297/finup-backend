@@ -37,8 +37,12 @@ public class S3FileStorage implements FileStorage {
     @Value("${app.file.s3.bucket-name}")
     private String bucketName;
 
+    @Value("${app.file.domain}")
+    private String fileDomain;
+
+
     @Override
-    public void upload(MultipartFile file, String storePath) {
+    public void upload(MultipartFile file, String filePath) {
 
         try {
             // [1] 파일 검증
@@ -55,7 +59,7 @@ public class S3FileStorage implements FileStorage {
             // [2] S3 업로드 요청 객체 생성
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(bucketName)
-                    .key(storePath)
+                    .key(filePath)
                     .contentType(file.getContentType())
                     .contentLength(file.getSize())
                     .build();
@@ -72,14 +76,14 @@ public class S3FileStorage implements FileStorage {
 
 
     @Override
-    public byte[] download(String storePath) {
+    public byte[] download(String filePath) {
 
         try {
             // [1] S3 스토리지에 저장된 파일 다운로드 요청 (InputStream)
             ResponseInputStream<GetObjectResponse> getRes = s3.getObject(
                     GetObjectRequest.builder()
                             .bucket(bucketName)
-                            .key(storePath)
+                            .key(filePath)
                             .build()
             );
 
@@ -94,13 +98,13 @@ public class S3FileStorage implements FileStorage {
 
 
     @Override
-    public void remove(String storePath) {
+    public void remove(String filePath) {
 
         try {
             s3.deleteObject(
                     DeleteObjectRequest.builder()
                             .bucket(bucketName)
-                            .key(storePath)
+                            .key(filePath)
                             .build()
             );
 
@@ -109,5 +113,12 @@ public class S3FileStorage implements FileStorage {
             throw new ProviderException(AppStatus.FILE_REMOVE_FAILED, e);
         }
     }
+
+
+    @Override
+    public String getUrl(String filePath) {
+        return "%s/%s".formatted(fileDomain, filePath);
+    }
+
 
 }

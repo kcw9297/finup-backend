@@ -99,7 +99,6 @@ public class RedisConfig {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        StrUtils.injectObjectMapperBean(objectMapper); // 유틸 클래스에서 사용하기 위해 삽입 (정적 유틸 클래스)
         return objectMapper;
     }
 

@@ -2,6 +2,7 @@ package app.finup.common.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.UtilsException;
@@ -27,18 +28,15 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StrUtils {
 
-    // 외부에서 주입받는 상수
-    @lombok.Getter
-    private static ObjectMapper objectMapper;
-
-    // 외부의 ObjectMapper 빈 등록 시점에 삽입
-    public static void injectObjectMapperBean(ObjectMapper mapper) {
-        if (Objects.isNull(objectMapper)) objectMapper = mapper; // 최초 초기화만 가능
-    }
-
     // 내부 상수
     private static final Random random = new Random();
     private static final Base64.Encoder urlEncoder = Base64.getUrlEncoder();
+
+    @lombok.Getter
+    private static final ObjectMapper objectMapper =
+            new ObjectMapper()
+                    .registerModule(new JavaTimeModule())
+                    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 
     /**
@@ -200,6 +198,9 @@ public final class StrUtils {
      * @param filename 대상 파일명
      */
     public static String getFileExt(String filename) {
+
+        // 만약 유효하지 않은 파일명이면 null
+        if (Objects.isNull(filename)) return null;
 
         // 파일 확장자가 있는 인덱스
         int extIdx = filename.lastIndexOf('.');

@@ -4,14 +4,15 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
+import app.finup.infra.ai.ChatProvider;
 import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.layer.base.template.AiCodeTemplate;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
-import app.finup.layer.domain.videolink.constant.VideoLinkCache;
+import app.finup.layer.domain.videolink.constant.VideoLinkPrompt;
+import app.finup.layer.domain.videolink.constant.VideoLinkRedisKey;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import app.finup.layer.domain.videolink.dto.VideoLinkDtoMapper;
-import app.finup.layer.domain.videolink.manager.VideoLinkAiManager;
-import app.finup.layer.domain.videolink.mapper.VideoLinkMapper;
 import app.finup.layer.domain.videolink.redis.VideoLinkRedisStorage;
 import app.finup.layer.domain.videolink.repository.VideoLinkRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * VideoLinkService 구현 클래스
@@ -36,15 +36,14 @@ import java.util.stream.Stream;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService {
+public class VideoLinkAiServiceImpl implements VideoLinkAiService {
 
     // 사용 의존성
     private final VideoLinkRepository videoLinkRepository;
     private final VideoLinkRedisStorage videoLinkRedisStorage;
-    private final VideoLinkAiManager videoLinkAiManager;
     private final EmbeddingProvider embeddingProvider;
     private final StudyRepository studyRepository;
-    private final VideoLinkMapper videoLinkMapper;
+    private final ChatProvider chatProvider;
 
     // 사용 상수
     private static final int RECOMMEND_AMOUNT_REQUEST = 20; // DB에 요청하는 추천 영상 개수
@@ -54,7 +53,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
 
     @Cacheable( // 홈은 단일 캐시 (모두에게 공용으로 보임)
-            value = VideoLinkCache.RECOMMEND_HOME_LOGOUT,
+            value = VideoLinkRedisKey.CACHE_RECOMMEND_HOME_LOGOUT,
             key = "'DEFAULT'"
     )
     @Override
@@ -62,7 +61,13 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
     public List<VideoLinkDto.Row> recommendForLogoutHome() {
 
         // [1] AI에게 키워드 추천 (공백 기준으로 나누어진 키워드 목록)
-        String sentence = videoLinkAiManager.recommendSentenceForLogoutHome();
+        String prompt = StrUtils.fillPlaceholder( // 프롬포트 생성
+                VideoLinkPrompt.PROMPT_RECOMMEND_SENTENCE_HOME,
+                Map.of(VideoLinkPrompt.LATEST_SENTENCES, "") // 홈은 과거이력 없음
+        );
+
+        // [2] 추천 문자열 생성
+        String sentence = AiCodeTemplate.sendQueryAndGetString(chatProvider, prompt);
         LogUtils.showWarn(this.getClass(), "AI SENTENCE = %s", sentence);
 
         // [2] 추천받은 키워드 기반 embedded 배열 생성
@@ -78,7 +83,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
 
     @Cacheable( // 캐싱 데이터 사용
-            value = VideoLinkCache.RECOMMEND_HOME_LOGIN,
+            value = VideoLinkRedisKey.CACHE_RECOMMEND_HOME_LOGIN,
             key = "#memberId"
     )
     @Override
@@ -88,7 +93,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
 
     @CachePut( // 기존 Cache 덮어 쓰기
-            value = VideoLinkCache.RECOMMEND_HOME_LOGIN,
+            value = VideoLinkRedisKey.CACHE_RECOMMEND_HOME_LOGIN,
             key = "#memberId"
     )
     public List<VideoLinkDto.Row> retryRecommendForLoginHome(Long memberId) {
@@ -103,7 +108,13 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
         String latestSentences = videoLinkRedisStorage.getLatestSentenceForHome(memberId);
 
         // [2] 키워드 추천
-        String sentence = videoLinkAiManager.recommendSentenceForLoginHome(latestSentences);
+        String prompt = StrUtils.fillPlaceholder( // 프롬포트 생성
+                VideoLinkPrompt.PROMPT_RECOMMEND_SENTENCE_HOME,
+                Map.of(VideoLinkPrompt.LATEST_SENTENCES, latestSentences)
+        );
+
+        // 추천 문자열 생성
+        String sentence = AiCodeTemplate.sendQueryAndGetString(chatProvider, prompt);
         LogUtils.showWarn(this.getClass(), "AI SENTENCE = %s", sentence);
 
         // [3] 추천된 키워드 기반 임베딩 배열 생성 & 이전 추천영상번호 조회
@@ -132,7 +143,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
 
     @Cacheable( // 캐싱 데이터 사용
-            value = VideoLinkCache.RECOMMEND_STUDY,
+            value = VideoLinkRedisKey.CACHE_RECOMMEND_STUDY,
             key = "#studyId + ':' + #memberId"
     )
     @Override
@@ -143,7 +154,7 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
 
 
     @CachePut( // 기존 Cache 덮어 쓰기
-            value = VideoLinkCache.RECOMMEND_STUDY,
+            value = VideoLinkRedisKey.CACHE_RECOMMEND_STUDY,
             key = "#studyId + ':' + #memberId"
     )
     @Override
@@ -183,12 +194,25 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
     // 추천 수행
     private List<VideoLinkDto.Row> doRecommend(Long memberId, Study study, Map<Long, VideoLinkDto.Row> candidates, List<Long> latestVideoLinkIds) {
 
-        try {
-            String json = StrUtils.toJson(VideoLinkDtoMapper.toRecommendation(study, candidates.values(), latestVideoLinkIds));
-            log.warn("AI REQUEST JSON : {}", json);
+        String json = StrUtils.toJson(
+                VideoLinkDtoMapper.toRecommendation(study, candidates.values(), latestVideoLinkIds)
+        );
+        log.warn("AI REQUEST JSON : {}", json);
 
-            // 추천 수행
-            List<Long> resultIds = videoLinkAiManager.recommendForStudy(json);
+        // 프롬포트 생성
+        String prompt = StrUtils.fillPlaceholder( // 프롬포트 생성
+                VideoLinkPrompt.PROMPT_RECOMMEND_VIDEO_STUDY,
+                Map.of(VideoLinkPrompt.INPUT, json)
+        );
+
+        // 추천 수행 및 결과 반환
+        return AiCodeTemplate.recommendWithPrev(
+                chatProvider, prompt, candidates, RECOMMEND_AMOUNT_RESPONSE,
+                result -> videoLinkRedisStorage.storeLatestRecommendedIds(result.stream().map(String::valueOf).toList(), memberId)
+        );
+
+            /*
+            List<Long> resultIds = AiCodeTemplate.sendQueryAndGetJson(json, prompt, );
 
             // 만약 6개 미만으로 추천된 경우 (AI가 없는 ID를 추천한 경우)
             List<Long> validIds = resultIds.stream()
@@ -223,7 +247,8 @@ public class VideoLinkRecommendServiceImpl implements VideoLinkRecommendService 
             LogUtils.showError(this.getClass(), "AI 분석 실패. 유사도 분석 상위 6개 반환");
             return candidates.values().stream().limit(6).toList();
         }
-    }
 
+             */
+    }
 
 }

@@ -26,14 +26,74 @@ import java.util.stream.Stream;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AiCodeTemplate {
 
+
     /**
-     * 이전 데이터 기반 "AI 분석 작업" 수행
+     * AI 쿼리 요청 후, 문자열 결과 그대로 반환
+     * @param chatProvider ChatProvider Bean
+     * @param prompt AI 프롬포트
+     * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
+     */
+    public static String sendQueryAndGetString(
+            ChatProvider chatProvider,
+            String prompt) {
+
+        String response = chatProvider.query(prompt);
+        return AiUtils.removeMarkdown(response);
+    }
+
+
+    /**
+     * AI 쿼리 요청 후, 문자열 결과 그대로 반환
+     * @param chatProvider ChatProvider Bean
+     * @param prompt AI 프롬포트
+     * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
+     */
+    public static String sendQueryAndGetStringWithPrev(
+            ChatProvider chatProvider,
+            String prompt,
+            Consumer<String> savePrevMethod) {
+
+        // [1] 쿼리 수행
+        String response = chatProvider.query(prompt);
+        String clean = AiUtils.removeMarkdown(response);
+
+        // [2] 이력 저장
+        savePrevMethod.accept(clean);
+
+        // [3] 결과 반환
+        return clean;
+    }
+
+
+
+    /**
+     * AI 쿼리 요청 후, JSON 결과 반환 (이전 이력)
+     * @param chatProvider ChatProvider Bean
+     * @param prompt AI 프롬포트
+     * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
+     */
+    public static <T> T sendQueryAndGetJson(
+            ChatProvider chatProvider,
+            String prompt,
+            Class<T> dtoClass) {
+
+        // [1] 쿼리 전달
+        String response = chatProvider.query(prompt);
+        String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
+
+        // [2] 결과 반환
+        return StrUtils.fromJson(clean, dtoClass);
+    }
+
+
+    /**
+     * AI 쿼리 요청 후, JSON 결과를 저장 후 반환 (이전 이력)
      * @param chatProvider ChatProvider Bean
      * @param prompt AI 프롬포트
      * @param savePrevMethod 이전 결과를 저장할 메소드(함수)
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
-    public static <T> T analyzeWithPrev(
+    public static <T> T sendQueryAndGetJsonWithPrev(
             ChatProvider chatProvider,
             String prompt,
             Consumer<T> savePrevMethod) {

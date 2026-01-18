@@ -5,12 +5,11 @@ import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import java.util.List;
 
 /**
- * 학습 영상 추천 로직을 취급하는 인터페이스 (메인 비즈니스 로직과 분리)
+ * 학습 영상 AI 로직을 취급하는 인터페이스
  * @author kcw
  * @since 2025-12-17
  */
-public interface VideoLinkRecommendService {
-
+public interface VideoLinkAiService {
 
     /**
      * 학습 영상 추천 (페이지 로그아웃 홈)

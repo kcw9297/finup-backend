@@ -3,6 +3,7 @@ package app.finup.infra.file.storage;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,8 +28,18 @@ import java.util.Objects;
 @Component
 public class LocalFileStorage implements FileStorage {
 
+    @Value("${server.port}")
+    private Integer serverPort;
+
+    @Value("${app.file.domain}")
+    private String fileDomain;
+
+    @Value("${app.file.dir}")
+    private String fileDir;
+
+
     @Override
-    public void upload(MultipartFile file, String storePath) {
+    public void upload(MultipartFile file, String filePath) {
 
         try {
 
@@ -43,13 +54,14 @@ public class LocalFileStorage implements FileStorage {
                 throw new ProviderException(AppStatus.FILE_EMPTY); // 비어 있는 파일 업로드 시
             }
 
-            // [2] 저장 파일 디렉토리 확인 (없을 시 생성)
+            // [2] 저장 파일 주소 생성 및 파일 디렉토리 생성
+            String storePath = getStorePath(filePath);
             String uploadDir = "%s/".formatted(Paths.get(storePath).getParent().toString());
             File dir = new File(uploadDir);
             if (!dir.exists()) dir.mkdirs();
 
             // [3] 파일 업로드
-            file.transferTo(new File(storePath)); // 파일 업로드
+            file.transferTo(new File(filePath)); // 파일 업로드
 
         } catch (ProviderException e) {
             throw e;
@@ -62,11 +74,11 @@ public class LocalFileStorage implements FileStorage {
 
 
     @Override
-    public byte[] download(String storePath) {
+    public byte[] download(String filePath) {
 
         try {
             // [1] 파일 저장 경로
-            Path path = Paths.get(storePath);
+            Path path = Paths.get(getStorePath(filePath));
 
             // [3] 파일 바이트 문자열 반환
             return Files.readAllBytes(path);
@@ -79,11 +91,11 @@ public class LocalFileStorage implements FileStorage {
 
 
     @Override
-    public void remove(String storePath) {
+    public void remove(String filePath) {
 
         try {
             // [1] 파일 저장 경로
-            Path path = Paths.get(storePath);
+            Path path = Paths.get(getStorePath(filePath));
 
             // [2] 파일이 존재하는 경우 파일 삭제
             if (Files.exists(path)) Files.deleteIfExists(path);
@@ -93,5 +105,18 @@ public class LocalFileStorage implements FileStorage {
             throw new ProviderException(AppStatus.FILE_DOWNLOAD_FAILED, e);
         }
     }
+
+
+    @Override
+    public String getUrl(String filePath) {
+        return "http://localhost:%s/%s/%s".formatted(serverPort, fileDomain, filePath);
+    }
+
+
+    // 실제 "저장"할 주소 반환
+    private String getStorePath(String filePath) {
+        return "%s/%s".formatted(fileDir, filePath);
+    }
+
 
 }

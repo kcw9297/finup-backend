@@ -94,7 +94,7 @@ public class StockAiServiceImpl implements StockAiService {
         String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_CHART, promptParams);
 
         // [3] 주식 종목정보 기반 AI 분석 수행
-        return AiCodeTemplate.analyzeWithPrev(
+        return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
                 chatProvider, prompt,
                 result -> stockRedisStorage.storePrevChartAnalyze(stockCode, memberId, result)
         );
@@ -141,7 +141,7 @@ public class StockAiServiceImpl implements StockAiService {
         String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_DETAIL, promptParams);
 
         // [3] 주식 종목정보 기반 AI 분석 수행
-        return AiCodeTemplate.analyzeWithPrev(
+        return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
                 chatProvider, prompt,
                 result -> stockRedisStorage.storePrevDetailAnalyze(stockCode, memberId, result)
         );
