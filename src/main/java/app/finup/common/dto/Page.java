@@ -2,6 +2,8 @@ package app.finup.common.dto;
 
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -12,7 +14,10 @@ import java.util.List;
  * @since 2025-11-26
  */
 @Data
-public class Page<T> {
+public class Page<T> implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private List<T> rows;       // 페이징 결과 데이터 리스트
     private long dataCount;     // 데이터의 총 개수 (같은 조건으로 조회된 총 데이터의 수)

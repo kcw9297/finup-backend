@@ -98,9 +98,8 @@ public class QuizAiServiceImpl implements QuizAiService {
 
         // [3] AI 추천 수행 및 결과 DTO 반환
         return AiCodeTemplate.recommendWithPrev(
-                        chatProvider, prompt, candidates, QUESTION_AMOUNT,
-                        prevIds -> quizRedisStorage.storePrevWordsIds(memberId, prevIds)
-                ).stream()
+                        chatProvider, prompt, candidates, Long.class, QUESTION_AMOUNT,
+                        prevIds -> quizRedisStorage.storePrevWordsIds(memberId, prevIds)).stream()
                 .map(selectedWords -> QuizDtoMapper.toQuestion(selectedWords, levelWords, AMOUNT_CHOICES))
                 .toList();
 

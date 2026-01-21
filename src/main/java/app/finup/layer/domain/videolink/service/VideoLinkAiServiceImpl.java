@@ -13,6 +13,7 @@ import app.finup.layer.domain.videolink.constant.VideoLinkPrompt;
 import app.finup.layer.domain.videolink.constant.VideoLinkRedisKey;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import app.finup.layer.domain.videolink.dto.VideoLinkDtoMapper;
+import app.finup.layer.domain.videolink.entity.VideoLink;
 import app.finup.layer.domain.videolink.redis.VideoLinkRedisStorage;
 import app.finup.layer.domain.videolink.repository.VideoLinkRepository;
 import lombok.RequiredArgsConstructor;
@@ -122,8 +123,12 @@ public class VideoLinkAiServiceImpl implements VideoLinkAiService {
         List<Long> recommendedIds = videoLinkRedisStorage.getLatestRecommendedIds(memberId);
 
         // [4] 임베딩 기반 영상 추천
-        List<VideoLinkDto.Row> candidates = videoLinkRepository
-                .findSimilarWithExcluding(embedding, RECOMMEND_AMOUNT_REQUEST, recommendedIds)
+        // NOT IN 혹은 IN 연산은 NULL 처리가 불가능하여 나눠서 연산
+        List<VideoLink> result = Objects.isNull(recommendedIds) || recommendedIds.isEmpty() ?
+                videoLinkRepository.findSimilar(embedding, RECOMMEND_AMOUNT_REQUEST) :
+                videoLinkRepository.findSimilarWithExcluding(embedding, RECOMMEND_AMOUNT_REQUEST, recommendedIds);
+
+        List<VideoLinkDto.Row> candidates = result
                 .stream()
                 .map(VideoLinkDtoMapper::toRow)
                 .collect(Collectors.toList()); // 가변 배열로 저장
@@ -207,48 +212,9 @@ public class VideoLinkAiServiceImpl implements VideoLinkAiService {
 
         // 추천 수행 및 결과 반환
         return AiCodeTemplate.recommendWithPrev(
-                chatProvider, prompt, candidates, RECOMMEND_AMOUNT_RESPONSE,
-                result -> videoLinkRedisStorage.storeLatestRecommendedIds(result.stream().map(String::valueOf).toList(), memberId)
-        );
+                chatProvider, prompt, candidates, Long.class, RECOMMEND_AMOUNT_RESPONSE,
+                result -> videoLinkRedisStorage.storeLatestRecommendedIds(result.stream().map(String::valueOf).toList(), memberId));
 
-            /*
-            List<Long> resultIds = AiCodeTemplate.sendQueryAndGetJson(json, prompt, );
-
-            // 만약 6개 미만으로 추천된 경우 (AI가 없는 ID를 추천한 경우)
-            List<Long> validIds = resultIds.stream()
-                    .filter(candidates::containsKey)
-                    .distinct()
-                    .collect(Collectors.toList());
-
-            // 부족한 수 만큼 채워 넣음
-            if (validIds.size() < 6) {
-                List<Long> finalValidIds = validIds;
-                List<Long> additional = candidates.keySet().stream()
-                        .filter(id -> !finalValidIds.contains(id))
-                        .limit(RECOMMEND_AMOUNT_RESPONSE - validIds.size())
-                        .toList();
-
-                validIds = Stream.concat(validIds.stream(), additional.stream()).collect(Collectors.toList());
-                LogUtils.showError(this.getClass(), "AI 분석 결과 부족분 발생. 보충 정보: %s", additional);
-            }
-
-            // 추천 결과 Id 정보 저장
-            List<String> strIds = validIds.stream().map(String::valueOf).toList();
-            videoLinkRedisStorage.storeLatestRecommendedIds(strIds, memberId);
-
-            // 결과 아이디 기반 후보 Map 내에서 추출 후 반환
-            Collections.shuffle(validIds); // 순서 섞기
-            return validIds.stream()
-                    .map(candidates::get)
-                    .toList();
-
-            // AI가 JSON 이외의 문자열을 반환하는 등 예기치 않은 반환으로 실패
-        } catch (Exception e) {
-            LogUtils.showError(this.getClass(), "AI 분석 실패. 유사도 분석 상위 6개 반환");
-            return candidates.values().stream().limit(6).toList();
-        }
-
-             */
     }
 
 }

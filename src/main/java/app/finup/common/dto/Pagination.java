@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class Pagination {
 
     // "Page" 객체를 통해 전달받는 값
-    private int dataCount;      // 데이터의 총 개수 (같은 조건으로 조회된 총 데이터의 수)
+    private long dataCount;     // 데이터의 총 개수 (같은 조건으로 조회된 총 데이터의 수)
     private int pageNum;        // 현재 페이지
     private int pageSize;       // 한 페이지 당 가져올 행 개수
     private int groupSize;      // 그룹당 페이지 개수
@@ -42,7 +42,7 @@ public class Pagination {
     private int curGroupStartPage;      // 현재 그룹의 시작 페이지 번호
     private int curGroupEndPage;        // 현재 그룹의 끝 페이지 번호
 
-    private Pagination(int dataCount, int pageNum, int pageSize, int groupSize) {
+    private Pagination(long dataCount, int pageNum, int pageSize, int groupSize) {
         this.dataCount = dataCount;
         this.pageNum = pageNum; // Page 객체 생성 시, 이미 +1 하여 계산
         this.pageSize = pageSize;

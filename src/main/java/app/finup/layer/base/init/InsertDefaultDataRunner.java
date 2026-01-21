@@ -5,8 +5,6 @@ import app.finup.common.constant.Env;
 import app.finup.common.utils.EnvUtils;
 import app.finup.layer.domain.member.entity.Member;
 import app.finup.layer.domain.member.repository.MemberRepository;
-import app.finup.layer.domain.reboard.entity.Reboard;
-import app.finup.layer.domain.reboard.repository.ReboardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -31,11 +28,9 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor
 public class InsertDefaultDataRunner implements ApplicationRunner {
 
-    private final Random random = new Random();
     private final Environment env;
     private final PasswordEncoder passwordEncoder;
     private final MemberRepository memberRepository;
-    private final ReboardRepository reboardRepository;
 
     private static final List<String> RANDOM_NAMES = List.of(
             "김민준", "이서연", "박지후", "최지민", "정하늘",
@@ -53,7 +48,6 @@ public class InsertDefaultDataRunner implements ApplicationRunner {
         // [2] ddl-auto 옵션이 create 인 경우에만 생성
         if (isCreate) {
             createTestMembers();
-            createTestReboards();
         }
     }
 
@@ -72,15 +66,6 @@ public class InsertDefaultDataRunner implements ApplicationRunner {
         memberRepository.saveAll(members);
     }
 
-    // 테스트 Reboard 생성
-    private void createTestReboards() {
-
-        List<Reboard> reboards = IntStream.rangeClosed(1, 100)
-                .mapToObj(i -> new Reboard("작성자%03d".formatted(i), "제목%03d".formatted(i), "본문%03d".formatted(i)))
-                .collect(Collectors.toList());
-
-        reboardRepository.saveAll(reboards);
-    }
 
 
 }

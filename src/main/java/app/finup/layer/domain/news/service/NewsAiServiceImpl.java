@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,27 +61,31 @@ public class NewsAiServiceImpl implements NewsAiService {
 
 
     private String doAnalyze(Long newsId, Long memberId) {
+
         // [1] 기존 뉴스 정보 조회
         News news = newsRepository
                 .findById(newsId)
                 .orElseThrow(() -> new BusinessException(AppStatus.NEWS_NOT_FOUND));
 
         // [2] AI 프롬포트에 필요한 파라미터 생성
-        String description = StrUtils.splitWithStart(news.getDescription(), MAX_LENGTH_DESCRIPTION); // 최대 길이 제한
+        String description = StrUtils.removeEmptySpace(// 과도한 공백 제거 (줄바꿈, 과도한 띄어쓰기 등..)
+                StrUtils.splitWithStart(news.getDescription(), MAX_LENGTH_DESCRIPTION) // 최대 길이 제한
+        );
+
+        // 이전 분석정보 및, 현재 분석요청 객체 생성
         NewsAnalyzeRequest input = new NewsAnalyzeRequest(news.getTitle(), news.getSummary(), description);
         String prev = newsRedisStorage.getPrevAnalyze(newsId, memberId);
 
         // 프롬포트 파라미터
-        Map<String, String> promptParams = new ConcurrentHashMap<>(Map.of(
-                NewsPrompt.INPUT, StrUtils.toJson(input),
-                NewsPrompt.PREV, prev
-        ));
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(NewsPrompt.INPUT, StrUtils.toJson(input));
+        promptParams.put(NewsPrompt.PREV, prev);
 
         // 프롬프트 생성
         String prompt = StrUtils.fillPlaceholder(NewsPrompt.PROMPT_ANALYZE, promptParams);
 
         // [3] AI분석 수행
-        return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
+        return AiCodeTemplate.sendQueryAndGetStringWithPrev(
                 chatProvider, prompt,
                 result -> newsRedisStorage.storePrevAnalyze(newsId, memberId, result)
         );

@@ -8,22 +8,17 @@ import app.finup.common.utils.AiUtils;
 import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.base.template.UploadFileCodeTemplate;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
-import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
 import app.finup.layer.domain.studyword.mapper.StudyWordMapper;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
-import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
-import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 

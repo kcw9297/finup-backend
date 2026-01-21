@@ -107,7 +107,7 @@ public class Url {
     public static final String WORD_QUIZ = API + "/word-quizzes";
 
     /* indicator */
-    public static final String INDICATOR = "/indicators";
+    public static final String INDICATOR = API + "/indicators";
     public static final String INDICATOR_PUBLIC = PUBLIC + INDICATOR;
 
     /* quiz */

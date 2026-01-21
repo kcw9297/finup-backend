@@ -33,20 +33,11 @@ public final class StudyWordDtoMapper {
     }
 
 
-    public static StudyWordDto.Quiz toQuiz(StudyWord entity) {
-
-        return StudyWordDto.Quiz.builder()
-                .name(entity.getName())
-                .meaning(entity.getMeaning())
-                .build();
-    }
-
-
-    public static StudyWordDto.Recommendation toRecommendation(Study entity, Collection<StudyWordDto.Row> candidates, List<Long> latestStudyWordIds) {
+    public static StudyWordAiDto.Recommendation toRecommendation(Study entity, Collection<StudyWordDto.Row> candidates, List<Long> latestStudyWordIds) {
 
         // [1] 학습 데이터
-        StudyWordDto.Recommendation.StudyInfo study =
-                StudyWordDto.Recommendation.StudyInfo.builder()
+        StudyWordAiDto.Recommendation.StudyInfo study =
+                StudyWordAiDto.Recommendation.StudyInfo.builder()
                         .name(entity.getName())
                         .summary(entity.getSummary())
                         .detail(entity.getDetail())
@@ -54,9 +45,9 @@ public final class StudyWordDtoMapper {
                         .build();
 
         // [2] 영상 데이터
-        List<StudyWordDto.Recommendation.WordCandidate> wordCandidates =
+        List<StudyWordAiDto.Recommendation.WordCandidate> wordCandidates =
                 candidates.stream()
-                        .map(candidate -> StudyWordDto.Recommendation.WordCandidate.builder()
+                        .map(candidate -> StudyWordAiDto.Recommendation.WordCandidate.builder()
                                 .studyWordId(candidate.getStudyWordId())
                                 .name(candidate.getName())
                                 .meaning(candidate.getMeaning())
@@ -64,7 +55,7 @@ public final class StudyWordDtoMapper {
                         ).toList();
 
         // [3] DTO 반환
-        return StudyWordDto.Recommendation.builder()
+        return StudyWordAiDto.Recommendation.builder()
                 .study(study)
                 .candidates(wordCandidates)
                 .latestStudyWordIds(latestStudyWordIds)

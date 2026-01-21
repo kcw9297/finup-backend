@@ -113,17 +113,19 @@ public class AiCodeTemplate {
 
     /**
      * 이전 데이터 기반 "AI 추천 작업" 수행
-     * @param chatProvider ChatProvider Bean
-     * @param prompt AI 프롬포트
-     * @param candidates 추천 후보 Map (Map<고유ID, 데이터> 형태)
-     * @param minRecommendAmount 추천 최소 개수
-     * @param savePrevMethod 이전 결과를 저장할 메소드(함수)
+     * @param chatProvider          ChatProvider Bean
+     * @param prompt                AI 프롬포트
+     * @param candidates            추천 후보 Map (Map<고유ID, 데이터> 형태)
+     * @param candidatesKeyClass    Candidate 후보 Map Key Class (고유ID 클래스)
+     * @param minRecommendAmount    추천 최소 개수
+     * @param savePrevMethod        이전 결과를 저장할 메소드(함수)
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <K, V> List<V> recommendWithPrev(
             ChatProvider chatProvider,
             String prompt,
             Map<K, V> candidates,
+            Class<K> candidatesKeyClass,
             int minRecommendAmount,
             Consumer<List<K>> savePrevMethod) {
 
@@ -132,7 +134,7 @@ public class AiCodeTemplate {
         String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
 
         // [2] 추천 결과 확인
-        List<K> recommendIds = StrUtils.fromJson(clean, new TypeReference<>() {});
+        List<K> recommendIds = StrUtils.fromJsonList(clean, candidatesKeyClass);
         LogUtils.showInfo(AiCodeTemplate.class, "📊 AI 추천 결과 : %s", recommendIds);
 
         // [5] 추천 결과 검증
@@ -152,7 +154,7 @@ public class AiCodeTemplate {
 
             // 유효 id와 새롭게 보강한 id 를 합침
             validIds = Stream.concat(validIds.stream(), additional.stream()).collect(Collectors.toList());
-            LogUtils.showWarn(AiCodeTemplate.class, "AI 분석 결과 부족분 발생. 보충 정보: %s", additional);
+            LogUtils.showWarn(AiCodeTemplate.class, "AI 분석 결과 부족분 발생. 보충 개수 : %d, 보충 정보: %s", additional.size(), additional);
         }
 
         // [6] 추천 결과 Id 정보 저장

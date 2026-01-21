@@ -34,7 +34,7 @@ public final class VideoLinkRedisKey {
     public static final String CACHE_RECOMMEND_HOME_LOGOUT = CACHE_RECOMMEND_HOME + "LOGOUT";
 
     // Lock Name
-    public static final String LOCK_RECOMMEND_HOME_LOGOUT = LOCK_PREFIX + "HOME:";
+    public static final String LOCK_RECOMMEND_HOME_LOGOUT = LOCK_PREFIX + "HOME:LOGOUT";
 
 
 }

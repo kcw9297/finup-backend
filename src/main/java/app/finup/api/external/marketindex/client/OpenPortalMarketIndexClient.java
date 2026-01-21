@@ -6,6 +6,7 @@ import app.finup.api.utils.ApiUtils;
 import app.finup.api.utils.ApiError;
 import app.finup.api.utils.ApiRetry;
 import app.finup.common.enums.AppStatus;
+import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.TimeUtils;
 import app.finup.common.utils.StrUtils;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.Duration;
@@ -54,13 +56,14 @@ public class OpenPortalMarketIndexClient implements MarketIndexClient {
                         .loggingMessage("OPEN PORTAL 시장 지수 목록 조회")
                         .apiFailedStatus(AppStatus.API_MARKET_INDEX_REQUEST_FAILED)
                         .build().toRetrySpec())
-                .flatMap(ApiUtils::validateResult) // API 요청 결과 검증
+                .flatMap(ApiUtils::validateEmpty) // API 요청 결과 자체 검증
 
                 // [3] API에서 얻은 모든 정보를 담은 DTO로 변환 후 결과 검증 (result 값 기반)
                 .map(json -> StrUtils.fromJson(json, MarketIndexApiDto.IndexListRp.class)) // JSON 형태 그대로 DTO로 변환
                 .flatMap(rp -> ApiUtils.validateCode( // 결과 코드 검증
                         rp, dto -> Objects.equals(dto.getResponse().getHeader().getResultCode(), "00")
                 ))
+                .flatMap(this::validateItem)
 
                 // [4] 최종적으로 제공할 DTO로 변환 (필요 데이터만 추출)
                 .map(MarketIndexApiDtoMapper::toRows)
@@ -92,6 +95,21 @@ public class OpenPortalMarketIndexClient implements MarketIndexClient {
                 //.queryParam("pageNo", 1)
                 .queryParam("basDt", TimeUtils.formatDateNoHyphen(date))
                 .build();
+    }
+
+
+    // 현재 DTO가 유효한지 검증
+    private Mono<MarketIndexApiDto.IndexListRp> validateItem(MarketIndexApiDto.IndexListRp indexListRp) {
+
+        return ApiUtils.validate(
+                rp -> Objects.nonNull(rp) &&
+                        Objects.nonNull(rp.getResponse()) &&
+                        Objects.nonNull(rp.getResponse().getBody()) &&
+                        Objects.nonNull(rp.getResponse().getBody().getItems()) &&
+                        Objects.nonNull(rp.getResponse().getBody().getItems().getItem()) &&
+                        !rp.getResponse().getBody().getItems().getItem().isEmpty(),
+                indexListRp, AppStatus.API_RESPONSE_EMPTY
+        );
     }
 
 }

@@ -16,6 +16,7 @@ public final class NewsDtoMapper {
 
     public static NewsDto.Row toRow(News entity) {
         return NewsDto.Row.builder()
+                .newsId(entity.getNewsId())
                 .title(entity.getTitle())
                 .summary(entity.getSummary())
                 .description(entity.getDescription())

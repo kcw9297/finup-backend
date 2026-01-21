@@ -26,6 +26,6 @@ public class NoticeScheduler {
     @Scheduled(fixedDelay = 10, initialDelay = 3, timeUnit = TimeUnit.SECONDS)
     @Async(AsyncMode.NORMAL)
     public void syncViewCount() {
-        LogUtils.runMethodAndShowCostLog("공지사항 조회수 동기화", noticeService::syncViewCount);
+        noticeService.syncViewCount();
     }
 }

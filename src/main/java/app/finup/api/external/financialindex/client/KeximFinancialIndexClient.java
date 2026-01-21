@@ -61,11 +61,11 @@ public class KeximFinancialIndexClient implements FinancialIndexClient {
                         .loggingMessage("KEXIM 환율 데이터 목록 조회")
                         .apiFailedStatus(AppStatus.API_INDICATOR_REQUEST_FAILED)
                         .build().toRetrySpec())
-                .flatMap(ApiUtils::validateResult) // API 요청 결과 검증
+                .flatMap(ApiUtils::validateEmpty) // API 요청 결과 검증
 
                 // [3] API에서 얻은 모든 정보를 담은 DTO로 변환 후 결과 검증 (result 값 기반)
                 .map(json -> StrUtils.fromJson(json, new TypeReference<List<FinancialIndexApiDto.ExchangeRateRp>>() {})) // JSON 형태 그대로 DTO로 변환
-                .flatMap(rpList -> ApiUtils.validateAllCode(rpList, rp -> rp.getResult() != 1)) // 결과 코드 검증
+                .flatMap(rpList -> ApiUtils.validateAllCode(rpList, rp -> rp.getResult() == 1)) // 결과 코드 검증
 
                 // [4] 최종적으로 제공할 DTO로 변환 (필요 데이터만 추출)
                 .map(FinancialIndexApiDtoMapper::toExchangeRateRows)

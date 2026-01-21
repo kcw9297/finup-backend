@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Safelist;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -22,26 +23,44 @@ import java.util.Objects;
 public class NewsCrawlingUtils {
 
     // HTML 검색 요청 상수
-    private static final String ALT = "alt";
-    private static final String CONTENT = "content";
     private static final String USER_AGENT_BASE = "Mozilla/5.0";
     private static final String USER_AGENT_CONTENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
     private static final String URL_GOOGLE = "https://www.google.com";
     private static final Duration TIMEOUT = Duration.ofSeconds(5);
-    private static final int THRESHOLD_LENGTH = 50;
-    private static final String DEFAULT_PUBLISHER = "네이버뉴스";
+    private static final int THRESHOLD_LENGTH = 200;
 
     // 각 사이트마다 사용하는 selector
     private static final String SELECTORS_NAVER_NEWS = "#dic_area, .newsct_article, .go_trans._article_content";
     private static final String SELECTORS_NAVER_NEWS_MOBILE = "#dic_area, .media_end_body, #newsct_article, #content, .newsct_article";
     private static final String SELECTORS_ARTICLE = "article";
-    private static final String SELECTORS_ETC = "#content, #news_body, #articleBody, .article-body, .article-content, .art_txt, .content-wrapper, .news_article, .read_txt, .view_cont, .nodeContentTitle, .news_body, .content-area";
+    private static final String SELECTORS_GOODNEWS = "#article-view-content-div";
+    private static final String SELECTORS_ASIATODAY = ".news_bm, #font";
+    private static final String SELECTORS_ETODAY = ".articleView";
+    private static final String SELECTORS_NEWS2DAY = ".view_con_wrap:nth-child(2) body";
+    private static final String SELECTORS_ETC =
+            "#articleContent, .newsview_content, #article .content, #content, #news_body, #articleBody, .article-body, .article-content, " +
+            ".art_txt, .content-wrapper, .news_article, .read_txt, .view_cont, .nodeContentTitle, .news_body, .content-area, #article-view-content-div";
 
-    // 이미지, 작성자를 추출하기 위한 selector
+    private static final List<String> NEWS_SELECTORS = List.of(
+            SELECTORS_NAVER_NEWS, SELECTORS_NAVER_NEWS_MOBILE, SELECTORS_ARTICLE, SELECTORS_GOODNEWS,
+            SELECTORS_ASIATODAY, SELECTORS_ETODAY, SELECTORS_NEWS2DAY, SELECTORS_ETC
+    );
+
+
+    // 이미지 추출 selector
+    private static final String ALT = "alt";
+    private static final String CONTENT = "content";
     private static final String SELECTOR_IMAGE = "meta[property=og:image]";
+
+    // 작성자 추출 selector
     private static final String SELECTOR_IMAGE_SITE = "meta[property=og:site_name]";
     private static final String SELECTOR_IMAGE_LOGO = ".media_end_head_top_logo_img";
     private static final String SELECTOR_TEXT_LOGO = ".press_logo";
+    private static final String SELECTOR_TEXT_LOGO_IMG = ".press_logo img";
+    private static final String SELECTOR_H1_IMG = "h1 img";
+    private static final String SELECTOR_HEADER_IMG = "header img";
+    private static final String DEFAULT_PUBLISHER = "네이버뉴스";
+
 
 
     /**
@@ -57,14 +76,14 @@ public class NewsCrawlingUtils {
 
             // [2] 네이버 뉴스 -> 네이버 모바일 뉴스 -> 언론사 홈페이지 -> 그 외 사이트 순으로 크롤링 수행
             // 정상 추출에 성공한 경우 반환 (50줄 이상의 내용 추출에 성공)
-            List<String> newsSelectors = List.of(SELECTORS_NAVER_NEWS, SELECTORS_NAVER_NEWS_MOBILE, SELECTORS_ARTICLE, SELECTORS_ETC);
-            for (String selector : newsSelectors) {
+            for (String selector : NEWS_SELECTORS) {
 
                 Element element = html.selectFirst(selector); // 본문 내용 추출
 
                 // 만약 크롤링 결과가 존재하면 추출 후 반환
                 if (Objects.nonNull(element)){
-                    String content = cleanText(element.text());
+                    String content = extractTextWithLineBreaks(element);
+                    content = cleanText(content);
                     if (content.length() >= THRESHOLD_LENGTH) return content;
                 }
             }
@@ -75,7 +94,7 @@ public class NewsCrawlingUtils {
 
             // 예외 발생 시, 로그를 남기고 빈 문자열 반환
         } catch (Exception e) {
-            LogUtils.showWarn(NewsCrawlingUtils.class, "본문 추출 시도 중 예외 발생! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
+            //LogUtils.showWarn(NewsCrawlingUtils.class, "본문 추출 시도 중 예외 발생! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
             return "";
         }
     }
@@ -96,7 +115,7 @@ public class NewsCrawlingUtils {
             return doc.select(SELECTOR_IMAGE).attr(CONTENT);
 
         } catch (Exception e) {
-            LogUtils.showWarn(NewsCrawlingUtils.class, "뉴스 섬네일 이미지 추출 실패! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
+            //LogUtils.showWarn(NewsCrawlingUtils.class, "뉴스 섬네일 이미지 추출 실패! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
             return "";
         }
     }
@@ -122,6 +141,18 @@ public class NewsCrawlingUtils {
             press = doc.select(SELECTOR_IMAGE_LOGO).attr(ALT);
             if (!press.isBlank()) return press;
 
+            // press_logo 내부 이미지 alt
+            press = doc.select(SELECTOR_TEXT_LOGO_IMG).attr(ALT);
+            if (!press.isBlank()) return press;
+
+            // h1 내부 이미지 alt
+            press = doc.select(SELECTOR_H1_IMG).attr(ALT);
+            if (!press.isBlank()) return press;
+
+            // header 내부 이미지 alt
+            press = doc.select(SELECTOR_HEADER_IMG).attr(ALT);
+            if (!press.isBlank()) return press;
+
             // 텍스트 로고
             press = doc.select(SELECTOR_TEXT_LOGO).text();
             if (!press.isBlank()) return press;
@@ -131,23 +162,85 @@ public class NewsCrawlingUtils {
 
 
         } catch (Exception e) {
-            LogUtils.showWarn(NewsCrawlingUtils.class, "뉴스 작성자 정보 추출 실패! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
+            //LogUtils.showWarn(NewsCrawlingUtils.class, "뉴스 작성자 정보 추출 실패! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
             return "";
         }
+    }
+
+    // 줄바꿈을 보존하고 HTML 태그 제거
+    private static String extractTextWithLineBreaks(Element element) {
+
+        // [1] 불필요한 요소 제거
+        element.select("a").remove();
+        element.select(".relation_lst").remove();
+        element.select(".end_photo_org").remove();
+        element.select(".byline").remove();
+        element.select(".journalist").remove();
+        element.select(".reporter").remove();
+        element.select("em.link_news").remove();
+
+        // 표 관련 태그 제거
+        element.select("table").remove(); // 표는 처음부터 하위요소 일괄 제거
+
+        // [2] 줄바꿈 삽입
+        element.select("br").before("\\n");
+        element.select("p").before("\\n\\n");
+
+        // [2] Jsoup.clean으로 HTML 태그 제거하면서 줄바꿈 보존
+        String text = Jsoup.clean(
+                element.html(),
+                "",
+                Safelist.none(),
+                new Document.OutputSettings().prettyPrint(false)
+        );
+
+        // [3] 이스케이프된 줄바꿈을 실제 줄바꿈으로 변환
+        return text.replace("\\n", "\n")
+                .replaceAll("\\n{3,}", "\n\n")
+                .trim();
     }
 
 
     // 뉴스에 불필요한 텍스트 제거
     private static String cleanText(String text) {
 
-        return Objects.isNull(text) ?
-                "" :
-                text.replaceAll("\\s+", " ")
-                        .replaceAll("▶.*$", "")
-                        .replaceAll("ⓒ.*$", "")
-                        .replaceAll("무단 전재.*", "")
-                        .replaceAll("기자]", "")
-                        .trim();
+        if (Objects.isNull(text)) return "";
+
+        return text
+                // 1. 먼저 불필요한 텍스트 제거
+                .replaceAll("\\[.*?기자\\]", "")
+                .replaceAll("\\[.*?PD\\]", "")
+                .replaceAll("\\[.*?앵커\\]", "")
+                .replaceAll("▶.*", "")
+                .replaceAll("(?m)^\\s*[ⓒⒸ©].*$", "")
+                .replaceAll("무단.*?전재.*", "")
+                .replaceAll("저작권자.*", "")
+                .replaceAll("Copyright.*", "")
+                .replaceAll("출처\\s*[=:].*", "")
+                .replaceAll("관련기사", "")
+                .replaceAll("#\\S+", "")
+                .replaceAll("포스트\\s*태그.*", "")
+                .replaceAll("글\\.\\s*[가-힣]+", "")
+
+                // 2. 기자 정보 제거
+                .replaceAll("(?m)^.*?기자\\s*$", "")
+                .replaceAll("(?m)^\\[.*?기자.*?\\]\\s*$", "")
+                .replaceAll("/\\s*[가-힣]{2,4}\\s*기자\\s*$", "")
+                .replaceAll(".*@\\S+\\.(com|network).*", "")
+                .replaceAll("(?m)^원문.*", "")
+                .replaceAll("좋아요\\d+", "")  // 줄 시작 조건 제거
+                .replaceAll("나빠요\\d+", "")  // 줄 시작 조건 제거
+
+                // 3. HTML 엔티티 잔여물 제거
+                .replaceAll("&[a-z]+;", "")  // &nbsp;, &lt;, &gt; 등 (변환 전)
+                .replace("\u00A0", " ")      // non-breaking space를 일반 공백으로
+                .replaceAll("<[^>]+>", "")
+
+                // 4. 줄바꿈 정리
+                .replaceAll("[ \\t\u00A0]+", " ")  // 공백, 탭, nbsp를 하나로
+                .replaceAll("\\n{3,}", "\n\n")
+                .replaceAll("(?m)^\\s+$", "")
+                .trim();
     }
 
 

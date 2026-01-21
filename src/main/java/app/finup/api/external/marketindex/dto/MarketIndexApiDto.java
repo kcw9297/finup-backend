@@ -124,7 +124,7 @@ public class MarketIndexApiDto {
             private LocalDate basePointDate; // 기준시점 (YYYYMMDD)
 
             @JsonProperty("basIdx")
-            private Integer baseIndexValue; // 기준지수
+            private BigDecimal baseIndexValue; // 기준지수
         }
     }
 

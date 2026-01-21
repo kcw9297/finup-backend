@@ -10,12 +10,5 @@ import lombok.Getter;
 
 @Getter
 public enum FinancialIndexType {
-
-    JPY("JPY(100)"), USD("USD");
-
-    private final String value;
-
-    FinancialIndexType(String value) {
-        this.value = value;
-    }
+    JPY, USD;
 }

@@ -45,7 +45,6 @@ public class IndicatorSchedulerServiceImpl implements IndicatorSchedulerService 
     // 사용 상수
     private static final int MAX_FALLBACK_DAYS = 15; // 만약 오늘이 영업일이 아닌 경우, 최대 15일 전까지 조회 시도
 
-
     @Override
     public void syncFinancialIndex() {
 

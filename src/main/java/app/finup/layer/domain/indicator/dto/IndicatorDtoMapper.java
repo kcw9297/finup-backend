@@ -5,6 +5,7 @@ import app.finup.api.external.marketindex.dto.MarketIndexApiDto;
 import app.finup.common.utils.TimeUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
  * @since 2026-01-15
  */
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class IndicatorDtoMapper {
 
@@ -69,7 +71,7 @@ public final class IndicatorDtoMapper {
 
 
                     // [2] 지표명 뒤에 /KRW 추가 (만약 "(100)" 문자열이 있는 경우 제거)
-                    String indexName = "%s/KRW".formatted(todayRow.getCurrencyName().replace("(100)", ""));
+                    String indexName = "%s/KRW".formatted(todayRow.getCurrencyCode().replace("(100)", ""));
 
                     return IndicatorDto.FinancialIndexRow.builder()
                             .indexName(indexName)

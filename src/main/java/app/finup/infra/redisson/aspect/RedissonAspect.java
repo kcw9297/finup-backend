@@ -13,6 +13,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.RedisException;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -102,10 +103,7 @@ public class RedissonAspect {
             );
 
             // Lock 획득에 실패한 경우 처리
-            if (!isAvailable) {
-                LogUtils.showError(this.getClass(), "Lock 획득 실패. Key : %s", key);
-                throw new LockException(AppStatus.LOCK_ALREADY_EXISTS);
-            }
+            if (!isAvailable) throw new LockException(AppStatus.LOCK_ALREADY_EXISTS);
 
             // Lock 획득 처리
             LogUtils.showInfo(this.getClass(), "🔒", "Lock 획득 성공. Key : %s", key);
@@ -113,17 +111,23 @@ public class RedissonAspect {
 
             // 위에서 던진 커스텀 예외는 다시 던짐
         } catch (LockException e) {
+            LogUtils.showError(this.getClass(), "Lock 획득 실패. 이미 Lock이 존재합니다. Key : %s", key);
             throw e;
+
+            // 인터럽트 발생
+        } catch (IllegalArgumentException e) {
+            LogUtils.showError(this.getClass(), "Lock 획득 실패. @RedissonLock 설정이 올바르지 않습니다. Key : %s\n원인: %s", key, e.getMessage());
+            throw new LockException(AppStatus.LOCK_ACQUIRE_FAILED);
+
+            // 인터럽트 발생
+        } catch (RedisException e) {
+            LogUtils.showError(this.getClass(), "Lock 획득 실패. Redis 서버 연결에 실패했습니다. Key : %s\n원인: %s", key, e.getMessage());
+            throw new LockException(AppStatus.LOCK_ACQUIRE_FAILED);
 
             // 인터럽트 발생
         } catch (InterruptedException e) {
             LogUtils.showError(this.getClass(), "Lock 획득 중 인터럽트 발생. Key : %s", key);
             Thread.currentThread().interrupt();
-            throw new LockException(AppStatus.LOCK_ACQUIRE_FAILED);
-
-            // 기타 예외 발생 (Redis 연결 실패 등 기타 예외)
-        } catch (Exception e) {
-            LogUtils.showError(this.getClass(), "Lock 획득 중 예상 외 오류 발생. Key : %s\n오류 : %s", key, e.getMessage());
             throw new LockException(AppStatus.LOCK_ACQUIRE_FAILED);
 
             // 현재 스레드가 LOCK을 보유하고 있는지 확인 후 헤제 (모든 로직이 실행된 후 후처리)

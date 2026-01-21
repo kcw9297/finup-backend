@@ -1,6 +1,7 @@
 package app.finup.common.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -9,13 +10,10 @@ import app.finup.common.exception.UtilsException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.util.UriUtils;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -85,6 +83,26 @@ public final class StrUtils {
             throw new UtilsException(AppStatus.UTILS_LOGIC_FAILED, e);
         }
     }
+
+
+    /**
+     * JSON 리스트 역직렬화 (JSON 문자열을 원래 타입으로 변경)
+     * @param json 역직렬화 대상 JSON 문자열
+     * @param elementType List 내 원소 타입
+     * @return 원래 타입으로 변환된 데이터 목록
+     */
+    public static <T> List<T> fromJsonList(String json, Class<T> elementType) {
+        try {
+            JavaType listType = objectMapper.getTypeFactory()
+                    .constructCollectionType(List.class, elementType);
+            return objectMapper.readValue(json, listType);
+
+        } catch (Exception e) {
+            log.error("JSON 역직렬화 실패. 오류 : {}", e.getMessage());
+            throw new UtilsException(AppStatus.UTILS_LOGIC_FAILED, e);
+        }
+    }
+
 
 
     /**
@@ -225,6 +243,20 @@ public final class StrUtils {
 
 
     /**
+     * 문자열 내 줄바꿈 제거 및 과도한 띄어 쓰기(공백 제거)
+     * @param text 대상 문자열
+     * @return split 처리한 문자열 (ex. 문자열...)
+     */
+    public static String removeEmptySpace(String text) {
+
+        return Objects.isNull(text) ? null :
+                text.replaceAll("[\\r\\n]+", " ")  // 모든 줄바꿈을 공백으로 변환
+                .replaceAll("\\s+", " ")       // 연속된 공백을 하나로 압축
+                .trim();
+    }
+
+
+    /**
      * 문자열 내 placeholder 값 대체 (ex. ${INPUT} 값을 대체)
      * @param text 대상 문자열 (placeholder 포함)
      * @param placeholders Map<Placeholder, 대체값>
@@ -236,8 +268,10 @@ public final class StrUtils {
         String result = text;
 
         // 탬플릿 내 Placeholder($) 값 채움
-        for (Map.Entry<String, String> entry : placeholders.entrySet())
-            result = result.replace(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, String> entry : placeholders.entrySet()) {
+            String value = Objects.isNull(entry.getValue()) ? "" : entry.getValue();
+            result = result.replace(entry.getKey(), value);
+        }
 
         // 결과 반환
         return result;

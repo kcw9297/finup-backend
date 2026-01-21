@@ -25,6 +25,7 @@ public final class NewsDto {
         @Serial
         private static final long serialVersionUID = 1L;
 
+        private Long newsId;
         private String title;
         private String summary;
         private String description;

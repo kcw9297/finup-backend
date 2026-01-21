@@ -24,10 +24,25 @@ public final class ApiUtils {
 
     /**
      * API 결과로 얻은 문자열 검증
+     * @param condition API 응답 문자열
+     * @param data 검증 시도 데이터
+     * @param failStatus 실패 시 처리할 AppStatus
+     * @return 검증 성공 처리한 Mono
+     */
+    public static <T> Mono<T> validate(Predicate<T> condition, T data, AppStatus failStatus) {
+
+        return condition.test(data) ?
+                Mono.just(data) :
+                Mono.error(new ProviderException(failStatus));
+    }
+
+
+    /**
+     * API 결과로 얻은 문자열 검증
      * @param result API 응답 문자열
      * @return 검증 성공 처리한 Mono
      */
-    public static Mono<String> validateResult(String result) {
+    public static Mono<String> validateEmpty(String result) {
 
         // [1] 1차적으로 문자열 자체가 유효한지 검증
         if (Objects.isNull(result) || result.isBlank())

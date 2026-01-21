@@ -38,6 +38,7 @@ spring:
           max-active: 8
           max-idle: 6
           min-idle: 3
+          max-wait: -1ms
 
 app:
   redis:
@@ -72,6 +73,7 @@ spring:
           max-active: 10
           max-idle: 8
           min-idle: 5
+          max-wait: 10s
 
 app:
   redis:

@@ -14,7 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@RequestMapping(Url.NEWS_PUBLIC)
+@RequestMapping(Url.NEWS)
 @RestController
 @RequiredArgsConstructor
 public class NewsController {
@@ -24,7 +24,7 @@ public class NewsController {
 
     /**
      * 최근 순으로 메인 뉴스 조회 (무한 스크롤)
-     * [GET] /news/main
+     * [GET] /news/{newsId}/analysis
      */
     @GetMapping("/{newsId}/analysis")
     public ResponseEntity<?> getAnalysis(@AuthenticationPrincipal CustomUserDetails userDetails,

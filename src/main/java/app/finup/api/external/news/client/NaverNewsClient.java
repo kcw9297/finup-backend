@@ -1,5 +1,8 @@
 package app.finup.api.external.news.client;
 
+import app.finup.api.external.news.enums.NewsSortType;
+import app.finup.api.utils.ApiError;
+import app.finup.api.utils.ApiUtils;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.StrUtils;
@@ -14,7 +17,9 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 /**
@@ -42,14 +47,14 @@ public class NaverNewsClient implements NewsClient {
 
 
     @Override
-    public List<NewsApi.Row> getLatest(String query, int amount) {
+    public List<NewsApi.Row> getLatest(String query, int amount, NewsSortType newsSortType) {
 
         try {
             // 일정 시간 대기 (jitter 외 추가 대기)
             delay();
 
             // 실제 API 호출
-            return callApi(query, amount);
+            return callApi(query, amount, newsSortType);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -68,28 +73,42 @@ public class NaverNewsClient implements NewsClient {
 
 
     // API 호출
-    private List<NewsApi.Row> callApi(String query, int amount) {
+    private List<NewsApi.Row> callApi(String query, int amount, NewsSortType newsSortType) {
 
-        return naverClient.get()
-                .uri(uriBuilder -> buildSearchURI(uriBuilder, query, amount))
+        // [1] API 요청
+        List<NewsApi.Row> result = naverClient.get()
+                .uri(uriBuilder -> buildSearchURI(uriBuilder, query, amount, newsSortType))
                 .retrieve()
                 .bodyToMono(String.class) // JSON 문자열로 변환
                 .timeout(TIMEOUT) // API 요청 + 응답 역직렬화까지 걸리는 시간 Timeout
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_NEWS_REQUEST_FAILED)))
+                .flatMap(ApiUtils::validateEmpty) // API 요청 결과 자체 검증
                 .map(json -> StrUtils.fromJson(json, NewsApi.SearchRp.class)) // JSON 문자열 파싱
                 .map(NewsApiDtoMapper::toRows) // 파싱한 DTO -> 정체한 DTO로 변환
+                .onErrorMap(Exception.class,
+                        ApiError.builder() // API 예외 처리
+                                .loggerClass(this.getClass())
+                                .apiFailedStatus(AppStatus.API_NEWS_REQUEST_FAILED)
+                                .build().toErrorFunction()
+                )
                 .block();
+
+        // [2] 결과를 정상 얻어온 경우, 작성일 역순으로 정렬 후 반환
+        return Objects.isNull(result) ?
+                null :
+                result.stream()
+                        .sorted(Comparator.comparing(NewsApi.Row::getPublishedAt).reversed()) // 최신순 정렬
+                        .toList();
     }
 
 
     // URL builder - 검색에 필요한 파라미터 첨가
-    private URI buildSearchURI(UriBuilder uriBuilder, String query, int amount) {
+    private URI buildSearchURI(UriBuilder uriBuilder, String query, int amount, NewsSortType newsSortType) {
 
         return uriBuilder
                 // 기본 설정 (건들면 안 되는 옵션)
                 .path(PATH_SEARCH) // 유튜브 영상 상세 API
                 .queryParam("query", query) // 검색어
-                .queryParam("sort", "date") // 최신순
+                .queryParam("sort", newsSortType.getType()) // 정렬 ("sim": 관련도순, "date": 최신순)
                 .queryParam("display", amount) // 최대 표시 개수 (최대 50개까지 가능)
                 .build();
     }

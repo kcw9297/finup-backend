@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.text.similarity.LevenshteinDistance;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -24,15 +25,36 @@ public class NewsFilterUtils {
     private static final double THRESHOLD_SIMILARITY = 0.75;
     private static final int THRESHOLD_LENGTH_MIN_TITLE = 15;
     private static final int THRESHOLD_LENGTH_MIN_SUMMARY = 50;
-    private static final List<String> KEYWORDS_TRIVIAL = List.of("상장", "퀴즈", "금시세", "소개", "챌린지", "이벤트", "언급", "관련", "거론");
+    private static final double PERCENT_BULLET_LINES = 0.6; // 전체 라인에서 "-"로 시작하는 비율
+    private static final double PERCENT_SHORT_LINES = 0.6; // 전체 라인에서 "-"로 시작하는 비율
+    private static final int THRESHOLD_DESCRIPTION_MIN_LENGTH = 400; // 기사 본문 최소 길이
 
+    private static final List<Pattern> NOISE_PATTERNS = List.of(
+            Pattern.compile(".*기사보내기.*"),  // 기사보내기 포함된 모든 줄
+            Pattern.compile(".*보도자료.*"),  // 기사보내기 포함된 모든 줄
+            Pattern.compile("복사하기"),
+            Pattern.compile(".*기사스크랩.*"),
+            Pattern.compile("다른 공유 찾기"),
+            Pattern.compile("현재위치"),
+            Pattern.compile("입력\\s+\\d{4}\\.\\d{2}\\.\\d{2}.*"),
+            Pattern.compile("댓글\\s+\\d+"),
+            Pattern.compile("인쇄"),
+            Pattern.compile("키워드"),
+            Pattern.compile("관련 기사"),
+            Pattern.compile("본문 글씨.*"),
+            Pattern.compile(".*기사.*공유.*|.*공유.*기사.*"),
+            Pattern.compile("^닫기$"),
+            Pattern.compile("Copyright.*reserved", Pattern.CASE_INSENSITIVE),
+            Pattern.compile("무단.*금지")
+    );
 
     /**
      * 뉴스 필터링 수행
      * @param rows 뉴스 API에서 검색된 뉴스 정보 (크롤링 본문 포함)
+     * @param filterKeywords 필터링할 키워드 목록
      * @return 필터링된 뉴스 DTO 목록
      */
-    public static List<NewsApi.Row> filter(List<NewsApi.Row> rows) {
+    public static List<NewsApi.Row> filter(List<NewsApi.Row> rows, Collection<String> filterKeywords) {
 
         // [1] 기사 링크 중복 제거
         rows = filterDistinctLink(rows);
@@ -40,7 +62,7 @@ public class NewsFilterUtils {
         // [2] 유사한 기사 제목 제거
         rows = rows.stream()
                 .filter(NewsFilterUtils::isNotShort)
-                .filter(NewsFilterUtils::isNotTrivial)
+                .filter(row -> NewsFilterUtils.isNotTrivial(row, filterKeywords))
                 .toList();
 
         // [3] 제목 유사도 검사 후 결과 반환
@@ -59,6 +81,7 @@ public class NewsFilterUtils {
                 .filter(row -> seen.add(row.getLink()))
                 .toList();
     }
+
 
 
     // 제목 유사도 중복 제거
@@ -156,8 +179,113 @@ public class NewsFilterUtils {
     }
 
 
+
     // 불필요한 단어가 포함되어 있는지 검증
-    private static boolean isNotTrivial(NewsApi.Row row) {
-        return KEYWORDS_TRIVIAL.stream().noneMatch(row.getTitle()::contains);
+    private static boolean isNotTrivial(NewsApi.Row row, Collection<String> filterKeywords) {
+        return filterKeywords.stream().noneMatch(row.getTitle()::contains);
+    }
+
+
+
+    /**
+     * 뉴스 본문 필터를 위한 검증 (크롤링 본문)
+     * @param description 크롤링한 뉴스 본문
+     * @return 필터링된 뉴스 DTO 목록
+     */
+    public static boolean isDescriptionValid(String description) {
+
+        // [1] 본문 길이가 일정 길이 미만이면 필터링
+        if (description.trim().length() < THRESHOLD_DESCRIPTION_MIN_LENGTH) return false;
+
+        // [2] bullet point 비율 체크 (-)
+        // 머릿말로만 이루어진 기사 필터링
+        List<String> lines = Arrays.asList(description.split("\n"));
+        long bulletLines = lines.stream().filter(line -> line.trim().startsWith("-")).count();
+        if (!lines.isEmpty() && (double) bulletLines / lines.size() > PERCENT_BULLET_LINES) return false;
+
+        // [3] 짧은 문장 나열형 체크 (추가)
+        long shortLines = lines.stream()
+                .filter(line -> !line.trim().isEmpty() && line.trim().length() < 30)
+                .count();
+
+        // 70% 이상이 30자 미만 짧은 문장이면 제외
+        if ((double) shortLines / lines.size() > PERCENT_SHORT_LINES) return false;
+
+        // 모든 검증을 마친 경우 true
+        return true;
+    }
+
+
+
+    public static String removeDescriptionNoiseLine(String description) {
+
+        // 노이즈를 제거할 수 없는 문자열이면 빈 문자열 반환
+        if (description == null || description.isEmpty()) return ""; // 제거를 수행할 수 없으면 빈 문자열 반환
+
+        // 결과 텍스트를 담을 문자열 정의 (초기: 원래 본문)
+        String result = description;
+
+        // 연속되는 짧은 줄 제거
+        result = removeShortLineClusters(result, 20, 3);
+
+        // 패턴 매칭되는 부분만 제거
+        for (Pattern pattern : NOISE_PATTERNS)
+            result = pattern.matcher(result).replaceAll("");
+
+
+        // 결과 문자열 반환
+        return result;
+    }
+
+
+    // 연속된 짧은 줄 제거 (핵심 로직)
+    private static String removeShortLineClusters(String text, int maxLength, int clusterSize) {
+
+        // 문장 분리
+        String[] lines = text.split("\n", -1);  // -1: 빈 문자열도 유지
+        List<String> result = new ArrayList<>();
+
+        // 문장 총 라인만큼 제거 수행
+        int i = 0;
+        while (i < lines.length) {
+
+            // 현재 위치부터 연속된 짧은 줄 카운트
+            int shortCount = 0;
+            int j = i;
+
+            //
+            while (j < lines.length) {
+                String currentTrimmed = lines[j].trim();
+
+                // 빈 줄은 건너뛰고 계속 진행
+                if (currentTrimmed.isEmpty()) {
+                    j++;
+                    continue;
+                }
+
+                // 짧은 줄이 등장하면 카운트
+                if (currentTrimmed.length() < maxLength) {
+                    shortCount++;
+                    j++;
+
+                    // 긴 줄을 만나면 중단
+                } else {
+                    break;
+                }
+            }
+
+            // 연속된 짧은 줄이 clusterSize 이상이면 모두 제거
+            if (shortCount >= clusterSize) {
+                i = j;  // 짧은 줄들 건너뛰기
+
+                // 정상적인 line 이면 결과에 문장 추가
+            } else {
+                result.add(lines[i]);
+                i++;
+            }
+        }
+
+        // 필터링 결과를 줄바꿈을 기준으로 통합 및 반환
+        return String.join("\n", result);
     }
 }

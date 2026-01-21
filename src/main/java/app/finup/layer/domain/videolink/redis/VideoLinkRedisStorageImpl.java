@@ -26,7 +26,7 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
 
     // 사용 상수
     private static final Duration TTL_LATEST_KEYWORDS = Duration.ofHours(12); // 12시간 지속
-    private static final int MAX_STORE_AMOUNT_ID = 25; // 4개 저장
+    private static final int MAX_STORE_AMOUNT_ID = 5;
     private static final int MAX_SENTENCE_HOME = 5;
 
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -39,8 +40,9 @@ public class IndicatorRedisStorageImpl implements IndicatorRedisStorage {
         // [1] Hash에 담을 데이터 형태로 변환 (Map<지표명, JSON>)
         Map<String, String> keyValueMap = rows.stream()
                 .collect(Collectors.toMap(
-                        IndicatorDto.FinancialIndexRow::getIndexName,
-                        StrUtils::toJson
+                        dto -> dto.getIndexName().replace("/KRW", ""),
+                        StrUtils::toJson,
+                        (existing, replacement) -> replacement
                 ));
 
         // [2] Hash 삽입 수행
@@ -53,9 +55,11 @@ public class IndicatorRedisStorageImpl implements IndicatorRedisStorage {
 
         // [1] Hash에 담을 데이터 형태로 변환 (Map<지표명, JSON>)
         Map<String, String> keyValueMap = rows.stream()
+                .filter(row -> !Objects.equals(row.getIndexName(), "IT 서비스")) // 필요하지 않은 지표이면서 중복 정보
                 .collect(Collectors.toMap(
                         IndicatorDto.MarketIndexRow::getIndexName,
-                        StrUtils::toJson
+                        StrUtils::toJson,
+                        (existing, replacement) -> replacement
                 ));
 
         // [2] Hash 삽입 수행
@@ -67,7 +71,7 @@ public class IndicatorRedisStorageImpl implements IndicatorRedisStorage {
     public List<IndicatorDto.FinancialIndexRow> getFinancialIndexes(List<FinancialIndexType> types) {
 
         // [1] enum 내 value 정보 기반 조회
-        List<String> keys = types.stream().map(FinancialIndexType::getValue).toList();
+        List<String> keys = types.stream().map(FinancialIndexType::name).toList();
 
         // [2] 조회 및 반환
         return RedisCodeTemplate.getMultiHash(

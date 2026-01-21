@@ -80,7 +80,7 @@ public class NewsServiceImpl implements NewsService {
             Supplier<Long> countingMethod) {
 
         // [1] Pageable 생성
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
+        Pageable pageable = PageRequest.of(pageNum-1, pageSize);
 
         // [2] 페이징 쿼리 수행
         List<NewsDto.Row> rows = pagingMethod.apply(pageable)

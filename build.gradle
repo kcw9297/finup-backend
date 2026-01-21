@@ -22,7 +22,7 @@ repositories {
 	mavenCentral()
 
     // Spring AI 저장소 (필수)
-    maven { url 'https://repo.spring.io/milestone/' }
+    maven { url 'https://repo.spring.io/mtailestone/' }
     maven { url 'https://repo.spring.io/snapshot/' }
 }
 dependencies {
@@ -123,4 +123,8 @@ dependencyManagement {
 }
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs = ['-XX:ReservedCodeCacheSize=256m']// VM 메모리 설정 (개발 환경)
 }

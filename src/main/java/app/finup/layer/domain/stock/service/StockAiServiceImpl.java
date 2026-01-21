@@ -25,10 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -85,10 +85,9 @@ public class StockAiServiceImpl implements StockAiService {
         StockAiDto.ChartAnalyzation prevAnalyze = stockRedisStorage.getPrevChartAnalyze(stockCode, memberId);
 
         // 프롬포트 파라미터
-        Map<String, String> promptParams = new ConcurrentHashMap<>(Map.of(
-                StockPrompt.INPUT, StrUtils.toJson(analyzeRequest),
-                StockPrompt.PREV, StrUtils.toJson(prevAnalyze)
-        ));
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(StockPrompt.INPUT, StrUtils.toJson(analyzeRequest));
+        promptParams.put(StockPrompt.PREV, StrUtils.toJson(prevAnalyze));
 
         // 프롬프트 생성
         String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_CHART, promptParams);
@@ -132,10 +131,9 @@ public class StockAiServiceImpl implements StockAiService {
         StockAiDto.DetailAnalyzation prevAnalyze = stockRedisStorage.getPrevDetailAnalyze(stockCode, memberId);
 
         // 프롬포트 파라미터
-        Map<String, String> promptParams = new ConcurrentHashMap<>(Map.of(
-                StockPrompt.INPUT, StrUtils.toJson(detail),
-                StockPrompt.PREV, StrUtils.toJson(prevAnalyze)
-        ));
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(StockPrompt.INPUT, StrUtils.toJson(detail));
+        promptParams.put(StockPrompt.PREV, StrUtils.toJson(prevAnalyze));
 
         // 프롬프트 생성
         String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_DETAIL, promptParams);
@@ -211,21 +209,19 @@ public class StockAiServiceImpl implements StockAiService {
         List<String> prev = stockRedisStorage.getPrevRecommendedVideoIds(stockCode, memberId);
 
         // 프롬포트 파라미터 생성
-        Map<String, String> promptParams = new ConcurrentHashMap<>(Map.of(
-                StockPrompt.INPUT, StrUtils.toJson(input),
-                StockPrompt.PREV, StrUtils.toJson(prev),
-                StockPrompt.STOCK_NAME, stockName,  // 추천 대상 종목명
-                StockPrompt.RECOMMEND_AMOUNT, String.valueOf(MIN_RECOMMEND_LENGTH) // 추천 영상 개수
-        ));
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(StockPrompt.INPUT, StrUtils.toJson(input));
+        promptParams.put(StockPrompt.PREV, StrUtils.toJson(prev));
+        promptParams.put(StockPrompt.STOCK_NAME, stockName);
+        promptParams.put(StockPrompt.RECOMMEND_AMOUNT, String.valueOf(MIN_RECOMMEND_LENGTH));
 
         // 프롬포트 생성
         String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_RECOMMEND_YOUTUBE, promptParams);
 
         // [4] 검색 결과 기반 AI 추천 수행
         return AiCodeTemplate.recommendWithPrev(
-                        chatProvider, prompt, candidates, MIN_RECOMMEND_LENGTH,
-                        prevIds -> stockRedisStorage.storePrevRecommendedVideoIds(stockCode, memberId, prevIds)
-                )
+                        chatProvider, prompt, candidates, String.class, MIN_RECOMMEND_LENGTH,
+                        prevIds -> stockRedisStorage.storePrevRecommendedVideoIds(stockCode, memberId, prevIds))
                 .stream()
                 .map(StockDtoMapper::toYouTubeRecommend)
                 .toList();
