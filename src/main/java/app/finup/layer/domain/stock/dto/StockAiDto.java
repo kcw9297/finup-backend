@@ -60,7 +60,10 @@ public class StockAiDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class YouTubeRecommendation {
+    public static class YouTubeRecommendation implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private String videoId;
         private String videoUrl;

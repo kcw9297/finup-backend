@@ -70,6 +70,7 @@ public class AiCodeTemplate {
      * AI 쿼리 요청 후, JSON 결과 반환 (이전 이력)
      * @param chatProvider ChatProvider Bean
      * @param prompt AI 프롬포트
+     * @param dtoClass 역직렬화 할 DTO 클래스 정보
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <T> T sendQueryAndGetJson(
@@ -90,12 +91,14 @@ public class AiCodeTemplate {
      * AI 쿼리 요청 후, JSON 결과를 저장 후 반환 (이전 이력)
      * @param chatProvider ChatProvider Bean
      * @param prompt AI 프롬포트
+     * @param dtoClass 역직렬화 할 DTO 클래스 정보
      * @param savePrevMethod 이전 결과를 저장할 메소드(함수)
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <T> T sendQueryAndGetJsonWithPrev(
             ChatProvider chatProvider,
             String prompt,
+            Class<T> dtoClass,
             Consumer<T> savePrevMethod) {
 
         // [1] 쿼리 전달
@@ -103,7 +106,7 @@ public class AiCodeTemplate {
         String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
 
         // [2] 이전 결과 저장
-        T result = StrUtils.fromJson(clean, new TypeReference<>() {});
+        T result = StrUtils.fromJson(clean, dtoClass);
         savePrevMethod.accept(result);
 
         // [3] 결과 반환

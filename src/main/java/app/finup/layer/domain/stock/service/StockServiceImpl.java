@@ -88,14 +88,32 @@ public class StockServiceImpl implements StockService {
 
 
     @Override
-    public List<StockDto.Info> getMarketCapList() {
-        return stockRedisStorage.getMarketCapStockInfos();
+    public List<StockDto.MarketCapRow> getMarketCapList() {
+        return stockRedisStorage.getMarketCapStockInfos()
+                .stream()
+                .map(StockDto.Info::getMarketCap)
+                .toList();
     }
 
 
     @Override
-    public List<StockDto.Info> getTradingValueList() {
-        return stockRedisStorage.getTradingValueStockInfos();
+    public List<StockDto.TradingValueRow> getTradingValueList() {
+        return stockRedisStorage.getTradingValueStockInfos()
+                .stream()
+                .map(StockDto.Info::getTradingValue)
+                .toList();
+    }
+
+
+    @Override
+    public StockDto.Chart getChart(String stockCode) {
+        return stockRedisStorage.getStockInfo(stockCode).getChart();
+    }
+
+
+    @Override
+    public StockDto.Detail getDetail(String stockCode) {
+        return stockRedisStorage.getStockInfo(stockCode).getDetail();
     }
 
 }

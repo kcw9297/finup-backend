@@ -6,6 +6,7 @@ import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.service.NewsAiService;
+import app.finup.layer.domain.news.service.NewsService;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class NewsController {
 
     // 사용 의존성
     private final NewsAiService newsAiService;
+    private final NewsService newsService;
 
     /**
      * 최근 순으로 메인 뉴스 조회 (무한 스크롤)
@@ -34,6 +36,23 @@ public class NewsController {
         return retry ?
                 Api.ok(newsAiService.retryAnalyze(newsId, userDetails.getMemberId())) :
                 Api.ok(newsAiService.analyze(newsId, userDetails.getMemberId()));
+    }
+
+
+    /**
+     * 최근 순으로 종목 뉴스 조회 (무한 스크롤)
+     * [GET] /news/stock
+     */
+    @GetMapping("/stock")
+    public ResponseEntity<?> getPagedStockNewsList(@RequestParam String stockCode,
+                                                   @RequestParam int pageNum,
+                                                   @RequestParam int pageSize) {
+
+        // [1] 페이징 수행
+        Page<NewsDto.Row> page = newsService.getPagedStockNewsList(stockCode, pageNum, pageSize);
+
+        // [2] 페이징 결과 반환
+        return Api.ok(page.getRows(), Pagination.of(page));
     }
 
 }

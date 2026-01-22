@@ -89,7 +89,7 @@ public class NewsCrawlingUtils {
             }
 
             // [3] 만약 위의 SELECTOR로도 추출에 실패하는 경우, 로그를 남기고 빈 문자열 반환
-            LogUtils.showWarn(NewsCrawlingUtils.class, "본문 추출 실패! 추출 시도 기사 URL : %s", newsUrl);
+            //LogUtils.showWarn(NewsCrawlingUtils.class, "본문 추출 실패! 추출 시도 기사 URL : %s", newsUrl);
             return "";
 
             // 예외 발생 시, 로그를 남기고 빈 문자열 반환

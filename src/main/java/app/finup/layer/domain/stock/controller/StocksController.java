@@ -4,6 +4,7 @@ import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.stock.enums.ChartType;
 import app.finup.layer.domain.stock.service.StockAiService;
+import app.finup.layer.domain.stock.service.StockService;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,28 @@ import org.springframework.web.bind.annotation.*;
 public class StocksController {
 
     private final StockAiService stockAiService;
+    private final StockService stockService;
+
+
+    /**
+     * 종목 차트 정보 제공 API
+     * [GET] /stocks/{stockCode}/chart
+     */
+    @GetMapping("/{stockCode}/chart")
+    public ResponseEntity<?> getChart(@PathVariable String stockCode) {
+        return Api.ok(stockService.getChart(stockCode));
+    }
+
+
+    /**
+     * 종목 차트 정보 제공 API
+     * [GET] /stocks/{stockCode}/detail
+     */
+    @GetMapping("/{stockCode}/detail")
+    public ResponseEntity<?> getDetail(@PathVariable String stockCode) {
+        return Api.ok(stockService.getDetail(stockCode));
+    }
+
 
     /**
      * 종목 차트 분석 정보 제공 API
@@ -66,8 +89,8 @@ public class StocksController {
                                                       @RequestParam(defaultValue = "false") boolean retry) {
 
         return retry ?
-                Api.ok(stockAiService.recommendYouTube(stockCode, userDetails.getMemberId())) :
-                Api.ok(stockAiService.retryRecommendYouTube(stockCode, userDetails.getMemberId()));
+                Api.ok(stockAiService.retryRecommendYouTube(stockCode, userDetails.getMemberId())) :
+                Api.ok(stockAiService.recommendYouTube(stockCode, userDetails.getMemberId()));
     }
 
 

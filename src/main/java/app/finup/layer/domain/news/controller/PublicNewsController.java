@@ -38,20 +38,4 @@ public class PublicNewsController {
         return Api.ok(page.getRows(), Pagination.of(page));
     }
 
-
-    /**
-     * 최근 순으로 종목 뉴스 조회 (무한 스크롤)
-     * [GET] /news/stock
-     */
-    @GetMapping("/stock")
-    public ResponseEntity<?> getPagedStockNewsList(@RequestParam String stockCode,
-                                                   @RequestParam int pageNum,
-                                                   @RequestParam int pageSize) {
-
-        // [1] 페이징 수행
-        Page<NewsDto.Row> page = newsService.getPagedStockNewsList(stockCode, pageNum, pageSize);
-
-        // [2] 페이징 결과 반환
-        return Api.ok(page.getRows(), Pagination.of(page));
-    }
 }
