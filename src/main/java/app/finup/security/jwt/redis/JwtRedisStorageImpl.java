@@ -1,4 +1,4 @@
-package app.finup.infra.jwt.redis;
+package app.finup.security.jwt.redis;
 
 import app.finup.common.constant.Const;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.time.Duration;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RedisJwtStorageImpl implements RedisJwtStorage {
+public class JwtRedisStorageImpl implements JwtRedisStorage {
 
     private final StringRedisTemplate srt;
 

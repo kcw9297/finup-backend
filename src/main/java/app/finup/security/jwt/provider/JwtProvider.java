@@ -1,6 +1,6 @@
-package app.finup.infra.jwt.provider;
+package app.finup.security.jwt.provider;
 
-import app.finup.infra.jwt.dto.JwtClaims;
+import app.finup.security.dto.JwtClaims;
 import app.finup.security.dto.CustomUserDetails;
 
 public interface JwtProvider {
@@ -12,6 +12,7 @@ public interface JwtProvider {
      */
     String login(CustomUserDetails userDetails);
 
+
     /**
      * 토큰 재발급 (AccessToken 만료 시)
      * @param at JWT AccessToken
@@ -19,12 +20,14 @@ public interface JwtProvider {
      */
     String reissue(String at);
 
+
     /**
      * JWT 내 Claims 조회 (토큰 내 상세정보)
      * @param at JWT AccessToken
      * @return JWT Claims 정보를 담은 Custom DTO
      */
     JwtClaims getClaims(String at);
+
 
     /**
      * 로그아웃 - RT 무효화

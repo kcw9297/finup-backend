@@ -1,4 +1,4 @@
-package app.finup.infra.jwt.dto;
+package app.finup.security.dto;
 
 import lombok.*;
 

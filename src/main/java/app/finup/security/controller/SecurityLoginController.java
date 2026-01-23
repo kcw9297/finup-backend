@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.provider.CookieProvider;
 import app.finup.common.utils.Api;
-import app.finup.infra.jwt.provider.JwtProvider;
+import app.finup.security.jwt.provider.JwtProvider;
 import app.finup.security.dto.CustomUserDetails;
 import app.finup.security.dto.Login;
 import lombok.RequiredArgsConstructor;

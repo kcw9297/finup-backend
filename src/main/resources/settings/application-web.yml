@@ -12,6 +12,7 @@ spring:
       max-request-size: 50MB
 
 jwt:
+  secret-key: ${JWT_SECRET_KEY}
   cookie-name: accessToken
   expiration:
     access-token: 60m

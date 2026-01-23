@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -47,9 +48,19 @@ public class WebClientConfig {
 
     @Bean(name = "youTubeClient") // 유튜브 API 사용을 위한 Client
     public WebClient youTubeClient() {
+
+        // 버퍼 크기를 16MB로 증가
+        // DataBufferLimitException: Exceeded limit on max bytes to buffer 예외 발생으로 인한 버퍼 증가 처리
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024)) // 16MB
+                .build();
+
         return WebClient.builder()
                 .baseUrl(ENDPOINT_YOUTUBE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .exchangeStrategies(strategies)
                 .build();
     }
 

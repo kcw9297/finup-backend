@@ -168,8 +168,7 @@ public class WordsServiceImpl implements WordsService {
 
     @Cacheable(
             value = WordsRedisKey.CACHE_SEARCH,
-            key = "#keyword",
-            unless = "#result.isEmpty"
+            key = "#keyword"
     )
     @Override
     @Transactional(readOnly = true)
@@ -178,16 +177,29 @@ public class WordsServiceImpl implements WordsService {
         // [1] 검색어가 비어있는 경우, 유사도 검색이 불가능하므로 빈 결과반환
         if (!StringUtils.hasText(keyword)) return List.of();
 
-        // [2] 최근 검색어 저장 (로그인 사용자만)
-        wordsRedisStorage.add(memberId, keyword);
-
-        // [3] 검색 전, 현재 검색 단어 벡터화 후 검색 수행
+        // [2] 검색 전, 현재 검색 단어 벡터화 후 검색 수행
         byte[] embedding = embeddingProvider.generate(keyword);
-        return wordsRepository
+        List<WordsDto.Row> rows = wordsRepository
                 .findWithSimilarByKeyword(keyword, embedding, 20)
                 .stream()
                 .map(WordsDtoMapper::toRow)
                 .toList();
+
+        // [3] 검색 결과가 있는 경우에만, 최근 검색어 저장
+        if (!rows.isEmpty()) storeRecentWord(memberId, keyword);
+
+        // [4] 검색 결과 반환
+        return rows;
+    }
+
+    // REDIS 내 최근 단어 저장 시도
+    private void storeRecentWord(Long memberId, String keyword) {
+
+        try {
+            wordsRedisStorage.add(memberId, keyword);
+        } catch (Exception e) {
+            LogUtils.showWarn(this.getClass(), "단어 저장 실패! 원인 : %s", e.getMessage());
+        }
     }
 
 
