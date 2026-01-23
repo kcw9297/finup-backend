@@ -1,7 +1,6 @@
 package app.finup.layer.domain.words.service;
 
 
-import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.AiUtils;
@@ -10,24 +9,25 @@ import app.finup.common.utils.ParallelUtils;
 import app.finup.infra.ai.EmbeddingProvider;
 import app.finup.infra.file.provider.CsvProvider;
 import app.finup.infra.file.storage.FileStorage;
+import app.finup.layer.domain.words.constant.WordsRedisKey;
 import app.finup.layer.domain.words.entity.Words;
 import app.finup.layer.domain.words.enums.WordsLevel;
 import app.finup.layer.domain.words.redis.WordsRedisStorage;
 import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.dto.WordsDtoMapper;
-import app.finup.layer.domain.words.mapper.WordsMapper;
 import app.finup.layer.domain.words.repository.WordsRepository;
 import com.google.common.collect.Lists;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,7 +40,6 @@ public class WordsServiceImpl implements WordsService {
     private final WordsRepository wordsRepository;
     private final WordsRedisStorage wordsRedisStorage;
     private final EmbeddingProvider embeddingProvider;
-    private final WordsMapper wordsMapper;
     private final CsvProvider csvProvider;
     private final FileStorage fileStorage;
 
@@ -152,64 +151,42 @@ public class WordsServiceImpl implements WordsService {
 
 
 
-    /**
-     * 홈 - 오늘의 단어 (JPA + 랜덤 Offset)
-     */
+    @Cacheable(
+            value = WordsRedisKey.CACHE_TODAY_WORDS,
+            key = "'DEFAULT'"
+    )
     @Override
     @Transactional(readOnly = true)
     public List<WordsDto.Row> getHomeWords() {
-
-        Long total = wordsRepository.count();
-        Integer size = 3;
-
-        if (total == 0) {
-            return Collections.emptyList();
-        }
-
-        Set<Long> randomIds = new HashSet<>();
-
-        while (randomIds.size() < size) {
-            Long randomId = ThreadLocalRandom.current()
-                    .nextLong(1, total + 1);
-            randomIds.add(randomId);
-        }
-
-        return wordsRepository.findAllById(randomIds)
+        return wordsRepository.findRandom(Pageable.ofSize(3))
                 .stream()
                 .map(WordsDtoMapper::toRow)
                 .toList();
     }
 
 
+    @Cacheable(
+            value = WordsRedisKey.CACHE_SEARCH,
+            key = "#keyword",
+            unless = "#result.isEmpty"
+    )
     @Override
     @Transactional(readOnly = true)
-    public Page<WordsDto.Row> search(WordsDto.Search rq, Long memberId) {
+    public List<WordsDto.Row> search(String keyword, Long memberId) {
 
-        log.info(
-                "[RECENT SEARCH] memberId={}, keyword={}",
-                memberId,
-                rq.getKeyword()
-        );
+        // [1] 검색어가 비어있는 경우, 유사도 검색이 불가능하므로 빈 결과반환
+        if (!StringUtils.hasText(keyword)) return List.of();
 
-        // [1] 최근 검색어 저장 (로그인 사용자만)
-        if (memberId != null && StringUtils.hasText(rq.getKeyword())) {
-            wordsRedisStorage.add(memberId, rq.getKeyword());
-        }
+        // [2] 최근 검색어 저장 (로그인 사용자만)
+        wordsRedisStorage.add(memberId, keyword);
 
-        // 키워드 없을 때도 빈 페이지 반환
-        if (!StringUtils.hasText(rq.getKeyword())) {
-            return Page.of(
-                    Collections.emptyList(),
-                    0,
-                    rq.getPageNum(),
-                    rq.getPageSize()
-            );
-        }
-
-        List<WordsDto.Row> rows = wordsMapper.search(rq);
-        Integer totalCount = wordsMapper.countBySearch(rq);
-
-        return Page.of(rows, totalCount, rq.getPageNum(), rq.getPageSize());
+        // [3] 검색 전, 현재 검색 단어 벡터화 후 검색 수행
+        byte[] embedding = embeddingProvider.generate(keyword);
+        return wordsRepository
+                .findWithSimilarByKeyword(keyword, embedding, 20)
+                .stream()
+                .map(WordsDtoMapper::toRow)
+                .toList();
     }
 
 

@@ -37,7 +37,7 @@ public class LongRangeValidator implements ConstraintValidator<LongRange, Long> 
         // 사용자 입력 오류 메세지
         message = annotation.message();
         if (Objects.isNull(message) || message.isBlank()) {
-            if (min == 1) message = "최대 %s 이내의 양수를 입력해야 합니다.".formatted(maxStr);
+            if (min <= 1) message = "최대 %s 이내의 양수를 입력해야 합니다.".formatted(maxStr);
             else message = "%s-%s 이내의 양수를 입력해야 합니다.".formatted(minStr, maxStr);
         }
     }

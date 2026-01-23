@@ -18,12 +18,6 @@ public interface StockService {
 
 
     /**
-     * 주식 파일 초기화
-     */
-    void initStockFile();
-
-
-    /**
      * 시가 총액 순 주식목록 조회 (상위 30개)
      * @return 시가총액 순 상위 30개 주식 종목 DTO 목록
      */

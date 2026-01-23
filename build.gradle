@@ -126,5 +126,10 @@ tasks.named('test') {
 }
 
 tasks.withType(JavaExec).configureEach {
-    jvmArgs = ['-XX:ReservedCodeCacheSize=256m']// VM 메모리 설정 (개발 환경)
+    jvmArgs = [
+            '-XX:ReservedCodeCacheSize=512m', // 캐시 크기
+            '-XX:InitialCodeCacheSize=256m', // 초기 캐시 크기
+            '-XX:+UseCodeCacheFlushing', // 자동 플러싱 활성화
+            '-XX:CodeCacheExpansionSize=32m' // 확장 단위
+    ]
 }

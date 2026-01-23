@@ -29,9 +29,6 @@ public class AppInitializer {
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
 
-        // 초기화 - 주식 파일 추출 (추출된 결과가 없을 시 최초 1회)
-        LogUtils.runMethodAndShowCostLog("주식 파일 추출", stockService::initStockFile);
-
         // 초기화 - 주식 AT 발급
         LogUtils.runMethodAndShowCostLog("주식 API AccessToken 발급", stockService::issueToken);
 

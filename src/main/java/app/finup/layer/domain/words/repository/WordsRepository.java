@@ -60,4 +60,16 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
         LIMIT :lim
     """)
     List<Words> findRandomByWordLevelWithExcludeIds(WordsLevel wordsLevel, Collection<Long> excludeIds, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM words
+        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%'))
+                AND embedding IS NOT NULL
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<Words> findWithSimilarByKeyword(String keyword, byte[] embedding, int lim);
 }

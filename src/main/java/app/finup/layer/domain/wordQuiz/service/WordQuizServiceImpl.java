@@ -2,11 +2,13 @@ package app.finup.layer.domain.wordQuiz.service;
 
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
+import app.finup.layer.domain.wordQuiz.constant.WordQuizRedisKey;
 import app.finup.layer.domain.wordQuiz.dto.WordQuizDto;
 import app.finup.layer.domain.words.entity.Words;
 import app.finup.layer.domain.words.repository.WordsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,10 @@ public class WordQuizServiceImpl implements WordQuizService {
 
     private final WordsRepository wordsRepository;
 
+    @Cacheable(
+            value = WordQuizRedisKey.CACHE_QUIZ,
+            key = "'DEFAILT'"
+    )
     @Override
     public WordQuizDto.Today getTodayQuiz() {
 

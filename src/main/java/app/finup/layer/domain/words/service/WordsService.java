@@ -1,6 +1,5 @@
 package app.finup.layer.domain.words.service;
 
-import app.finup.common.dto.Page;
 import app.finup.layer.domain.words.dto.WordsDto;
 
 import java.util.List;
@@ -21,10 +20,10 @@ public interface WordsService {
 
     /**
      * 금융 용어 검색
-     * @param rq 검색 요청 DTO (filter, keyword, pageNum, pageSize 포함)
+     * @param keyword 검색 키워드
      * @return 페이징된 검색 결과(용어 목록) DTO 리스트
      */
-    Page<WordsDto.Row> search(WordsDto.Search rq, Long memberId);
+    List<WordsDto.Row> search(String keyword, Long memberId);
 
 
     /**

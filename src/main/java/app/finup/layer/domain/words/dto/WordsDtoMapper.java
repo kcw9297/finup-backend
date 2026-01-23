@@ -11,6 +11,7 @@ import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WordsDtoMapper {
+
     public static WordsDto.Row toRow(Words entity) {
         return WordsDto.Row.builder()
                 .termId(entity.getTermId())
@@ -19,27 +20,4 @@ public class WordsDtoMapper {
                 .build();
     }
 
-    public static Words toEntity(WordsDto.Row row) {
-        return Words.builder()
-                .name(row.getName())
-                .description(row.getDescription())
-                .build();
-    }
-
-    public static WordsDto.Similarity toSimilarity(
-            Long termId,
-            String name,
-            String description,
-            double score
-    ) {
-        return new WordsDto.Similarity(
-                termId,
-                name,
-                description,
-                score
-        );
-    }
-    private static String stripHanja(String name) {
-        return name.replaceAll("\\s*\\([^)]*\\)", "");
-    }
 }
