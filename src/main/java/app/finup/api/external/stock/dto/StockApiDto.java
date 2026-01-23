@@ -579,7 +579,7 @@ public final class StockApiDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CandleRp {
 
-        @JsonProperty("output")
+        @JsonProperty("output2")
         private List<Candle> candles;
 
         @JsonProperty("rt_cd")
@@ -592,6 +592,8 @@ public final class StockApiDto {
         private String msg1;  // 메시지
 
         @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Candle {
 

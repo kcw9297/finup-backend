@@ -102,6 +102,12 @@ public final class KisParamBuilder {
         return this;
     }
 
+    // 날짜2
+    public KisParamBuilder date2(String date) {
+        params.add("FID_INPUT_DATE_2", date);
+        return this;
+    }
+
     // 빌드 메소드
     // MarketCap(시가총액) 전용 빌드
     public MultiValueMap<String, String> buildForMarketCap() {

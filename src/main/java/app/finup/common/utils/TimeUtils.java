@@ -61,12 +61,30 @@ public final class TimeUtils {
 
 
     /**
+     * 포메팅된 현재 시간 문자열 제공 (2025-01-01)
+     * @return 포메팅 처리된 문자열
+     */
+    public static String formatNowDate() {
+        return FORMATTER_DATE.format(getNowLocalDate());
+    }
+
+
+    /**
      * 시간 포메팅 (20250101)
      * @param time 문자열 변환 대상 시간 객체
      * @return 포메팅 처리된 문자열
      */
     public static String formatDateNoHyphen(TemporalAccessor time) {
         return FORMATTER_DATE_NO_HYPHEN.format(time);
+    }
+
+
+    /**
+     * 포메팅된 현재 시간 문자열 제공 (2025-01-01)
+     * @return 포메팅 처리된 문자열
+     */
+    public static String formatNowDateNoHyphen() {
+        return FORMATTER_DATE_NO_HYPHEN.format(getNowLocalDate());
     }
 
 
@@ -82,6 +100,16 @@ public final class TimeUtils {
 
 
     /**
+     * 시간 포메팅 (00:00:00)
+     * @return 포메팅 처리된 문자열
+     */
+
+    public static String formatNowTime() {
+        return FORMATTER_TIME.format(getNowLocalDateTime());
+    }
+
+
+    /**
      * 시간 포메팅 (2025-01-01 00:00:00)
      * @param time 문자열 변환 대상 시간 객체
      * @return 포메팅 처리된 문자열
@@ -90,6 +118,17 @@ public final class TimeUtils {
     public static String formatDateTime(TemporalAccessor time) {
         return FORMATTER_DATE_TIME.format(time);
     }
+
+
+    /**
+     * 포메팅된 현재 시간 문자열 제공 (2025-01-01 00:00:00)
+     * @return 포메팅 처리된 문자열
+     */
+
+    public static String formatNowDateTime() {
+        return FORMATTER_DATE_TIME.format(getNowLocalDateTime());
+    }
+
 
 
     /**

@@ -12,11 +12,11 @@ spring:
       max-request-size: 50MB
 
 jwt:
-  cookie-name: ${JWT_COOKIE_NAME}
+  cookie-name: accessToken
   expiration:
-    access-token: ${JWT_EXPIRATION_ACCESS_TOKEN}
-    refresh-token: ${JWT_EXPIRATION_REFRESH_TOKEN}
-    cookie: ${JWT_EXPIRATION_COOKIE}
+    access-token: 60m
+    refresh-token: 6h
+    cookie: 6h
 
 # ===============================
 # profile - local

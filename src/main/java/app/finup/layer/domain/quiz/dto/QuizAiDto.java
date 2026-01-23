@@ -2,6 +2,8 @@ package app.finup.layer.domain.quiz.dto;
 
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -20,7 +22,11 @@ public class QuizAiDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Question {
+    public static class Question implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         private String question;      // 문제
         private List<String> choices; // 보기
         private Integer answer;       // 정답 index

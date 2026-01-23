@@ -1,5 +1,6 @@
 package app.finup.config;
 
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.utils.LogUtils;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
@@ -118,7 +119,7 @@ public class ParallelConfig {
     @PreDestroy
     public void shutdown() {
 
-        LogUtils.showInfo(this.getClass(), "🚨", "ExecutorService 종료 시작");
+        LogUtils.showInfo(this.getClass(), LogEmoji.ALERT, "ExecutorService 종료 시작");
 
         // [1] 현재 사용중인 모든 Executor Map 생성 (추후 추가 시 여기에 추가)
         Map<ExecutorService, String> executorPrefixMap = Map.of(
@@ -130,14 +131,14 @@ public class ParallelConfig {
 
         // [2] 일괄 종료 수행
         executorPrefixMap.forEach(this::shutdownExecutorService);
-        LogUtils.showInfo(this.getClass(), "✅", "ExecutorService 종료 완료");
+        LogUtils.showInfo(this.getClass(), LogEmoji.OK, "ExecutorService 종료 완료");
     }
 
 
     // ExecutorService 종료 처리 (종료 시 현재 스레드가 처리 중인 작업 추적용)
     private void shutdownExecutorService(ExecutorService executor, String name) {
 
-        LogUtils.showInfo(this.getClass(), "🛑", "%s 종료 중", name);
+        LogUtils.showInfo(this.getClass(), LogEmoji.WARN, "%s 종료 중", name);
 
         // 새 작업들은 작업 중단 처리
         executor.shutdown();
@@ -158,7 +159,7 @@ public class ParallelConfig {
 
                 // 정상 종료된 경우
             } else {
-                LogUtils.showInfo(this.getClass(), "✅", "%s 정상 종료 완료", name);
+                LogUtils.showInfo(this.getClass(), LogEmoji.OK, "%s 정상 종료 완료", name);
             }
 
             // 인터럽트 발생 시

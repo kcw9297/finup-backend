@@ -17,7 +17,7 @@ public final class WordsRedisKey {
     public static final String MEMBER_ID = "${MEMBER_ID}";
 
     // Base Key
-    private static final String KEY_PREFIX = "VIDEO_LINK:";
+    private static final String KEY_PREFIX = "WORDS:";
     private static final String CACHE_PREFIX = "CACHE:" + KEY_PREFIX;
     private static final String LOCK_PREFIX = "LOCK:" + KEY_PREFIX;
 

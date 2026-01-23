@@ -2,6 +2,7 @@ package app.finup.layer.domain.words.service;
 
 
 import app.finup.common.enums.AppStatus;
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.AiUtils;
 import app.finup.common.utils.LogUtils;
@@ -61,7 +62,7 @@ public class WordsServiceImpl implements WordsService {
 
         // [2] 최소 단어 개수를 충족하면 파일을 읽지 않음
         if (count > MIN_AMOUNT_WORDS) {
-            LogUtils.showInfo(this.getClass(), "✅", "이미 단어가 존재하여 초기화하지 않습니다. 현재 단어 개수 : %,d개", count);
+            LogUtils.showInfo(this.getClass(), LogEmoji.OK, "이미 단어가 존재하여 초기화하지 않습니다. 현재 단어 개수 : %,d개", count);
             return;
         }
 
@@ -113,7 +114,7 @@ public class WordsServiceImpl implements WordsService {
 
         wordsRepository.deleteAll();
         wordsRepository.saveAll(entities);
-        LogUtils.showInfo(this.getClass(), "✅", "단어 초기화 완료. 초기화 단어 개수 : %,d개", entities.size());
+        LogUtils.showInfo(this.getClass(), LogEmoji.OK, "단어 초기화 완료. 초기화 단어 개수 : %,d개", entities.size());
     }
 
     // RowMap 내 null value 가 존재하는지 확인

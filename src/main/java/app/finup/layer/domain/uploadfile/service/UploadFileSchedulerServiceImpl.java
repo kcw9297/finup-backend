@@ -1,6 +1,7 @@
 package app.finup.layer.domain.uploadfile.service;
 
 
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.utils.LogUtils;
 import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.domain.uploadfile.dto.UploadFileDto;
@@ -54,7 +55,7 @@ public class UploadFileSchedulerServiceImpl implements UploadFileSchedulerServic
         // [4] DB 삭제 (현재는 로그 기록만 하고, 성공/실패 무관하게 삭제)
         uploadFileRepository.deleteAllById(orphanIds);
         LogUtils.showInfo(
-                this.getClass(), "✅",
+                this.getClass(), LogEmoji.OK,
                 "고아(주인 없는) 파일 삭제 완료.\n삭제 성공 : %s, 삭제 실패 : %s", removedList, failedList
         );
     }

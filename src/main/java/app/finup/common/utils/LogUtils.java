@@ -1,5 +1,6 @@
 package app.finup.common.utils;
 
+import app.finup.common.enums.LogEmoji;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,12 +108,12 @@ public final class LogUtils {
      * @param formatMessage 포멧을 요구하는 메세지 ex. JWT TOKEN : %s
      * @param params        포멧 메시지에 포함될 파라미터들
      */
-    public static void showInfo(Class<?> clazz, String startEmoji, String formatMessage, Object... params) {
+    public static void showInfo(Class<?> clazz, LogEmoji startEmoji, String formatMessage, Object... params) {
 
         if (log.isInfoEnabled())
             log.info(
                     "{} [ {} ] {} : {}",
-                    startEmoji, clazz.getSimpleName(), getCaller(), format(formatMessage, params)
+                    startEmoji.getValue(), clazz.getSimpleName(), getCaller(), format(formatMessage, params)
             );
 
     }

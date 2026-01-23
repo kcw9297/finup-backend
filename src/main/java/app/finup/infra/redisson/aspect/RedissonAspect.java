@@ -1,6 +1,7 @@
 package app.finup.infra.redisson.aspect;
 
 import app.finup.common.enums.AppStatus;
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.exception.LockException;
 import app.finup.common.utils.LogUtils;
 import app.finup.infra.redisson.annotation.RedissonLock;
@@ -106,7 +107,7 @@ public class RedissonAspect {
             if (!isAvailable) throw new LockException(AppStatus.LOCK_ALREADY_EXISTS);
 
             // Lock 획득 처리
-            LogUtils.showInfo(this.getClass(), "🔒", "Lock 획득 성공. Key : %s", key);
+            LogUtils.showInfo(this.getClass(), LogEmoji.LOCK, "Lock 획득 성공. Key : %s", key);
             return joinPoint.proceed();
 
             // 위에서 던진 커스텀 예외는 다시 던짐
@@ -135,7 +136,7 @@ public class RedissonAspect {
             try {
                 if (Objects.nonNull(lock) && lock.isHeldByCurrentThread()) {
                     lock.unlock();
-                    LogUtils.showInfo(this.getClass(), "🔓", "Lock 해제 완료. Key : %s", key);
+                    LogUtils.showInfo(this.getClass(), LogEmoji.UNLOCK, "Lock 해제 완료. Key : %s", key);
                 }
 
                 // 이미 헤제된 Lock을 또 헤제하려는 경우

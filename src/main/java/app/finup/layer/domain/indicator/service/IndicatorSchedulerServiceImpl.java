@@ -4,6 +4,7 @@ package app.finup.layer.domain.indicator.service;
 import app.finup.api.external.financialindex.client.FinancialIndexClient;
 import app.finup.api.external.marketindex.client.MarketIndexClient;
 import app.finup.common.enums.AppStatus;
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
@@ -107,7 +108,7 @@ public class IndicatorSchedulerServiceImpl implements IndicatorSchedulerService 
 
         // [3] 최근 영업일과 등락률 계산을 위해 다음 영업일 조회
         int firstFallBackDay = firstResult.getSecond();
-        LogUtils.showInfo(this.getClass(), "✅", "%s 경제 지표 조회 완료!", startDate.minusDays(firstFallBackDay));
+        LogUtils.showInfo(this.getClass(), LogEmoji.OK, "%s 경제 지표 조회 완료!", startDate.minusDays(firstFallBackDay));
         LocalDate nextStartDate = startDate.minusDays(firstFallBackDay + 1); // 첫 번째 조회일보다 하루 이후부터 조회
 
         // 두 번째 영업일 조회
@@ -115,7 +116,7 @@ public class IndicatorSchedulerServiceImpl implements IndicatorSchedulerService 
                 getIndicator(fallbackDay -> callClientMethod.apply(nextStartDate.minusDays(fallbackDay)));
 
         Integer secondFallBackDay = secondResult.getSecond();
-        LogUtils.showInfo(this.getClass(), "✅", "%s 경제 지표 조회 완료!", nextStartDate.minusDays(secondFallBackDay));
+        LogUtils.showInfo(this.getClass(), LogEmoji.OK, "%s 경제 지표 조회 완료!", nextStartDate.minusDays(secondFallBackDay));
 
         // [4] 두 영업일 정보 기반 오늘 게시할 지표 계산 및 결과 반환
         return mappingMethod.apply(firstResult.getFirst(), secondResult.getFirst());
@@ -134,7 +135,7 @@ public class IndicatorSchedulerServiceImpl implements IndicatorSchedulerService 
                 getIndicator(fallbackDay -> callClientMethod.apply(startDate.minusDays(fallbackDay)));
 
         // [2] 매핑 수행 및 반환
-        LogUtils.showInfo(this.getClass(), "✅", "%s 주식 시장 지표 조회 완료!", startDate.minusDays(firstResult.getSecond()));
+        LogUtils.showInfo(this.getClass(), LogEmoji.OK, "%s 주식 시장 지표 조회 완료!", startDate.minusDays(firstResult.getSecond()));
         return mappingMethod.apply(firstResult.getFirst());
     }
 

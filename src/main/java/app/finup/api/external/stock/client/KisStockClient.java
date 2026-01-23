@@ -1,5 +1,8 @@
 package app.finup.api.external.stock.client;
 
+import app.finup.api.utils.ApiError;
+import app.finup.api.utils.ApiRetry;
+import app.finup.api.utils.ApiUtils;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
@@ -8,6 +11,7 @@ import app.finup.api.external.stock.dto.StockApiDto;
 import app.finup.api.external.stock.dto.StockApiDtoMapper;
 import app.finup.api.external.stock.enums.CandleType;
 import app.finup.api.external.stock.utils.KisParamBuilder;
+import app.finup.common.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,11 +20,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 import reactor.util.retry.RetryBackoffSpec;
 
 import java.net.URI;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -52,18 +56,22 @@ public class KisStockClient implements StockClient {
     private static final String TR_ID_MARKET_CAP = "FHPST01740000";
     private static final String TR_ID_TRADING_VALUE = "FHPST01710000";
     private static final String TR_ID_DETAIL = "FHKST01010100";
-    private static final String TR_ID_CHART = "FHKST01010400";
+    private static final String TR_ID_CHART = "FHKST03010100";
 
     // 차트 파라미터 상수
     private static final String CHART_PRICE_ADJUST_TYPE_ADJUSTED = "0"; // 수정주가 (액면분할/병합, 유상증자 등의 이벤트 반영가)
     private static final String CHART_PRICE_ADJUST_TYPE_ORIGINAL = "1"; // 원주가 (실제 거래된 가격 그대로 표시)
+    private static final int CHART_INTERVAL_DAY = 6; // 단위 : 달
+    private static final int CHART_INTERVAL_WEEK = 3; // 단위 : 년
+    private static final int CHART_INTERVAL_MONTH = 10; // 단위 : 년
+
 
     // URL 상수
     private static final String URL_AUTH = "/oauth2/tokenP"; // 토큰 요청
     private static final String URL_LIST_MARKET_CAP = "/uapi/domestic-stock/v1/ranking/market-cap"; // 시가총액 순위
     private static final String URL_LIST_TRADING_VALUE = "/uapi/domestic-stock/v1/quotations/volume-rank"; // 거래량 순위
     private static final String URL_DETAIL = "/uapi/domestic-stock/v1/quotations/inquire-price"; // 종목 상세
-    private static final String URL_CHART = "/uapi/domestic-stock/v1/quotations/inquire-daily-price"; // 종목 차트
+    private static final String URL_CHART = "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice"; // 종목 차트
 
     // API 요청 관련 상수
     private static final Duration TIMEOUT_ISSUE = Duration.ofSeconds(15);
@@ -97,7 +105,7 @@ public class KisStockClient implements StockClient {
                 // [2] 요청 결과 JSON 문자열로 변환
                 .bodyToMono(String.class)
                 .timeout(TIMEOUT_ISSUE) // 요청 Timeout
-                .retryWhen(setRetrySpec("KIS API AccessToken 발급 시도")) // 실패 시 재시도 로직
+                .retryWhen(setRetrySpec()) // 실패 시 재시도 로직
                 .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_AT_ISSUE_FAILED))) // 결과가 빈 경우 처리
 
                 // [3] 토큰 존재 검증
@@ -215,11 +223,30 @@ public class KisStockClient implements StockClient {
     private MultiValueMap<String, String> setCandleParamMap(String code, CandleType candleType) {
 
         return KisParamBuilder.builder()
-                .marketCode("J")
                 .stockCode(code)
+                .marketCode("J")
                 .periodType(candleType.getType())
                 .priceAdjustType(CHART_PRICE_ADJUST_TYPE_ADJUSTED)
+                .date1(calculateStartDate(candleType))
+                .date2(TimeUtils.formatNowDateNoHyphen())
                 .build();
+    }
+
+
+    private String calculateStartDate(CandleType candleType) {
+
+        // [1] 현재 한국 시간 조회
+        LocalDate startDate = TimeUtils.getNowLocalDate();
+
+        // [2] 캔들 타입마다 시작 시간을 다르게 계산
+        switch (candleType) {
+            case DAY -> startDate = startDate.minusMonths(CHART_INTERVAL_DAY);
+            case WEEK -> startDate = startDate.minusYears(CHART_INTERVAL_WEEK);
+            case MONTH -> startDate = startDate.minusYears(CHART_INTERVAL_MONTH);
+        };
+
+        // [3] yyyyMMdd 형태로 변환 및 반환
+        return TimeUtils.formatDateNoHyphen(startDate);
     }
 
 
@@ -249,15 +276,15 @@ public class KisStockClient implements StockClient {
                 // [2] 요청 결과 JSON 문자열로 변환
                 .bodyToMono(String.class)
                 .timeout(TIMEOUT_GET) // 요청 Timeout
-                .retryWhen(setRetrySpec("KIS API 주식 정보 조회 시도")) // 실패 시 재시도 로직
-                .switchIfEmpty(Mono.error(new ProviderException(AppStatus.API_STOCK_AT_ISSUE_FAILED)))
+                .retryWhen(setRetrySpec()) // 실패 시 재시도 로직
+                .flatMap(ApiUtils::validateEmpty)
 
                 // [3] JSON 응답 그대로 첫 번째 DTO 반환 (JSON 구조 그대로) -> 이후 필요한 데이터만 추출하여 최종 반환 DTO로 변환
                 .map(json -> StrUtils.fromJson(json, firstDtoClass)) // JSON 형태 그대로 DTO로 변환
                 .map(mappingMethod) // 최종 형태 DTO로 변환
 
                 // [4] 예외 통합 처리
-                .onErrorMap(Exception.class, throwError("기타 사유로 KIS API 주식 정보 조회 시도 실패."))
+                .onErrorMap(Exception.class, throwError("KIS API 주식 정보 조회 실패"))
 
                 // [5] 최종 결과 생성 (변환 결과)
                 .block();
@@ -265,35 +292,19 @@ public class KisStockClient implements StockClient {
 
 
     // 인증 요청 실패 시, 재시도를 위한 재시도 로직 spec 객체 설정
-    private RetryBackoffSpec setRetrySpec(String retryMessage) {
+    private RetryBackoffSpec setRetrySpec() {
 
-        return Retry.backoff(RETRY_MAX_ATTEMPTS, RETRY_MIN_BACKOFF)
+        return ApiRetry.builder() // Retry 설정
+                .attempts(RETRY_MAX_ATTEMPTS)
+                .minBackoff(RETRY_MIN_BACKOFF)
                 .maxBackoff(RETRY_MAX_BACKOFF)
-                .jitter(RETRY_JITTER) // 시간차를 가지고 재시도하도록 변경 (동시 요청 방지)
-                //.doBeforeRetry(signal -> // 인증 시도 전 행동 (로그 남기기)
-                //        LogUtils.showInfo(this.getClass(), "%s %d/%d (대기: %dms)",
-                //                retryMessage,
-                //                signal.totalRetries() + 1,
-                //                RETRY_MAX_ATTEMPTS,
-                //                calculateBackoffTime(signal.totalRetries())) // 대기 시간 표시
-                //)
-                .onRetryExhaustedThrow((backoffSpec, signal) -> { // 인증 재시도를 모두 실패한 경우
-                    LogUtils.showError(this.getClass(), "%s 실패. 총 %d번 시도", retryMessage, RETRY_MAX_ATTEMPTS);
-                    return new ProviderException(AppStatus.API_STOCK_REQUEST_FAILED);
-                });
+                .jitter(RETRY_JITTER)
+                .loggerClass(this.getClass())
+                .showBeforeRetryLog(false)
+                .loggingMessage("KIS API 주식 정보 조회 시도")
+                .apiFailedStatus(AppStatus.API_STOCK_REQUEST_FAILED)
+                .build().toRetrySpec();
     }
-
-
-    private long calculateBackoffTime(long retryCount) {
-        long baseBackoff = RETRY_MIN_BACKOFF.toMillis() * (long) Math.pow(2, retryCount);
-        long maxBackoff = RETRY_MAX_BACKOFF.toMillis();
-        long actualBackoff = Math.min(baseBackoff, maxBackoff);
-
-        // Jitter 적용 (±50%)
-        double jitterFactor = 1.0 + (Math.random() - 0.5) * 2 * RETRY_JITTER;
-        return (long) (actualBackoff * jitterFactor);
-    }
-
 
     // API 요청 URL(URI) 생성
     private URI buildURI(UriBuilder uriBuilder, String uri, MultiValueMap<String, String> params) {
@@ -303,11 +314,12 @@ public class KisStockClient implements StockClient {
 
     // 통합 실패 예외 처리
     private Function<Exception, Throwable> throwError(String message) {
-        return ex -> {
-            if (ex instanceof ProviderException) return ex;
-            LogUtils.showError(this.getClass(), "%s 원인 : %s", message, ex.getMessage());
-            return new ProviderException(AppStatus.API_STOCK_REQUEST_FAILED, ex);
-        };
+
+        return ApiError.builder() // API 예외 처리
+                .loggerClass(this.getClass())
+                .message(message)
+                .apiFailedStatus(AppStatus.API_STOCK_REQUEST_FAILED)
+                .build().toErrorFunction();
     }
 
 

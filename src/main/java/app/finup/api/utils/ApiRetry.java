@@ -1,6 +1,7 @@
 package app.finup.api.utils;
 
 import app.finup.common.enums.AppStatus;
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.exception.ProviderException;
 import app.finup.common.utils.LogUtils;
 import lombok.Builder;
@@ -31,6 +32,12 @@ public class ApiRetry {
     private double jitter = 0.5; // 재시도 간격에 무작위성 추가 (동시에 시도가 몰리는 것을 방지)
 
     @Builder.Default
+    private boolean showBeforeRetryLog = true; // 재시도 전 로그 출력
+
+    @Builder.Default
+    private boolean showExhaustedLog = true; // 재시도 실패 로그 출력
+
+    @Builder.Default
     private String loggingMessage = "API 요청"; // 로깅 메세지
 
     private Class<?> loggerClass; // 호출 클래스 정보
@@ -47,11 +54,12 @@ public class ApiRetry {
         return Retry.backoff(attempts, minBackoff)
                 .maxBackoff(maxBackoff)
                 .jitter(jitter)
-                .doBeforeRetry(signal ->
-                        LogUtils.showInfo(loggerClass, "%s %d/%d", loggingMessage, signal.totalRetries() + 1, attempts)
-                )
+                .doBeforeRetry(signal -> {
+                    if (showBeforeRetryLog)
+                        LogUtils.showInfo(loggerClass, LogEmoji.TRY, "%s %d/%d", loggingMessage, signal.totalRetries() + 1, attempts);
+                })
                 .onRetryExhaustedThrow((backoffSpec, signal) -> {
-                    LogUtils.showError(loggerClass, "%s 실패. 총 %d번 시도", loggingMessage, attempts);
+                    if (showExhaustedLog) LogUtils.showError(loggerClass, "%s 실패. 총 %d번 시도", loggingMessage, attempts);
                     return new ProviderException(apiFailedStatus);
                 });
     }

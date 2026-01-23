@@ -1,5 +1,6 @@
 package app.finup.layer.base.template;
 
+import app.finup.common.enums.LogEmoji;
 import app.finup.common.utils.AiUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
@@ -138,7 +139,7 @@ public class AiCodeTemplate {
 
         // [2] 추천 결과 확인
         List<K> recommendIds = StrUtils.fromJsonList(clean, candidatesKeyClass);
-        LogUtils.showInfo(AiCodeTemplate.class, "📊 AI 추천 결과 : %s", recommendIds);
+        LogUtils.showInfo(AiCodeTemplate.class, LogEmoji.ANALYSIS, "AI 추천 결과 : %s", recommendIds);
 
         // [5] 추천 결과 검증
         // 5-1) 유효한 영상번호만 추출 (AI가 목록 외 번호를 추천한 경우 필터)
