@@ -33,44 +33,48 @@ public class AsyncConfig {
     public Executor normalScheduler() {
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(6);
-        executor.setQueueCapacity(30);
-        executor.setAllowCoreThreadTimeOut(true);  // 유휴 시 코어 스레드도 종료
-        executor.setKeepAliveSeconds(60);
         executor.setThreadNamePrefix(PREFIX);
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(3);
+        executor.setQueueCapacity(10);
+        executor.setAllowCoreThreadTimeOut(true);
+        executor.setKeepAliveSeconds(30);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.setAwaitTerminationSeconds(10);  // 종료 대기 시간
+        executor.setWaitForTasksToCompleteOnShutdown(true);  // 안전한 종료
         executor.initialize();
         return executor;
     }
 
-    @Bean(name = AsyncMode.NEWS_ASYNC)
+    @Bean(name = AsyncMode.NEWS)
     public Executor newsCrawlingScheduler() {
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(10);
-        executor.setKeepAliveSeconds(60);
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(60);
         executor.setThreadNamePrefix(PREFIX_NEWS_CRAWLING);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(50);
+        executor.setKeepAliveSeconds(60);
+        executor.setAwaitTerminationSeconds(60);
+        executor.setAllowCoreThreadTimeOut(true);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;
     }
 
-    @Bean(name = AsyncMode.STOCK_ASYNC)
+    @Bean(name = AsyncMode.STOCK)
     public Executor stockSearchScheduler() {
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(10);
-        executor.setKeepAliveSeconds(60);
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(60);
         executor.setThreadNamePrefix(PREFIX_STOCK_SEARCH);
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(20);
+        executor.setKeepAliveSeconds(60);
+        executor.setAwaitTerminationSeconds(60);
+        executor.setAllowCoreThreadTimeOut(true);
+        executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.initialize();
         return executor;

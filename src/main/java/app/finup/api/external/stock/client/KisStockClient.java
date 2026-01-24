@@ -301,6 +301,7 @@ public class KisStockClient implements StockClient {
                 .jitter(RETRY_JITTER)
                 .loggerClass(this.getClass())
                 .showBeforeRetryLog(false)
+                .showExhaustedLog(false)
                 .loggingMessage("KIS API 주식 정보 조회 시도")
                 .apiFailedStatus(AppStatus.API_STOCK_REQUEST_FAILED)
                 .build().toRetrySpec();

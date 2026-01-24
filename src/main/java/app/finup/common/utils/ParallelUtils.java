@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.*;
@@ -29,7 +30,7 @@ public final class ParallelUtils {
 
     // SEMAPHORE (최대 작업 스레드 제한)
     public static final Semaphore SEMAPHORE_OPENAI_EMBEDDING =  new Semaphore(10);
-    public static final Semaphore SEMAPHORE_NEWS_CRAWLING = new Semaphore(20);
+    public static final Semaphore SEMAPHORE_NEWS_CRAWLING = new Semaphore(5);
     public static final Semaphore SEMAPHORE_API_NAVER_NEWS = new Semaphore(5);
     public static final Semaphore SEMAPHORE_API_STOCK = new Semaphore(5);
 
@@ -50,7 +51,7 @@ public final class ParallelUtils {
             ExecutorService executorService) {
 
         // Consumer를 Function으로 변환 (반환값 Void)
-        doParallel(workName, tasks, ParallelUtils::doRun, semaphore, executorService);
+        doParallel(workName, tasks, ParallelUtils::doRun, semaphore, executorService, Duration.ZERO);
     }
 
 
@@ -79,7 +80,31 @@ public final class ParallelUtils {
             Semaphore semaphore,
             ExecutorService executorService) {
 
-        return doParallel(workName, items, mappingTask, semaphore, executorService);
+        return doParallel(workName, items, mappingTask, semaphore, executorService, Duration.ZERO);
+    }
+
+
+    /**
+     * 병렬 작업 수행 (입력, 반환 값 존재)
+     * @param <T>             입력 타입
+     * @param <R>             반환 타입
+     * @param workName        수행 작업명
+     * @param items           처리할 아이템 리스트
+     * @param mappingTask     각 아이템에 적용할 함수
+     * @param semaphore       최대 동시 실행 제한
+     * @param executorService 병렬 처리를 제어할 ExecutorService
+     * @param delay           작업 시작 전 부여할 딜레이
+     * @return 모든 작업의 결과 리스트 (순서 보장 X)
+     */
+    public static <T, R> List<R> doParallelTask(
+            String workName,
+            Collection<T> items,
+            Function<T, R> mappingTask,
+            Semaphore semaphore,
+            ExecutorService executorService,
+            Duration delay) {
+
+        return doParallel(workName, items, mappingTask, semaphore, executorService, delay);
     }
 
 
@@ -100,7 +125,7 @@ public final class ParallelUtils {
             ExecutorService executorService) {
 
         // Consumer를 Function으로 변환 (반환값 Void)
-        doParallel(workName, items, item -> doAccept(task, item), semaphore, executorService);
+        doParallel(workName, items, item -> doAccept(task, item), semaphore, executorService, Duration.ZERO);
     }
 
 
@@ -117,8 +142,8 @@ public final class ParallelUtils {
             Collection<T> items,
             Function<T, R> mappingTask,
             Semaphore semaphore,
-            ExecutorService executorService
-    ) {
+            ExecutorService executorService,
+            Duration delay) {
 
         // 유효하지 않은 요청은 작업 미수행
         if (Objects.isNull(items) || items.isEmpty()) return List.of();
@@ -148,7 +173,7 @@ public final class ParallelUtils {
 
         // [3] 워커 실행
         List<CompletableFuture<Void>> workers =
-                runWorker(asyncItems, mappingTask, semaphore, executorService, maxWorkers, workQueue, results, totalProcessed, failedItems, totalFailed);
+                runWorker(asyncItems, mappingTask, semaphore, executorService, maxWorkers, workQueue, results, totalProcessed, failedItems, totalFailed, delay);
 
         // [4] 모든 작업 완료 처리
         try {
@@ -192,7 +217,8 @@ public final class ParallelUtils {
             ConcurrentLinkedQueue<R> results,
             AtomicInteger totalProcessed,
             ConcurrentLinkedQueue<T> failedItems,
-            AtomicInteger totalFailed) {
+            AtomicInteger totalFailed,
+            Duration delay) {
 
         return IntStream.rangeClosed(1, maxWorkers)
                 .mapToObj(workerIndex -> CompletableFuture.runAsync(() -> {
@@ -218,11 +244,12 @@ public final class ParallelUtils {
 
                             // 로직 수행
                             try {
+
                                 // 작업 수행 후, 결과 반환 (Semaphore 제한 적용)
                                 R result = runWithLimit(semaphore, () -> mappingTask.apply(item));
 
                                 // 작업 처리 queue에 결과 데이터 삽입
-                                results.add(result);
+                                if (Objects.nonNull(result)) results.add(result); // null 방지
                                 totalProcessed.incrementAndGet(); // 처리한 총 프로세스 수 증가
                                 successCount++;
 
@@ -235,7 +262,8 @@ public final class ParallelUtils {
                                 // 최대 횟수를 넘기지 않은 경우, 다시 큐에 삽입
                                 if (attemptNumber <= MAX_RETRY) {
                                     workQueue.put(item); // 다시 삽입 처리
-                                    log.warn("⚠️ WORKER-{}\t 작업 실패 ({}차 시도) - 재시도 예정: {}", workerIndex, attemptNumber, e.getMessage());
+                                    String message = Objects.isNull(e.getMessage()) ? e.getClass().getSimpleName() : e.getMessage();
+                                    log.warn("⚠️ WORKER-{}\t 작업 실패 ({}차 시도) - 재시도 예정: {}", workerIndex, attemptNumber, message);
 
                                     // 만약 최대 횟수를 넘어간 경우, 큐에 다시 삽입하지 않고 실패 처리
                                 } else {
@@ -243,13 +271,22 @@ public final class ParallelUtils {
                                     asyncItems.remove(item);
                                     totalFailed.incrementAndGet();
                                     failedCount++;
-                                    log.error("❌ WORKER-{}\t 최종 실패 ({}차 시도 모두 실패): {}", workerIndex, attemptNumber, e.getMessage());
+                                    String message = Objects.isNull(e.getMessage()) ? e.getClass().getSimpleName() : e.getMessage();
+                                    log.error("❌ WORKER-{}\t 최종 실패 ({}차 시도 모두 실패): {}", workerIndex, attemptNumber-1, message);
 
                                 }
 
                                 // 현재 스레드가 담당한 작업 카운트 증가
                             } finally {
+                                // 작업 카운터 증가
                                 processedCount++;
+
+                                // 대기시간 적용
+                                long baseDelay = delay.toMillis();
+                                if (baseDelay > 0) {
+                                    long jitter = ThreadLocalRandom.current().nextLong(-baseDelay / 2, baseDelay / 2 + 1);
+                                    TimeUnit.MILLISECONDS.sleep(baseDelay + jitter);
+                                }
                             }
 
                         } catch (InterruptedException e) {

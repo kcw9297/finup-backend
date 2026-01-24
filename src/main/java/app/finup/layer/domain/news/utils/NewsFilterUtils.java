@@ -216,7 +216,7 @@ public class NewsFilterUtils {
     }
 
 
-
+    // 짧은 연속된 줄만 있는 경우 제거
     public static String removeDescriptionNoiseLine(String description) {
 
         // 노이즈를 제거할 수 없는 문자열이면 빈 문자열 반환
@@ -226,12 +226,11 @@ public class NewsFilterUtils {
         String result = description;
 
         // 연속되는 짧은 줄 제거
-        result = removeShortLineClusters(result, 20, 3);
+        result = removeShortLineClusters(result, 30, 3);
 
         // 패턴 매칭되는 부분만 제거
         for (Pattern pattern : NOISE_PATTERNS)
             result = pattern.matcher(result).replaceAll("");
-
 
         // 결과 문자열 반환
         return result;

@@ -18,4 +18,10 @@ public interface NewsSchedulerService {
      * 특정 종목 뉴스 기사 동기화
      */
     void syncStock();
+
+
+    /**
+     * 오래된 기사 삭제
+     */
+    void removeOlds();
 }

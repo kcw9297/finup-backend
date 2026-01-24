@@ -278,6 +278,13 @@ public final class StrUtils {
     }
 
 
+    /**
+     * 해당 문자열이 유효한지 검증 (null이거나 공백이 아님)
+     * @param text 대상 문자열
+     * @return 검증 결과 (false - 유효하지 않음)
+     */
+    public static boolean isValid(String text) {
+        return Objects.nonNull(text) && !text.isBlank();
 
-
+    }
 }

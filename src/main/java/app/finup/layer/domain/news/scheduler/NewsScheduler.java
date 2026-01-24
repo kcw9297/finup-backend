@@ -30,7 +30,7 @@ public class NewsScheduler {
     // 주식 정보 초기화 스케줄링 (단 한번만 수행)
     @RedissonLock(key = NewsRedisKey.LOCK_SYNC_MAIN)
     @Scheduled(initialDelay = 500, fixedDelay = Long.MAX_VALUE)
-    @Async(AsyncMode.NEWS_ASYNC)
+    @Async(AsyncMode.NEWS)
     public void initSyncMain(){
         LogUtils.runMethodAndShowCostLog("메인 기사 초기화", newsSchedulerService::syncMain);
     }
@@ -39,7 +39,7 @@ public class NewsScheduler {
     // 메인 뉴스 조회 및 본문 크롤링
     @RedissonLock(key = NewsRedisKey.LOCK_SYNC_MAIN)
     @Scheduled(cron = "0 10,40 * * * *")
-    @Async(AsyncMode.NEWS_ASYNC)
+    @Async(AsyncMode.NEWS)
     public void syncMain(){
         LogUtils.runMethodAndShowCostLog("메인 뉴스 동기화", newsSchedulerService::syncMain);
     }
@@ -48,10 +48,16 @@ public class NewsScheduler {
     // 매 시간 15분/45분 마다 종목 내 뉴스 크롤링
     @RedissonLock(key = NewsRedisKey.LOCK_SYNC_STOCK)
     @Scheduled(cron = "0 15,45 * * * *")
-    @Async(AsyncMode.NEWS_ASYNC)
+    @Async(AsyncMode.NEWS)
     public void syncStock(){
         LogUtils.runMethodAndShowCostLog("종목 뉴스 동기화", newsSchedulerService::syncStock);
     }
 
 
+    // 오래된 뉴스 삭제 (Lock 불필요)
+    @Scheduled(cron = "0 0 0/3 * * *")
+    @Async(AsyncMode.NORMAL)
+    public void removeOlds(){
+        LogUtils.runMethodAndShowCostLog("오래된 뉴스 삭제", newsSchedulerService::removeOlds);
+    }
 }

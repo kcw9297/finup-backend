@@ -44,7 +44,7 @@ public class StockScheduler {
     // 주식 정보 초기화 스케줄링 (단 한번만 수행)
     @RedissonMultiLock(keys = {StockRedisKey.LOCK_SYNC, NewsRedisKey.LOCK_SYNC_STOCK}) // MultiLock
     @Scheduled(initialDelay = 30000, fixedDelay = Long.MAX_VALUE)
-    @Async(AsyncMode.STOCK_ASYNC)
+    @Async(AsyncMode.STOCK)
     public void initSync(){
 
         // [1] 종목 초기화
@@ -58,7 +58,7 @@ public class StockScheduler {
     // 주식 정보 동기화 스케줄링
     @RedissonMultiLock(keys = {StockRedisKey.LOCK_SYNC, NewsRedisKey.LOCK_SYNC_STOCK}) // MultiLock
     @Scheduled(cron = "0 0,30 9-16 * * MON-FRI")
-    @Async(AsyncMode.STOCK_ASYNC)
+    @Async(AsyncMode.STOCK)
     public void sync(){
 
         // [1] 종목 동기화

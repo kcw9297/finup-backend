@@ -118,6 +118,7 @@ public enum AppStatus {
 
     /* 뉴스 줭보 News */
     NEWS_NOT_FOUND(500, "뉴스가 존재하지 않습니다. 뉴스 목록을 다시 확인해 주세요.", "NEWS_NOT_FOUND"),
+    NEWS_CRAWL_EMPTY(500, "뉴스 크롤링 결과를 조회하지 못했습니다. (EMPTY)", "NEWS_CRAWL_EMPTY"),
 
     /* 내 단어장 MemberWordbook */
     WORD_NOT_FOUND(400, "존재하지 않는 단어입니다.", "WORD_NOT_FOUND"),
@@ -151,6 +152,7 @@ public enum AppStatus {
 
     /* 지표 Indicator */
     INDICATOR_FALLBACK_FAILED(500, "지표 Fallback 처리에 실패했습니다", "INDICATOR_FALLBACK_FAILED"),
+
     /* ======================================== 작성 영역 끝 ========================================================= */
 
     /* 범용 상태 */

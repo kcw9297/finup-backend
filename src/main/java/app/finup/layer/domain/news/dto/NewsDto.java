@@ -36,4 +36,36 @@ public final class NewsDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime publishedAt;
     }
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class CrawlResult {
+
+        private String description;
+        private String thumbnail;
+        private String publisher;
+        private boolean success;
+
+        public static CrawlResult success(String description, String thumbnail, String publisher) {
+            return CrawlResult.builder()
+                    .description(description)
+                    .thumbnail(thumbnail)
+                    .publisher(publisher)
+                    .success(true)
+                    .build();
+        }
+
+
+        public static CrawlResult fail() {
+            return CrawlResult.builder()
+                    .description("")
+                    .thumbnail("")
+                    .publisher("")
+                    .success(false)
+                    .build();
+        }
+    }
 }

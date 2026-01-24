@@ -12,7 +12,7 @@ import lombok.Getter;
 public final class AsyncMode {
 
     public static final String NORMAL = "normalMode";
-    public static final String NEWS_ASYNC = "newsAsyncMode";
-    public static final String STOCK_ASYNC = "stockAsyncMode";
+    public static final String NEWS = "newsMode";
+    public static final String STOCK = "stockMode";
 }
 

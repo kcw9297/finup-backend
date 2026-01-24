@@ -4,6 +4,7 @@ import app.finup.layer.domain.studyprogress.entity.StudyProgress;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import java.util.Optional;
  * @author kcw
  * @since 2025-12-02
  */
+@Transactional(readOnly = true)
 public interface StudyProgressRepository extends JpaRepository<StudyProgress, Long> {
 
     @Query("""
@@ -31,6 +33,7 @@ public interface StudyProgressRepository extends JpaRepository<StudyProgress, Lo
     Optional<StudyProgress> findByStudyIdAndMemberId(Long studyId, Long memberId);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM StudyProgress sp
@@ -39,6 +42,7 @@ public interface StudyProgressRepository extends JpaRepository<StudyProgress, Lo
     void deleteByMemberId(Long memberId);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM StudyProgress sp
@@ -47,6 +51,7 @@ public interface StudyProgressRepository extends JpaRepository<StudyProgress, Lo
     void deleteByStudyId(Long studyId);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM StudyProgress sp

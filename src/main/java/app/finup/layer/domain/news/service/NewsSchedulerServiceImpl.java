@@ -5,8 +5,10 @@ import app.finup.common.utils.HtmlUtils;
 import app.finup.common.utils.ParallelUtils;
 import app.finup.api.external.news.dto.NewsApi;
 import app.finup.api.external.news.client.NewsClient;
+import app.finup.common.utils.TimeUtils;
 import app.finup.layer.domain.news.constant.NewsFilter;
 import app.finup.layer.domain.news.constant.NewsRedisKey;
+import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.entity.News;
 import app.finup.layer.domain.news.enums.NewsType;
 import app.finup.layer.domain.news.repository.NewsRepository;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
@@ -36,7 +37,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
     // 사용 의존성
@@ -63,10 +63,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
     @Override
     public void syncMain() {
 
-        // [1] 오래된 Entity 삭제
-        newsRepository.removeOld(LocalDateTime.now().minus(THRESHOLD_SAVE));
-
-        // [2] 현재 뉴스 엔티티 조회
+        // [1] 현재 뉴스 엔티티 조회
         Map<String, News> curTitleEntityMap = // "뉴스 제목" - "News Entity" Map (뉴스 이름으로 중복 판단)
                 newsRepository.findByNewsType(NewsType.MAIN)
                         .stream()
@@ -76,19 +73,21 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                                 (existing, replacement) -> existing
                         ));
 
-        // [3] 뉴스 검색 수행 및 필터링 결과 기반 엔티티 생성 및 저장
+        // [2] 뉴스 검색 수행 및 필터링 결과 기반 엔티티 생성 및 저장
         // API 뉴스 기사 및 현재 기사 목록 일괄 조회 후, 유사도 및 중복 기사 필터링
         List<NewsApi.Row> rows = newsClient.getLatest(QUERY_SEARCH_MAIN, AMOUNT_NEWS_MAIN, NewsSortType.LATEST);
         List<NewsApi.Row> filteredRows = NewsFilterUtils.filter(rows, NewsFilter.FILTER_KEYWORD_MAIN);
 
-        // [4] 필터된 결과 기반 Entity 생성 및 저장
+        // [3] 필터된 결과 기반 Entity 생성 및 저장
         List<News> entities =
                 filteredRows.parallelStream()
                         .filter(dto -> isNotDuplicatedTitle(dto, curTitleEntityMap))
-                        .map(this::crawalNewsAndMapToNewsEntity)
+                        .map(this::crawlNewsAndMapToNewsEntity)
+                        .filter(Objects::nonNull)
                         .filter(entity -> NewsFilterUtils.isDescriptionValid(entity.getDescription()))
                         .toList();
 
+        // [4] 저장 수행 (내부 트랜잭션 사용)
         newsRepository.saveAll(entities);
     }
 
@@ -139,7 +138,8 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 requests,
             request -> new StockNewsResponse(newsClient.getLatest(request.stockName, AMOUNT_NEWS_STOCK, NewsSortType.RELATED), request.stockCode(), request.stockName()),
                 ParallelUtils.SEMAPHORE_API_NAVER_NEWS,
-                newsApiExecutor
+                newsApiExecutor,
+                Duration.ofMillis(500)
         ).stream()
             .map(response -> // 검색 결과 필터링
                     Map.entry(response.stockCode, NewsFilterUtils.filter(response.stocks, NewsFilter.FILTER_KEYWORD_STOCK))
@@ -171,11 +171,12 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                         ParallelUtils.SEMAPHORE_NEWS_CRAWLING,
                         crawlingExecutor)
                 .stream()
+                .filter(Objects::nonNull)
                 .filter(entity -> NewsFilterUtils.isDescriptionValid(entity.getDescription()))
                 .filter(entity -> isNotDuplicatedTitle(entity, curTitles)) // 종목마다 중복 기사가 존재할 수 있으므로 한번 더 수행
                 .toList();
 
-        // [6] 저장
+        // [6] 저장 (내부 트랜잭션 사용)
         newsRepository.saveAll(entities);
     }
 
@@ -206,46 +207,65 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
 
     // 메인 뉴스 Entity 클래스로 변환
-    private News crawalNewsAndMapToNewsEntity(NewsApi.Row row) {
+    private News crawlNewsAndMapToNewsEntity(NewsApi.Row row) {
 
-        return setNewsBuilder(row)
-                .newsType(NewsType.MAIN)
-                .build();
+        // 크롤링 수행
+        News.NewsBuilder newsBuilder = crawlAndSetNewsEntity(row);
+
+        // 크롤링 결과에 따라 반환
+        return Objects.isNull(newsBuilder) ?
+                null :
+                newsBuilder
+                        .newsType(NewsType.MAIN)
+                        .build();
     }
 
     // 종목 뉴스 Entity 클래스로 변환
     private News toStockNewsEntity(NewsApi.Row row, String stockCode) {
 
-        return setNewsBuilder(row)
-                .newsType(NewsType.STOCK)
-                .stockCode(stockCode)
-                .build();
+        // 크롤링 수행
+        News.NewsBuilder newsBuilder = crawlAndSetNewsEntity(row);
+
+        // 크롤링 결과에 따라 반환
+        return Objects.isNull(newsBuilder) ?
+                null :
+                newsBuilder
+                        .newsType(NewsType.STOCK)
+                        .stockCode(stockCode)
+                        .build();
     }
 
     // 기본 값 설정
-    private News.NewsBuilder setNewsBuilder(NewsApi.Row row) {
+    private News.NewsBuilder crawlAndSetNewsEntity(NewsApi.Row row) {
 
         // 기사 링크
         String link = row.getLink();
 
-        // 기사 본문 크롤링 및 불필요 문장 제거 (1차적 제거)
-        String description = NewsCrawlingUtils.extractDescription(link);
-        String cleanDescription = NewsFilterUtils.removeDescriptionNoiseLine(description);
+        // 기사 크롤링 수행
+        NewsDto.CrawlResult result = NewsCrawlingUtils.extractAll(link);
 
-        return News.builder()
-                .title(HtmlUtils.getText(row.getTitle()))
-                .summary(HtmlUtils.getText(row.getSummary()))
-                .description(cleanDescription)
-                .thumbnail(NewsCrawlingUtils.extractThumbnail(link))
-                .publisher(NewsCrawlingUtils.extractPublisher(link))
-                .link(link)
-                .publishedAt(row.getPublishedAt());
+        // 뉴스 엔티티 생성 및 반환
+        return result.isSuccess() ?
+                News.builder()
+                        .title(HtmlUtils.getText(row.getTitle()))
+                        .summary(HtmlUtils.getText(row.getSummary()))
+                        .description(NewsFilterUtils.removeDescriptionNoiseLine(result.getDescription()))
+                        .thumbnail(result.getThumbnail())
+                        .publisher(result.getPublisher())
+                        .link(link)
+                        .publishedAt(row.getPublishedAt()) : null;
     }
-
-
 
     // 종목 검색 작업 요청 DTO
     private record StockNewsRequest(String stockCode, String stockName) {}
     private record StockNewsResponse(List<NewsApi.Row> stocks, String stockCode, String stockName) {}
     private record StockNewsCrawRequest(String stockCode, NewsApi.Row row) {}
+
+
+    @Override
+    @Transactional
+    public void removeOlds() {
+        newsRepository.removeOld(TimeUtils.getNowLocalDateTime().minus(THRESHOLD_SAVE));
+    }
+
 }

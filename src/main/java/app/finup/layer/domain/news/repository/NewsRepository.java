@@ -6,10 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Transactional(readOnly = true)
 public interface NewsRepository extends JpaRepository<News, Long> {
 
     @Query("""
@@ -54,6 +56,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     long countByStockCode(String stockCode);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM News n
