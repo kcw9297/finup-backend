@@ -81,8 +81,6 @@ dependencies {
     //implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
     //implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.26.0'
 
-    /* 기타 유틸 라이브러리 */
-
     // google-guava (batch 처리 라이브러리)
     implementation 'com.google.guava:guava:33.3.1-jre'
 

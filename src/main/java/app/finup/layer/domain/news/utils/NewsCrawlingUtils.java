@@ -15,9 +15,9 @@ import org.jsoup.safety.Safelist;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 뉴스와 관련한 유틸 기능 클래스
@@ -29,28 +29,46 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NewsCrawlingUtils {
 
+    private static final List<String> USER_AGENTS = List.of(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+    );
+
+
+    private static final List<String> REFERRERS = List.of(
+            "https://www.google.com/",
+            "https://search.naver.com/",
+            "https://www.daum.net/"
+    );
+
+    private static final String ACCEPT_HEADER = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8";
+    private static final String ACCEPT_LANGUAGE = "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7";
+
     // HTML 검색 요청 상수
+    private static final Random RANDOM = new Random();
     private static final String USER_AGENT_CONTENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
     private static final String URL_GOOGLE = "https://www.google.com";
-    private static final Duration TIMEOUT = Duration.ofSeconds(5);
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
     private static final int THRESHOLD_LENGTH = 200;
+    private static final long BASE_DELAY_MS = 2000;
 
     // 각 사이트마다 사용하는 selector
-    private static final Set<String> SELECTORS_DESCRIPTION = Set.of(
-            // 네이버 뉴스
-            "#dic_area", ".newsct_article", ".go_trans._article_content",
-            ".media_end_body", "#newsct_article", "#content",
+    private static final String SELECTORS_NAVER_NEWS = "#dic_area, .newsct_article, .go_trans._article_content";
+    private static final String SELECTORS_NAVER_NEWS_MOBILE = "#dic_area, .media_end_body, #newsct_article, #content, .newsct_article";
+    private static final String SELECTORS_ARTICLE = "article";
+    private static final String SELECTORS_GOODNEWS = "#article-view-content-div";
+    private static final String SELECTORS_ASIATODAY = ".news_bm, #font";
+    private static final String SELECTORS_ETODAY = ".articleView";
+    private static final String SELECTORS_NEWS2DAY = ".view_con_wrap:nth-child(2) body";
+    private static final String SELECTORS_ETC =
+            "#articleContent, .newsview_content, #article .content, #content, #news_body, #articleBody, .article-body, .article-content, " +
+                    ".art_txt, .content-wrapper, .news_article, .read_txt, .view_cont, .nodeContentTitle, .news_body, .content-area, #article-view-content-div";
 
-            // 주요 언론사
-            "article", "#article-view-content-div", ".news_bm, #font",
-            ".articleView", ".view_con_wrap:nth-child(2) body",
-
-            // 기타 사이트들 (개별 분리)
-            "#articleContent", ".newsview_content", "#article .content",
-            "#news_body", "#articleBody", ".article-body",
-            ".article-content", ".art_txt", ".content-wrapper",
-            ".news_article", ".read_txt", ".view_cont",
-            ".nodeContentTitle", ".news_body", ".content-area"
+    private static final List<String> SELECTORS_DESCRIPTION = List.of(
+            SELECTORS_NAVER_NEWS, SELECTORS_NAVER_NEWS_MOBILE, SELECTORS_ARTICLE, SELECTORS_GOODNEWS,
+            SELECTORS_ASIATODAY, SELECTORS_ETODAY, SELECTORS_NEWS2DAY, SELECTORS_ETC
     );
 
     // 이미지 추출 selector
@@ -91,7 +109,6 @@ public class NewsCrawlingUtils {
             // [4] 추출한 정보를 DTO에 담아 반환
             return NewsDto.CrawlResult.success(description, thumbnail, publisher);
 
-
         } catch (Exception e) {
             LogUtils.showWarn(NewsCrawlingUtils.class, "크롤링 실패! 추출 시도 기사 URL : %s, 예외 메세지 : %s", newsUrl, e.getMessage());
             return NewsDto.CrawlResult.fail();
@@ -100,13 +117,30 @@ public class NewsCrawlingUtils {
 
 
     // 뉴스 URL 기반 크롤 환경으로 접속
-    private static Document connectToUrl(String url) throws IOException {
+    private static Document connectToUrl(String url) throws IOException, InterruptedException {
+
+        // 랜덤한 userAgent, referrer 선택
+        String userAgent = USER_AGENTS.get(RANDOM.nextInt(USER_AGENTS.size()));
+        String referrer = REFERRERS.get(RANDOM.nextInt(REFERRERS.size()));
+        log.warn("userAgent = {}, referrer = {}", userAgent, referrer);
+
+        // 임시 대기
+        long jitter = ThreadLocalRandom.current().nextLong(-BASE_DELAY_MS / 2, BASE_DELAY_MS / 2 + 1);
+        TimeUnit.MILLISECONDS.sleep(BASE_DELAY_MS + jitter);
+
+        // 크롤링 수행 및 반환
         return Jsoup.connect(url)
-                .userAgent(USER_AGENT_CONTENT)
-                .referrer(URL_GOOGLE) // 구글에서 검색해서 온 것 처럼 취급
+                .userAgent(userAgent)
+                .referrer(referrer)
+                .header("Accept", ACCEPT_HEADER)
+                .header("Accept-Language", ACCEPT_LANGUAGE)
+                .header("Accept-Encoding", "gzip, deflate")
+                .header("Upgrade-Insecure-Requests", "1")
+                .header("Sec-Fetch-Dest", "document")
+                .header("Sec-Fetch-Mode", "navigate")
+                .header("Sec-Fetch-Site", "cross-site")
                 .timeout((int) TIMEOUT.toMillis())
-                //.maxBodySize(MAX_BODY_SIZE) // body 크기 제한
-                .ignoreHttpErrors(true) // HTTP 에러 무시하고 빠르게 실패
+                .ignoreHttpErrors(true)
                 .get();
     }
 

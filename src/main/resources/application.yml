@@ -15,6 +15,12 @@ spring:
     active: ${ACTIVE_PROFILE}
 
 
+## 로깅 레벨
+logging:
+  level:
+    org.openqa.selenium.devtools: ERROR
+    org.openqa.selenium.chromium: ERROR
+
 ### 서버 포트 ###
 
 server:

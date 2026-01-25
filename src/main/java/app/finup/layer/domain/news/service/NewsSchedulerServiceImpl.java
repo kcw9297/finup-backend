@@ -138,8 +138,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 requests,
             request -> new StockNewsResponse(newsClient.getLatest(request.stockName, AMOUNT_NEWS_STOCK, NewsSortType.RELATED), request.stockCode(), request.stockName()),
                 ParallelUtils.SEMAPHORE_API_NAVER_NEWS,
-                newsApiExecutor,
-                Duration.ofMillis(500)
+                newsApiExecutor
         ).stream()
             .map(response -> // 검색 결과 필터링
                     Map.entry(response.stockCode, NewsFilterUtils.filter(response.stocks, NewsFilter.FILTER_KEYWORD_STOCK))
@@ -169,7 +168,8 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                         crawlingRequest,
                         request -> toStockNewsEntity(request.row(), request.stockCode()),
                         ParallelUtils.SEMAPHORE_NEWS_CRAWLING,
-                        crawlingExecutor)
+                        crawlingExecutor,
+                        Duration.ofMillis(500))
                 .stream()
                 .filter(Objects::nonNull)
                 .filter(entity -> NewsFilterUtils.isDescriptionValid(entity.getDescription()))
