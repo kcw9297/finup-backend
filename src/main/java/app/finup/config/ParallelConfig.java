@@ -45,11 +45,11 @@ public class ParallelConfig {
 
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                20, // corePoolSize: 항상 유지할 스레드
-                40, // maxPoolSize: 최대 스레드
-                120L, // keepAliveTime (스레드 최대 생존 시간)
+                5, // corePoolSize: 기본 스레드 개수
+                10, // maxPoolSize: 최대 스레드 (큐가 가득 차면 추가 스레드 생성을 수행하는데, 그 경우 최대 한도)
+                60L, // keepAliveTime (스레드 최대 생존 시간)
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(150),  // 작업 대기 큐 크기
+                new SynchronousQueue<>(),  // 작업 큐 사용 안함
                 new CustomThreadFactory(PREFIX_CRAWLING), // 스레드를 구분할 PREFIX
                 new ThreadPoolExecutor.CallerRunsPolicy()  // 작업 대기 큐가 가득 찬 경우 전략 (호출한 스레드가 실행)
         );
@@ -64,13 +64,13 @@ public class ParallelConfig {
 
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                5, // corePoolSize: 항상 유지할 스레드
-                10, // maxPoolSize: 최대 스레드
-                120L, // keepAliveTime (스레드 최대 생존 시간)
+                5,
+                10,
+                60L,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(50),  // 작업 대기 큐 크기
-                new CustomThreadFactory(PREFIX_API_NEWS), // 스레드를 구분할 PREFIX
-                new ThreadPoolExecutor.CallerRunsPolicy()  // 작업 대기 큐가 가득 찬 경우 전략 (호출한 스레드가 실행)
+                new LinkedBlockingQueue<>(50),
+                new CustomThreadFactory(PREFIX_API_NEWS),
+                new ThreadPoolExecutor.CallerRunsPolicy()
         );
         executor.allowCoreThreadTimeOut(true);
         return executor;
@@ -83,13 +83,13 @@ public class ParallelConfig {
 
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                10,  // corePoolSize: 항상 유지할 스레드
-                20,  // maxPoolSize: 최대 스레드
-                90L, // keepAliveTime (스레드 최대 생존 시간)
+                5,
+                10,
+                60L,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(100),  // 작업 대기 큐 크기
-                new CustomThreadFactory(PREFIX_API_STOCK), // 스레드를 구분할 PREFIX
-                new ThreadPoolExecutor.CallerRunsPolicy()  // 작업 대기 큐가 가득 찬 경우 전략 (호출한 스레드가 실행)
+                new LinkedBlockingQueue<>(50),
+                new CustomThreadFactory(PREFIX_API_STOCK),
+                new ThreadPoolExecutor.CallerRunsPolicy()
         );
         executor.allowCoreThreadTimeOut(true);
         return executor;
@@ -102,13 +102,13 @@ public class ParallelConfig {
 
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                10,  // corePoolSize: 항상 유지할 스레드
-                20,  // maxPoolSize: 최대 스레드
-                60L, // keepAliveTime (스레드 최대 생존 시간)
+                10,  // corePoolSize
+                20,  // maxPoolSize
+                60L, // keepAliveTime
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(100),  // 작업 대기 큐 크기
-                new CustomThreadFactory(PREFIX_API_EMBEDDING), // 스레드를 구분할 PREFIX
-                new ThreadPoolExecutor.CallerRunsPolicy()  // 작업 대기 큐가 가득 찬 경우 전략 (호출한 스레드가 실행)
+                new LinkedBlockingQueue<>(50),
+                new CustomThreadFactory(PREFIX_API_EMBEDDING),
+                new ThreadPoolExecutor.CallerRunsPolicy()
         );
         executor.allowCoreThreadTimeOut(true);
         return executor;
