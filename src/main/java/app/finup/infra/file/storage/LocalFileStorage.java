@@ -61,7 +61,7 @@ public class LocalFileStorage implements FileStorage {
             if (!dir.exists()) dir.mkdirs();
 
             // [3] 파일 업로드
-            file.transferTo(new File(filePath)); // 파일 업로드
+            file.transferTo(new File(storePath)); // 파일 업로드
 
         } catch (ProviderException e) {
             throw e;

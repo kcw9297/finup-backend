@@ -63,8 +63,8 @@ public class NewsCrawlingUtils {
     private static final String SELECTORS_ETODAY = ".articleView";
     private static final String SELECTORS_NEWS2DAY = ".view_con_wrap:nth-child(2) body";
     private static final String SELECTORS_ETC =
-            "#articleContent, .newsview_content, #article .content, #content, #news_body, #articleBody, .article-body, .article-content, " +
-                    ".art_txt, .content-wrapper, .news_article, .read_txt, .view_cont, .nodeContentTitle, .news_body, .content-area, #article-view-content-div";
+            "#articleContent, .newsview_content, #article .content, #content, #news_body, #articleBody, .article-body, .article-content, .detail_editor, " +
+            ".art_txt, .content-wrapper, .news_article, .read_txt, .view_cont, .nodeContentTitle, .news_body, .content-area, #article-view-content-div";
 
     private static final List<String> SELECTORS_DESCRIPTION = List.of(
             SELECTORS_NAVER_NEWS, SELECTORS_NAVER_NEWS_MOBILE, SELECTORS_ARTICLE, SELECTORS_GOODNEWS,
@@ -122,7 +122,7 @@ public class NewsCrawlingUtils {
         // 랜덤한 userAgent, referrer 선택
         String userAgent = USER_AGENTS.get(RANDOM.nextInt(USER_AGENTS.size()));
         String referrer = REFERRERS.get(RANDOM.nextInt(REFERRERS.size()));
-        log.warn("userAgent = {}, referrer = {}", userAgent, referrer);
+        //log.warn("userAgent = {}, referrer = {}", userAgent, referrer);
 
         // 임시 대기
         long jitter = ThreadLocalRandom.current().nextLong(-BASE_DELAY_MS / 2, BASE_DELAY_MS / 2 + 1);

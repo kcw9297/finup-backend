@@ -93,6 +93,10 @@ public enum AppStatus {
     /* 회원 Member */
     MEMBER_NOT_FOUND(400, "회원 정보가 존재하지 않습니다.", "MEMBER_NOT_FOUND"),
     MEMBER_DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.", "MEMBER_DUPLICATE_NICKNAME"),
+    MEMBER_EQUAL_PASSWORD(400, "이전과 다른 비밀번호로 변경해 주세요.", "MEMBER_EQUAL_PASSWORD"),
+    MEMBER_OK_EDIT_NICKNAME(200, "닉네임을 변경했습니다.", "MEMBER_OK_EDIT_NICKNAME"),
+    MEMBER_OK_EDIT_PROFILE(200, "프로필 이미지를 변경했습니다.", "MEMBER_OK_EDIT_PROFILE"),
+    MEMBER_OK_EDIT_PASSWORD(200, "비밀번호를 변경했습니다.", "MEMBER_OK_EDIT_PASSWORD"),
 
     /* 단계 학습 Study */
     STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),

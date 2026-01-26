@@ -3,6 +3,9 @@ package app.finup.security.filter;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.JwtVerifyException;
 import app.finup.common.utils.Api;
+import app.finup.infra.file.storage.FileStorage;
+import app.finup.security.dto.LoginMember;
+import app.finup.security.service.SecurityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +43,8 @@ import java.util.Objects;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // 사용 의존성
+    private final SecurityService securityService;
+    private final FileStorage fileStorage;
     private final JwtProvider jwtProvider;
     private final CookieProvider cookieProvider;
 
@@ -152,14 +157,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // JWT Claims 정보 기반 UserDetails 생성
     private CustomUserDetails setUserDetails(JwtClaims jwtClaims) {
 
+        // [1] Claims 정보
+        Long memberId = jwtClaims.getMemberId();
+
+        // [2] 회원 정보
+        LoginMember loginMember = securityService.getLoginMember(memberId);
+
+        // [2] 회원 조회 정보
         return CustomUserDetails.builder()
-                .memberId(jwtClaims.getMemberId())
-                .email(jwtClaims.getEmail())
-                .nickname(jwtClaims.getNickname())
-                .role(jwtClaims.getRole())
-                .social(jwtClaims.getSocial())
-                .profileImageUrl(jwtClaims.getProfileImageUrl())
-                .authorities(List.of(new SimpleGrantedAuthority(MemberRole.valueOf(jwtClaims.getRole()).getAuthority())))
+                .memberId(memberId)
+                .email(loginMember.getEmail())
+                .nickname(loginMember.getNickname())
+                .role(loginMember.getRole())
+                .social(loginMember.getSocial())
+                .profileImageUrl(loginMember.getProfileImageUrl())
+                .authorities(List.of(new SimpleGrantedAuthority(MemberRole.valueOf(loginMember.getRole()).getAuthority())))
                 .build();
     }
 }

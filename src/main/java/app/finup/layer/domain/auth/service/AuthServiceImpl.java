@@ -85,13 +85,6 @@ public class AuthServiceImpl implements AuthService {
         log.info("[AUTH] 회원가입 이메일 인증 성공. email={}", email);
     }
 
-    @Override
-    public MemberDto.Detail getProfile(Long memberId) {
-        Member member = memberRepository.findByIdWithProfileImage(memberId)
-                .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
-
-        return MemberDtoMapper.toDetail(member);
-    }
 
     // 내부 유틸: 6자리 난수 생성 (000000 ~ 999999)
     private String createVerificationCode() {

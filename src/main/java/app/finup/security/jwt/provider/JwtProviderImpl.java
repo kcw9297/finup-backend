@@ -70,11 +70,6 @@ public class JwtProviderImpl implements JwtProvider {
         Map<String, Object> claims = new ConcurrentHashMap<>();
         claims.put(Const.JTI, jti);
         claims.put(Const.MEMBER_ID, userDetails.getMemberId());
-        claims.put(Const.EMAIL, userDetails.getEmail());
-        claims.put(Const.NICKNAME, userDetails.getNickname());
-        claims.put(Const.IS_ACTIVE, userDetails.getIsActive());
-        claims.put(Const.ROLE, userDetails.getRole());
-        claims.put(Const.SOCIAL, userDetails.getSocial());
         return claims;
     }
 
@@ -115,7 +110,7 @@ public class JwtProviderImpl implements JwtProvider {
 
 
     @Override
-    public void logout(String at) {
+    public void invalidateRefreshToken(String at) {
 
         // [1] AT 내 jti 조회 (만료되어도 예외가 발생하지 않도록 조회)
         String jti = jwtGenerator.verifyAndGetExpiredJti(at);

@@ -92,10 +92,6 @@ public class JwtGeneratorImpl implements JwtGenerator {
         return JwtClaims.builder()
                 .jti(claims.get(Const.JTI, String.class))
                 .memberId(claims.get(Const.MEMBER_ID, Long.class))
-                .email(claims.get(Const.EMAIL, String.class))
-                .nickname( claims.get(Const.NICKNAME, String.class))
-                .role(claims.get(Const.ROLE, String.class))
-                .social(claims.get(Const.SOCIAL, String.class))
                 .build();
     }
 

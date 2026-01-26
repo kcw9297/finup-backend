@@ -30,8 +30,8 @@ public interface JwtProvider {
 
 
     /**
-     * 로그아웃 - RT 무효화
+     * RT 무효화
      * @param at JWT AccessToken
      */
-    void logout(String at);
+    void invalidateRefreshToken(String at);
 }

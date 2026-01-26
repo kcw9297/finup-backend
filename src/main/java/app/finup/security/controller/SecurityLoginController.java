@@ -2,7 +2,7 @@ package app.finup.security.controller;
 
 import app.finup.common.constant.Const;
 import app.finup.common.constant.Url;
-import app.finup.layer.domain.auth.dto.AuthDtoMapper;
+import app.finup.security.dto.LoginMemberProfile;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import app.finup.common.enums.AppStatus;
@@ -72,7 +72,7 @@ public class SecurityLoginController {
 
         // [5] AT 정보를 쿠키에 담아 전달 후, 성공 응답 전달
         cookieProvider.createCookie(response, jwtCookieName, jwt, jwtCookieExpiration);
-        return Api.ok(AppStatus.AUTH_OK_LOGIN, AuthDtoMapper.toLoginMember(userDetails));
+        return Api.ok(AppStatus.AUTH_OK_LOGIN, LoginMemberProfile.of(userDetails));
     }
 
 
@@ -88,7 +88,7 @@ public class SecurityLoginController {
 
         // [2] 만약, AT가 존재하고 만료된 상태가 아니라면 토큰 무효화 수행
         if (Objects.nonNull(at) && Objects.isNull(request.getAttribute(AppStatus.TOKEN_EXPIRED.name()))) {
-            jwtProvider.logout(at); // Redis 내 RT 제거
+            jwtProvider.invalidateRefreshToken(at); // Redis 내 RT 제거
             cookieProvider.invalidateCookie(response, jwtCookieName); // AT Cookie 무효화
             cookieProvider.invalidateCookie(response, Const.XSRF_TOKEN); // XSRF 토큰 무효화
         }
