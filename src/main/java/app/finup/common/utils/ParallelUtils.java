@@ -32,7 +32,7 @@ public final class ParallelUtils {
     // SEMAPHORE (최대 작업 스레드 제한)
     public static final Semaphore SEMAPHORE_UNLIMITED = new Semaphore(Integer.MAX_VALUE);
     public static final Semaphore SEMAPHORE_OPENAI_EMBEDDING = new Semaphore(10);
-    public static final Semaphore SEMAPHORE_NEWS_CRAWLING_NAVER = new Semaphore(3);
+    public static final Semaphore SEMAPHORE_NEWS_CRAWLING_NAVER = new Semaphore(7);
     public static final Semaphore SEMAPHORE_NEWS_CRAWLING_ETC = new Semaphore(10);
     public static final Semaphore SEMAPHORE_API_NAVER_NEWS = new Semaphore(5);
     public static final Semaphore SEMAPHORE_API_STOCK = new Semaphore(5);
@@ -40,8 +40,8 @@ public final class ParallelUtils {
     // 최대 재시도 횟수 (지금은 그냥 여기서 일괄 통제)
     private static final int MAX_RETRY = 5;
     private static final Duration MIN_429_RETRY_WAIT = Duration.ofSeconds(1); // 429 재시도 시 최소 대기시간
-    private static final Duration MAX_429_RETRY_WAIT = Duration.ofSeconds(30); // 429 재시도 시 최소 대기시간
-    private static final Duration RETRY_WAIT_ALL_JITTER = Duration.ofSeconds(2); // 일괄 대기시간에 부여하는 JITTER
+    private static final Duration MAX_429_RETRY_WAIT = Duration.ofSeconds(5); // 429 재시도 시 최소 대기시간
+    private static final Duration RETRY_WAIT_ALL_JITTER = Duration.ofMillis(500); // 일괄 대기시간에 부여하는 JITTER
     private static final Duration MAX_RETRY_WAIT_ALL = Duration.ofSeconds(60); // 일괄 대기 최대 대기시간
 
 
@@ -182,14 +182,14 @@ public final class ParallelUtils {
 
         // [2] 시작 로그 및 시작시간 측정
         log.info("""
-                
-                ┌─ PARALLEL WORK START ────────────────────────────────────────────────────────────
-                │ 수행 작업명\t\t\t{}
-                │ 총 작업 수\t\t\t{}
-                │ Worker 수\t\t\t{}
-                │ 시작 시간\t\t\t{}
-                └───────────────────────────────────────────────────────────────────────────────
-                """, workName, items.size(), maxWorkers, TimeUtils.formatDateTime(LocalDateTime.now()));
+        
+        ┌─ PARALLEL WORK START ────────────────────────────────────────────────────────────
+        │ 수행 작업명\t\t\t{}
+        │ 총 작업 수\t\t\t{}
+        │ Worker 수\t\t\t{}
+        │ 시작 시간\t\t\t{}
+        └───────────────────────────────────────────────────────────────────────────────
+        """, workName, items.size(), maxWorkers, TimeUtils.formatDateTime(TimeUtils.getNowLocalDateTime()));
 
         // [3] 작업 시작 전 필요 값 정의
         long startTime = System.currentTimeMillis(); // 시작 시간
@@ -207,17 +207,16 @@ public final class ParallelUtils {
 
             // 작업 결과 로그 출력
             log.info("""
-                            
-                            ┌─ PARALLEL WORK COMPLETED  ───────────────────────────────────────────────────────
-                            │ 수행 작업명\t\t\t\t{}
-                            │ 총 처리 작업 수\t\t\t{}/{}
-                            │ 성공/실패 작업 수\t\t성공: {}\t\t실패: {}
-                            │ 소요 시간\t\t\t\t{}
-                            │ 종료 시간\t\t\t\t{}
-                            └───────────────────────────────────────────────────────────────────────────────
-                            """, workName, totalProcessed.get(), items.size(),
-                    totalProcessed.get(), failedItems.size(),
-                    LogUtils.calculateCost(startTime), TimeUtils.formatDateTime(LocalDateTime.now()));
+            
+            ┌─ PARALLEL WORK COMPLETED  ───────────────────────────────────────────────────────
+            │ 수행 작업명\t\t\t\t{}
+            │ 총 처리 작업 수\t\t\t{}/{}
+            │ 성공/실패 작업 수\t\t성공: {}\t\t실패: {}
+            │ 소요 시간\t\t\t\t{}
+            │ 종료 시간\t\t\t\t{}
+            └───────────────────────────────────────────────────────────────────────────────
+            """, workName, totalProcessed.get(), items.size(), totalProcessed.get(), failedItems.size(),
+                    LogUtils.calculateCost(startTime), TimeUtils.formatDateTime(TimeUtils.getNowLocalDateTime()));
 
 
         } catch (TimeoutException e) {

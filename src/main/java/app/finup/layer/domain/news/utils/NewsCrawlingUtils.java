@@ -48,7 +48,7 @@ public class NewsCrawlingUtils {
     private static final Random RANDOM = new Random();
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
     private static final int LENGTH_MIN_DESCRIPTION = 600;
-    private static final long BASE_DELAY_MS = 500;
+    private static final long BASE_DELAY_MS = 200;
 
     // 각 사이트마다 사용하는 selector
     private static final String SELECTOR_META_DESCRIPTION = "meta[property=og:description]";
