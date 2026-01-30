@@ -31,16 +31,14 @@ public final class ParallelUtils {
 
     // SEMAPHORE (최대 작업 스레드 제한)
     public static final Semaphore SEMAPHORE_UNLIMITED = new Semaphore(Integer.MAX_VALUE);
-    public static final Semaphore SEMAPHORE_OPENAI_EMBEDDING = new Semaphore(10);
-    public static final Semaphore SEMAPHORE_NEWS_CRAWLING_NAVER = new Semaphore(7);
+    public static final Semaphore SEMAPHORE_NEWS_CRAWLING_NAVER = new Semaphore(3);
     public static final Semaphore SEMAPHORE_NEWS_CRAWLING_ETC = new Semaphore(10);
-    public static final Semaphore SEMAPHORE_API_NAVER_NEWS = new Semaphore(5);
-    public static final Semaphore SEMAPHORE_API_STOCK = new Semaphore(5);
+    public static final Semaphore SEMAPHORE_SYNC_STOCK = new Semaphore(5);
 
     // 최대 재시도 횟수 (지금은 그냥 여기서 일괄 통제)
     private static final int MAX_RETRY = 5;
     private static final Duration MIN_429_RETRY_WAIT = Duration.ofSeconds(1); // 429 재시도 시 최소 대기시간
-    private static final Duration MAX_429_RETRY_WAIT = Duration.ofSeconds(5); // 429 재시도 시 최소 대기시간
+    private static final Duration MAX_429_RETRY_WAIT = Duration.ofSeconds(10); // 429 재시도 시 최소 대기시간
     private static final Duration RETRY_WAIT_ALL_JITTER = Duration.ofMillis(500); // 일괄 대기시간에 부여하는 JITTER
     private static final Duration MAX_RETRY_WAIT_ALL = Duration.ofSeconds(60); // 일괄 대기 최대 대기시간
 
@@ -86,7 +84,6 @@ public final class ParallelUtils {
 
     /**
      * 병렬 작업 수행 (입력, 반환 값 존재)
-     *
      * @param <T>             입력 타입
      * @param <R>             반환 타입
      * @param workName        수행 작업명
@@ -109,7 +106,6 @@ public final class ParallelUtils {
 
     /**
      * 병렬 작업 수행 (입력, 반환 값 존재)
-     *
      * @param <T>             입력 타입
      * @param <R>             반환 타입
      * @param workName        수행 작업명
@@ -117,7 +113,7 @@ public final class ParallelUtils {
      * @param mappingTask     각 아이템에 적용할 함수
      * @param semaphore       최대 동시 실행 제한
      * @param executorService 병렬 처리를 제어할 ExecutorService
-     * @param delay           작업 시작 전 부여할 딜레이
+     * @param delay           각 작업 완료 후 부여할 딜레이
      * @return 모든 작업의 결과 리스트 (순서 보장 X)
      */
     public static <T, R> List<R> doParallelTask(
@@ -133,7 +129,7 @@ public final class ParallelUtils {
 
 
     /**
-     * 병렬 작업 수행 (반환 값 존재, 입력 값 없음)
+     * 병렬 작업 수행 (반환 값 없음, 입력 값 존재)
      *
      * @param <T>             입력 타입
      * @param workName        수행 작업명
@@ -151,6 +147,29 @@ public final class ParallelUtils {
 
         // Consumer를 Function으로 변환 (반환값 Void)
         doParallel(workName, items, item -> doAccept(task, item), semaphore, executorService, Duration.ZERO);
+    }
+
+
+    /**
+     * 병렬 작업 수행 (반환 값 없음, 입력 값 존재)
+     * @param <T>             입력 타입
+     * @param workName        수행 작업명
+     * @param items           처리할 아이템 리스트
+     * @param task            각 아이템에 적용할 함수
+     * @param semaphore       최대 동시 실행 제한
+     * @param executorService 병렬 처리를 제어할 ExecutorService
+     * @param delay           각 작업 완료 후 부여할 딜레이
+     */
+    public static <T> void doParallelConsume(
+            String workName,
+            Collection<T> items,
+            Consumer<T> task,
+            Semaphore semaphore,
+            ExecutorService executorService,
+            Duration delay) {
+
+        // Consumer를 Function으로 변환 (반환값 Void)
+        doParallel(workName, items, item -> doAccept(task, item), semaphore, executorService, delay);
     }
 
 

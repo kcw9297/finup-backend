@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -100,7 +101,7 @@ public class WordsServiceImpl implements WordsService {
                                 "OPENAI Embedding",
                                 chunks,
                                 embeddingProvider::generate,
-                                ParallelUtils.SEMAPHORE_OPENAI_EMBEDDING,
+                                new Semaphore(10),
                                 embeddingApiExecutor
                         ).stream()
                         .flatMap(map -> map.entrySet().stream())

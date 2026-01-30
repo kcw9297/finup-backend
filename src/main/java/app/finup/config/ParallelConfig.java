@@ -25,8 +25,9 @@ public class ParallelConfig {
     // 사용 상수
     private static final String PREFIX = "P-";
     private static final String PREFIX_CRAWLING = PREFIX + "CRAWLING-";
+    private static final String PREFIX_SYNC = PREFIX + "SYNC-";
+    private static final String PREFIX_SYNC_NEWS = PREFIX_SYNC + "NEWS-";
     private static final String PREFIX_API = PREFIX + "API-";
-    private static final String PREFIX_API_NEWS = PREFIX_API + "NEWS-";
     private static final String PREFIX_API_STOCK = PREFIX_API + "STOCK-";
     private static final String PREFIX_API_EMBEDDING = PREFIX_API + "EMBEDDING-";
 
@@ -46,10 +47,10 @@ public class ParallelConfig {
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
                 20, // corePoolSize: 기본 스레드 개수
-                30, // maxPoolSize: 최대 스레드 (큐가 가득 차면 추가 스레드 생성을 수행하는데, 그 경우 최대 한도)
+                100, // maxPoolSize: 최대 스레드 (큐가 가득 차면 추가 스레드 생성을 수행하는데, 그 경우 최대 한도)
                 60L, // keepAliveTime (스레드 최대 생존 시간)
                 TimeUnit.SECONDS,
-                new SynchronousQueue<>(),  // 작업 큐 사용 안함
+                new LinkedBlockingQueue<>(50),
                 new CustomThreadFactory(PREFIX_CRAWLING), // 스레드를 구분할 PREFIX
                 new ThreadPoolExecutor.CallerRunsPolicy()  // 작업 대기 큐가 가득 찬 경우 전략 (호출한 스레드가 실행)
         );
@@ -59,17 +60,17 @@ public class ParallelConfig {
 
 
     // 뉴스 API 호출 전용
-    @Bean(name = "newsApiExecutor")
-    public ExecutorService newsApiExecutor() {
+    @Bean(name = "syncNewsExecutor")
+    public ExecutorService syncNewsExecutor() {
 
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                5,
                 10,
+                20,
                 60L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<>(50),
-                new CustomThreadFactory(PREFIX_API_NEWS),
+                new CustomThreadFactory(PREFIX_SYNC_NEWS),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         );
         executor.allowCoreThreadTimeOut(true);
@@ -124,7 +125,7 @@ public class ParallelConfig {
         // [1] 현재 사용중인 모든 Executor Map 생성 (추후 추가 시 여기에 추가)
         Map<ExecutorService, String> executorPrefixMap = Map.of(
                 crawlingExecutor(), PREFIX_CRAWLING,
-                newsApiExecutor(), PREFIX_API_NEWS,
+                syncNewsExecutor(), PREFIX_SYNC_NEWS,
                 stockApiExecutor(), PREFIX_API_STOCK,
                 embeddingApiExecutor(), PREFIX_API_EMBEDDING
         );

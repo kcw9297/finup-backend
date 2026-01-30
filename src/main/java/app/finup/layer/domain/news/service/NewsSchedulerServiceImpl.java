@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -46,7 +47,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
     private final StockRedisStorage stockRedisStorage;
 
     // 병렬 로직을 제어할 의존성
-    private final ExecutorService newsApiExecutor;
+    private final ExecutorService syncNewsExecutor;
     private final ExecutorService crawlingExecutor;
 
     // 사용 상수
@@ -55,8 +56,9 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
     private static final Duration THRESHOLD_SAVE = Duration.ofDays(30); // 약 1달 정도 기사까진 보존
     private static final int AMOUNT_NEWS_MAIN = 100; // 검색 기사 수량
     private static final int AMOUNT_NEWS_STOCK = 50; // 검색 기사 수량
-    private static final Duration WAIT_SYNC_STOCK = Duration.ofMillis(2000);
-    private static final Duration WAIT_CRAWL_NAVER = Duration.ofMillis(1000);
+    private static final Duration WAIT_SYNC_STOCK = Duration.ofMillis(3000);
+    private static final Duration WAIT_CRAWL_INTERVAL = Duration.ofMillis(1000);
+    private static final Duration WAIT_CRAWL_NAVER = Duration.ofMillis(1500);
 
 
     @CacheEvict( // 기존 캐시 삭제
@@ -128,32 +130,13 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
         int tryStocks = requests.size();
 
         // [5] 종목별 순차 처리 (예외 격리)
-        requests.forEach(request -> {
-            try {
-                // 동기화 수행 후 결과 통계정보 얻어옴
-                SyncStockNewsResponse response =
-                        processSyncSingleStock(request, curEntityMap, totalSearched, totalTitleFiltered, totalSaved);
-
-                // 성공 카운팅 후 로그 출력
-                successStocks.incrementAndGet();
-                LogUtils.showInfo(this.getClass(), LogEmoji.OK,
-                        "[%d/%d] 종목 [%s(%s)] 처리 완료. 검색: [%,d]개, 필터링: [%,d]개, 저장: [%,d]개",
-                        processedStocks.incrementAndGet(), tryStocks, request.stockName, request.stockCode,
-                        response.apiSearchAmount, response.afterFilteredAmount, response.savedAmount
-                );
-
-            } catch (Exception e) {
-                failedStocks.incrementAndGet();
-                LogUtils.showWarn(this.getClass(),
-                        "[%d/%d] 종목 [%s(%s)] 처리 실패.  원인: %s",
-                        processedStocks.incrementAndGet(), tryStocks, request.stockName, request.stockCode, e.getMessage()
-                );
-
-                // 완료 후 일정 시간 대기
-            } finally {
-                ParallelUtils.wait(WAIT_SYNC_STOCK, this.getClass());
-            }
-        });
+        ParallelUtils.doParallelConsume(
+                "종목 뉴스 크롤링 병렬 처리",
+                requests,
+                request -> processSyncStock(request, curEntityMap, totalSearched, totalTitleFiltered, totalSaved, successStocks, processedStocks, tryStocks, failedStocks),
+                ParallelUtils.SEMAPHORE_SYNC_STOCK,
+                syncNewsExecutor
+        );
 
         // [6] 최종 결과 로그
         LogUtils.showInfo(this.getClass(), LogEmoji.OK,
@@ -161,6 +144,39 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 requests.size(), failedStocks.get(),
                 totalSearched.get(), totalTitleFiltered.get(), totalSaved.get()
         );
+    }
+
+
+    // 주식 뉴스 크롤링 수행
+    private void processSyncStock(
+            StockNewsRequest request, Map<String, List<News>> curEntityMap,
+            AtomicInteger totalSearched, AtomicInteger totalTitleFiltered, AtomicInteger totalSaved, AtomicInteger successStocks, AtomicInteger processedStocks, int tryStocks, AtomicInteger failedStocks
+    ) {
+
+        try {
+            // 동기화 수행 후 결과 통계정보 얻어옴
+            SyncStockNewsResponse response =
+                    processSyncSingleStock(request, curEntityMap, totalSearched, totalTitleFiltered, totalSaved);
+
+            // 성공 카운팅 후 로그 출력
+            successStocks.incrementAndGet();
+            LogUtils.showInfo(this.getClass(), LogEmoji.OK,
+                    "[%d/%d] 종목 [%s(%s)] 처리 완료. 검색: [%,d]개, 필터링: [%,d]개, 저장: [%,d]개",
+                    processedStocks.incrementAndGet(), tryStocks, request.stockName, request.stockCode,
+                    response.apiSearchAmount, response.afterFilteredAmount, response.savedAmount
+            );
+
+        } catch (Exception e) {
+            failedStocks.incrementAndGet();
+            LogUtils.showWarn(this.getClass(),
+                    "[%d/%d] 종목 [%s(%s)] 처리 실패.  원인: %s",
+                    processedStocks.incrementAndGet(), tryStocks, request.stockName, request.stockCode, e.getMessage()
+            );
+
+            // 완료 후 일정 시간 대기
+        } finally {
+            ParallelUtils.wait(WAIT_SYNC_STOCK, this.getClass());
+        }
     }
 
     // 단일 종목 처리
@@ -182,6 +198,9 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 NewsSortType.RELATED
         );
         totalSearched.addAndGet(apiResults.size());
+
+        // 네이버 뉴스 완료 후 잠시 대기
+        ParallelUtils.wait(WAIT_CRAWL_INTERVAL, this.getClass());
 
         // [2] 제목 필터링
         List<News> curStockNews = curEntityMap.getOrDefault(stockCode, List.of());
@@ -218,7 +237,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
             if (news.isEmpty()) return 0; // 처리 개수가 없으므로 0 반환 후 중단
 
             // [2] 크롤링 수행 및 결과 본문 유사도 비교
-            List<News> crawledNews = doCrawlingStockNewsAndMapToEntity(taskName, news, crawler);
+            List<News> crawledNews = doCrawlingStockNewsAndMapToEntity(news, crawler);
             List<News> filteredNews = NewsFilterUtils.filterSimilarDescription(crawledNews, currentNews, false);
 
             // [3] 저장 수행
@@ -237,7 +256,6 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
     // 크롤링 수행 및 크롤링 결과 기사 정보를 기사 엔티티로 변경
     private <T extends NewsObject> List<News> doCrawlingStockNewsAndMapToEntity(
-            String message,
             List<T> crawlingRequest,
             Function<T, News> crawler
     ) {
@@ -259,7 +277,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 });
 
         // 크롤링 수행 후, 결과 필터링
-        return doCrawlingStockNews(message, naverNewsRequest, etcNewsRequest, crawler)
+        return doCrawlingStockNews(naverNewsRequest, etcNewsRequest, crawler)
                 .filter(Objects::nonNull)
                 .filter(entity -> NewsFilterUtils.isDescriptionValid(entity.getDescription()))
                 .toList();
@@ -267,30 +285,32 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
     // 종목 뉴스 크롤링 수행 처리 메소드
     private <T extends NewsObject> Stream<News> doCrawlingStockNews(
-            String message,
             List<T> naverNewsRequest,
             List<T> etcNewsRequest,
             Function<T, News> crawler
     ) {
 
-        // [1] 병렬 처리를 콜렉션 선언
-        List<Supplier<List<News>>> tasks = new ArrayList<>();
-        tasks.add(() -> ParallelUtils.doParallelTask(
-                "네이버 뉴스 크롤링", naverNewsRequest, crawler, ParallelUtils.SEMAPHORE_NEWS_CRAWLING_NAVER, crawlingExecutor, WAIT_CRAWL_NAVER
-        ));
-        tasks.add(() -> ParallelUtils.doParallelTask(
-                "기타 뉴스 크롤링", etcNewsRequest, crawler, ParallelUtils.SEMAPHORE_NEWS_CRAWLING_ETC, crawlingExecutor
-        ));
+        // [1] 네이버 뉴스 크롤링 수행
+        Stream<News> naverNews = ParallelUtils.doParallelTask(
+                "네이버 뉴스 크롤링",
+                naverNewsRequest,
+                crawler,
+                ParallelUtils.SEMAPHORE_NEWS_CRAWLING_NAVER, // 공유 세마포어 사용 (Rate Limit 방지)
+                crawlingExecutor,
+                WAIT_CRAWL_NAVER
+        ).stream();
 
-        // [2] 두 뉴스 크롤링 요청을 각각 병렬 처리
-        return ParallelUtils.doParallelTask(
-                message,
-                tasks,
-                Supplier::get,
-                ParallelUtils.SEMAPHORE_UNLIMITED,
+        // [2] 기타 뉴스 크롤링 수행
+        Stream<News> etcNews = ParallelUtils.doParallelTask(
+                "기타 뉴스 크롤링",
+                etcNewsRequest,
+                crawler,
+                ParallelUtils.SEMAPHORE_NEWS_CRAWLING_ETC,
                 crawlingExecutor
+        ).stream();
 
-        ).stream().flatMap(List::stream);
+        // [3] 두 결과를 모두 합친 스트림으로 반환
+        return Stream.concat(naverNews, etcNews);
     }
 
 

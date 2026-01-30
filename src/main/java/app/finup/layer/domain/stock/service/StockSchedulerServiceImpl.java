@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -125,7 +126,7 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
                 taskName,
                 stockCodes,
                 stockCode -> Map.entry(stockCode, apiFetcher.apply(stockCode)),
-                ParallelUtils.SEMAPHORE_API_STOCK,
+                new Semaphore(5),
                 stockApiExecutor,
                 DELAY_STOCK_API
 
