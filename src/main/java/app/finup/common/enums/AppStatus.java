@@ -10,7 +10,6 @@ import lombok.Getter;
 @Getter
 public enum AppStatus {
 
-
     /* 검증 및 인증 상태 */
     VALIDATION_INVALID_PARAMETER(400, "입력하신 값을 다시 확인해 주세요.", "VALIDATION_INVALID_PARAMETER"),
     AUTH_MAIL_NOT_FOUND(400, "탈퇴 혹은 정지 상태거나 존재하지 않는 이메일입니다.", "AUTH_MAIL_NOT_FOUND"),
@@ -36,6 +35,9 @@ public enum AppStatus {
     /* 범용 유틸 클래스 상태 */
     UTILS_LOGIC_FAILED(500, "처리 중 오류가 발생했습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_LOGIC_FAILED"),
     UTILS_REORDER_FAILED(500, "위치를 변경할 수 없습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_REORDER_FAILED"),
+    UTILS_SEMAPHORE_ACQUIRE_FAILED(500, "SEMAPHORE 쓰레드 획득에 실패했습니다!", "UTILS_SEMAPHORE_ACQUIRE_FAILED"),
+    UTILS_CRAWL_RESPONSE_EMPTY(500, "크롤링 추출 결과가 비어있습니다!", "UTILS_CRAWL_RESPONSE_EMPTY"),
+
 
     /* Infra - Lock */
     LOCK_ALREADY_EXISTS(500, "이미 LOCK이 존재하여 획득 실패.", "LOCK_ACQUIRE_FAILED"),
@@ -122,7 +124,6 @@ public enum AppStatus {
 
     /* 뉴스 줭보 News */
     NEWS_NOT_FOUND(500, "뉴스가 존재하지 않습니다. 뉴스 목록을 다시 확인해 주세요.", "NEWS_NOT_FOUND"),
-    NEWS_CRAWL_EMPTY(500, "뉴스 크롤링 결과를 조회하지 못했습니다. (EMPTY)", "NEWS_CRAWL_EMPTY"),
 
     /* 내 단어장 MemberWordbook */
     WORD_NOT_FOUND(400, "존재하지 않는 단어입니다.", "WORD_NOT_FOUND"),
@@ -165,7 +166,9 @@ public enum AppStatus {
     METHOD_NOT_ALLOWED(405, "지원하지 않는 형식입니다.", "METHOD_NOT_ALLOWED"),
     CACHE_EXPIRED(403, "정보가 만료되었습니다.", "CACHE_EXPIRED"),
     UNAUTHORIZED(401, "로그인이 필요한 서비스입니다.", "UNAUTHORIZED"),
-    ACCESS_DENIED(403, "잘못된 요청입니다.", "ACCESS_DENIED");
+    ACCESS_DENIED(403, "잘못된 요청입니다.", "ACCESS_DENIED"),
+    TOO_MANY_REQUEST(429, "시도 가능 횟수를 초과한 요청입니다!", "TOO_MANY_REQUEST");
+
 
 
     private final int httpCode;     // HTTP 코드

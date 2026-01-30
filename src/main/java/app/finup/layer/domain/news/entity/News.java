@@ -1,10 +1,12 @@
 package app.finup.layer.domain.news.entity;
 
 import app.finup.layer.domain.news.enums.NewsType;
+import app.finup.layer.domain.news.support.NewsObject;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,7 +21,7 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-public class News {
+public class News implements NewsObject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

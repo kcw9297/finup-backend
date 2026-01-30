@@ -20,4 +20,12 @@ public class WordsDtoMapper {
                 .build();
     }
 
+
+    public static WordsAiDto.Recommendation toRecommendation(Words entity) {
+        return WordsAiDto.Recommendation.builder()
+                .termId(entity.getTermId())
+                .name(entity.getName())
+                .build();
+    }
+
 }

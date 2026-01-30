@@ -20,6 +20,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.PrematureCloseException;
 import reactor.util.retry.RetryBackoffSpec;
 
 import java.net.URI;
@@ -74,8 +75,8 @@ public class KisStockClient implements StockClient {
     private static final String URL_CHART = "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice"; // 종목 차트
 
     // API 요청 관련 상수
-    private static final Duration TIMEOUT_ISSUE = Duration.ofSeconds(15);
-    private static final Duration TIMEOUT_GET = Duration.ofSeconds(5);
+    private static final Duration TIMEOUT_ISSUE = Duration.ofSeconds(30);
+    private static final Duration TIMEOUT_GET = Duration.ofSeconds(30);
     private static final int RETRY_MAX_ATTEMPTS = 5;
     private static final Duration RETRY_MIN_BACKOFF = Duration.ofMillis(700);
     private static final Duration RETRY_MAX_BACKOFF = Duration.ofMillis(3000);

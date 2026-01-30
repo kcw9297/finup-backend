@@ -1,5 +1,6 @@
 package app.finup.api.external.news.dto;
 
+import app.finup.layer.domain.news.support.NewsObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
@@ -47,7 +48,7 @@ public final class NewsApi {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Row implements Serializable {
+    public static class Row implements Serializable, NewsObject {
 
         @Serial
         private static final long serialVersionUID = 1L;
@@ -56,6 +57,11 @@ public final class NewsApi {
         private String summary;
         private String link;
         private LocalDateTime publishedAt;
+
+        @Override
+        public String getDescription() {
+            return "";
+        }
     }
 
 }

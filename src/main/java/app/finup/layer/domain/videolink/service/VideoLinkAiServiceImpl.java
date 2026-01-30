@@ -202,7 +202,7 @@ public class VideoLinkAiServiceImpl implements VideoLinkAiService {
         String json = StrUtils.toJson(
                 VideoLinkDtoMapper.toRecommendation(study, candidates.values(), latestVideoLinkIds)
         );
-        log.warn("AI REQUEST JSON : {}", json);
+        //log.warn("AI REQUEST JSON : {}", json);
 
         // 프롬포트 생성
         String prompt = StrUtils.fillPlaceholder( // 프롬포트 생성

@@ -1,11 +1,14 @@
 package app.finup.layer.domain.news.utils;
 
-import app.finup.api.external.news.dto.NewsApi;
+import app.finup.common.utils.HtmlUtils;
+import app.finup.common.utils.StrUtils;
+import app.finup.layer.domain.news.support.NewsObject;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.text.similarity.LevenshteinDistance;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -15,19 +18,49 @@ import java.util.stream.Collectors;
  * @since 2026-01-07
  */
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NewsFilterUtils {
 
+    // 제공 상수
+    public static final Set<String> FILTER_KEYWORD_MAIN = Set.of(
+            "마감 시황", "개장 시황", "출발 시황", "보합 출발", "혼조세",
+            "장중 시황", "장중 등락", "오늘의 증시", "이 시각 증시", "지금 증시",
+            "상한가 행진", "상한가 종목", "폭등", "급등주",
+            "속출", "고수", "부자", "대박", "리치", "지금 사야", "매수 타이밍", "놓치면",
+            "테마", "특징주", "고배율",
+            "골든크로스", "데드크로스", "분배금",
+            "암호화폐", "코인", "비트코인", "부동산", "외환", "금시세", "카드론",
+            "정당", "지지도", "선거", "총선", "교회",
+            "[속보]", "[영상]", "퀴즈", "챌린지", "이벤트", "당첨",
+            "연예", "스포츠", "축구", "야구", "공연", "음악",
+            "역사", "문화재", "전시", "투어",
+            "株", "社", "포인트", "고용"
+    );
+
+    public static final Set<String> FILTER_KEYWORD_STOCK = Set.of(
+            "마감", "개장", "출발", "보합", "혼조", "장중", "매수", "폭등세", "매도", "장 마감",
+            "급등주", "간다", "오늘의 주식", "이 시각 증시", "체크", "점검",
+            "속출", "고수", "부자", "대박", "리치",
+            "테마주", "특징주", "고배율", "추천주", "관심주", "지금 사야", "매수 타이밍", "놓치면",
+            "골든크로스", "데드크로스", "분배금",
+            "부동산", "외환", "금시세", "카드론",
+            "정당", "지지도", "선거", "총선", "교회",
+            "[속보]", "[영상]", "퀴즈", "챌린지", "이벤트", "당첨"
+    );
+
     // 사용 상수
-    private static final LevenshteinDistance LD = new LevenshteinDistance();
-    private static final double THRESHOLD_JACCARD_HIGH = 0.6;
-    private static final double THRESHOLD_JACCARD_MIDDLE = 0.4;
-    private static final double THRESHOLD_SIMILARITY = 0.75;
-    private static final int THRESHOLD_LENGTH_MIN_TITLE = 15;
+    private static final int N_GRAM = 3;
+    private static final double THRESHOLD_JACCARD_TITLE = 0.55;
+    private static final double THRESHOLD_JACCARD_DESCRIPTION = 0.35;
+    private static final double THRESHOLD_DICE_TITLE = 0.68;
+    private static final double THRESHOLD_DICE_DESCRIPTION = 0.50;
+
+    private static final int THRESHOLD_LENGTH_MIN_TITLE = 20;
     private static final int THRESHOLD_LENGTH_MIN_SUMMARY = 50;
     private static final double PERCENT_BULLET_LINES = 0.6; // 전체 라인에서 "-"로 시작하는 비율
     private static final double PERCENT_SHORT_LINES = 0.6; // 전체 라인에서 "-"로 시작하는 비율
-    private static final int THRESHOLD_DESCRIPTION_MIN_LENGTH = 400; // 기사 본문 최소 길이
+    private static final int THRESHOLD_DESCRIPTION_MIN_LENGTH = 600; // 기사 본문 최소 길이
 
     private static final List<Pattern> NOISE_PATTERNS = List.of(
             Pattern.compile(".*기사보내기.*"),  // 기사보내기 포함된 모든 줄
@@ -49,29 +82,61 @@ public class NewsFilterUtils {
     );
 
     /**
-     * 뉴스 필터링 수행
-     * @param rows 뉴스 API에서 검색된 뉴스 정보 (크롤링 본문 포함)
+     * 뉴스 제목 심층 필터링 수행
+     * @param targetNews 유사도를 판별할 뉴스 목록
+     * @param curNews 이미 저장된 기존 뉴스
      * @param filterKeywords 필터링할 키워드 목록
      * @return 필터링된 뉴스 DTO 목록
      */
-    public static List<NewsApi.Row> filter(List<NewsApi.Row> rows, Collection<String> filterKeywords) {
+    public static <T extends NewsObject, C extends NewsObject> List<T> filterDetailTitle(
+            Collection<T> targetNews, Collection<C> curNews, Collection<String> filterKeywords
+    ) {
 
         // [1] 기사 링크 중복 제거
-        rows = filterDistinctLink(rows);
+        targetNews = filterDistinctLink(targetNews);
 
         // [2] 유사한 기사 제목 제거
-        rows = rows.stream()
+        targetNews = targetNews.stream()
                 .filter(NewsFilterUtils::isNotShort)
+                .filter(NewsFilterUtils::isValid)
                 .filter(row -> NewsFilterUtils.isNotTrivial(row, filterKeywords))
                 .toList();
 
         // [3] 제목 유사도 검사 후 결과 반환
-        return filterSimilarTitle(rows);
+        return filterSimilarTitle(targetNews, curNews, false);
+    }
+
+
+    // 기사 정보가  정상적으로 제공되었는지 검증
+    private static <T extends NewsObject> boolean isValid(T row) {
+
+        return StrUtils.isValid(row.getLink()) &&
+                StrUtils.isValid(row.getTitle()) &&
+                StrUtils.isValid(row.getSummary());
+    }
+
+    // 문자열, 요약 정보가 없거나, 너무 짧지 않은지 검증
+    private static <T extends NewsObject> boolean isNotShort(T row) {
+
+        // [1] 검증 대상
+        String title = row.getTitle();
+        String summary = row.getSummary();
+
+        // [2] 길이 비교 및 결과 반환
+        return Objects.nonNull(title) && Objects.nonNull(summary) &&
+                title.length() >= THRESHOLD_LENGTH_MIN_TITLE &&
+                summary.length() >= THRESHOLD_LENGTH_MIN_SUMMARY;
+    }
+
+
+    // 불필요한 단어가 포함되어 있는지 검증
+    private static <T extends NewsObject> boolean isNotTrivial(T row, Collection<String> filterKeywords) {
+        return filterKeywords.stream().noneMatch(row.getTitle()::contains);
     }
 
 
     // 기사 링크 필터링 (중복 제거)
-    private static List<NewsApi.Row> filterDistinctLink(List<NewsApi.Row> rows) {
+    private static <T extends NewsObject> List<T> filterDistinctLink(Collection<T> rows) {
 
         // [1] 중복을 불허하는 set Collection 생성
         Set<String> seen = new HashSet<>();
@@ -83,57 +148,183 @@ public class NewsFilterUtils {
     }
 
 
-
-    // 제목 유사도 중복 제거
-    private static List<NewsApi.Row> filterSimilarTitle(List<NewsApi.Row> rows) {
-
-        // [1] 결과를 담을 result List 선언
-        List<NewsApi.Row> result = new ArrayList<>();
-
-        // [2] 유사도 계산 후, 검증을 통과한 목록 반환
-        for (NewsApi.Row row : rows) checkSimilar(row, result);
-        return result;
+    /**
+     * 유사한 기사 제목 제거
+     * @param <T> NewsObject 구현 뉴스 객체
+     * @param targetNews 유사도를 판별할 뉴스 목록
+     * @param curNews 이미 저장된 기존 뉴스
+     * @param returnSimilar 필터된 결과를 받는지 여부 (true - 필터에 "걸린" 유사 기사 목록을 제공)
+     * @return 필터링된 기사 목록
+     */
+    public static <T extends NewsObject, C extends NewsObject> List<T> filterSimilarTitle(
+            Collection<T> targetNews, Collection<C> curNews, boolean returnSimilar
+    ) {
+        return filterSimilar(targetNews, curNews, true, false, returnSimilar);
     }
 
 
-    // 유사도 계산
-    private static void checkSimilar(NewsApi.Row row, List<NewsApi.Row> result) {
+    /**
+     * 유사한 기사 본문 제거
+     * @param <T> NewsObject 구현 뉴스 객체
+     * @param targetNews 유사도를 판별할 뉴스 목록
+     * @param curNews 이미 저장된 기존 뉴스
+     * @param returnSimilar 필터된 결과를 받는지 여부 (true - 필터에 "걸린" 유사 기사 목록을 제공)
+     * @return 필터링된 기사 목록
+     */
+    public static <T extends NewsObject, C extends NewsObject> List<T> filterSimilarDescription(
+            Collection<T> targetNews, Collection<C> curNews, boolean returnSimilar
+    ) {
+        return filterSimilar(targetNews, curNews, false, true, returnSimilar);
+    }
 
-        // [1] 유사 여부 검사
-        boolean isSimilar = result.stream()
+
+    // 유사도 검증 수행
+    public static <T extends NewsObject, C extends NewsObject> List<T> filterSimilar(
+            Collection<T> targetNews,
+            Collection<C> curNews,
+            boolean isTitle,
+            boolean isDescription,
+            boolean returnSimilar
+    ) {
+
+        // [1] 결과를 담을 리스트 선언
+        List<NewsObject> allProcessed = new ArrayList<>(curNews); // 이미 존재하는 뉴스 담음
+        List<T> result = new ArrayList<>();
+        List<T> filteredResult = new ArrayList<>();
+
+        // [2] 유사 판별 수행 및 결과 수집
+        for (T news : targetNews) {
+
+            // 유사 판별 수행
+            boolean isTitleSimilar = isTitle &&
+                    isSimilar(news, allProcessed, NewsObject::getTitle, isTitle, isDescription);
+            boolean isDescriptionSimilar = isDescription &&
+                    isSimilar(news, allProcessed, NewsObject::getDescription, isTitle, isDescription);
+
+            // 결과 저장
+            if (isTitle && !isDescription)
+                addToResult(isTitleSimilar, returnSimilar, news, filteredResult, result, allProcessed);
+
+            else if (!isTitle && isDescription)
+                addToResult(isDescriptionSimilar, returnSimilar, news, filteredResult, result, allProcessed);
+        }
+
+        // [3] 결과 저장
+        return returnSimilar ? filteredResult : result;
+    }
+
+
+    // 필터 결과 삽입
+    private static <T extends NewsObject> void addToResult(
+            boolean isSimilar, boolean returnSimilar, T news, List<T> filteredResult, List<T> result, List<NewsObject> allProcessed
+    ) {
+        if (isSimilar && returnSimilar) filteredResult.add(news); // "필터당한" 결과를 반환하는 경우 (유사한 기사들 목록)
+        else if (!isSimilar && !returnSimilar) result.add(news); // "필터링" 된 유사 기사가 없는 정보만 반환하는 경우
+        allProcessed.add(news);
+    }
+
+
+    // 제목 유사 여부 판단
+    private static <T extends NewsObject> boolean isSimilar(
+            T news,
+            List<NewsObject> allProcessed,
+            Function<NewsObject, String> extractor,
+            boolean isTitle,
+            boolean isDescription
+    ) {
+
+        // [1] 검사 대상 뉴스 정보 일반화
+        String s1 = normalize(extractor.apply(news));
+        if (s1.isEmpty()) return false; // 빈 단어이면 유사도 검사 미수행
+
+        // [2] 검사 대상 토큰화
+        Set<String> grams1 = ngrams(s1);
+
+        // [3] 이미 통과한 뉴스들(result 내 데이터)과 유사한지 검증
+        return allProcessed.stream()
                 .anyMatch(existing -> {
-                    // [1] 제목 단어 겹침 정도 계산 (jaccard)
-                    double j = calculateJaccard(existing.getTitle(), row.getTitle());
 
-                    // [2] 유사도 판별 결과 반환
-                    // 60% 이상의 중복이 발견되면 즉시 유사 판별
-                    // 40% 이상의 중복인 경우, 토큰화 후 유사도를 계산하여 75% 이상 유사도를 가지면 유사 판별
-                    return j >= THRESHOLD_JACCARD_HIGH ||
-                            (j >= THRESHOLD_JACCARD_MIDDLE &&
-                                    calculateSimilarity(existing.getTitle(), row.getTitle()) >= THRESHOLD_SIMILARITY);
+                    // 결과 목록 뉴스 일반화
+                    String s2 = normalize(extractor.apply(existing));
+
+                    // 제목이 완전히 같으면 중복으로 간주 (검증 유형 무관)
+                    if (Objects.equals(s1, s2)) return true;
+                    if (s2.isEmpty()) return false; // 혹시라도 빈 결과인 경우 통과
+
+                    // 결과 목록 뉴스 정보 토큰화
+                    Set<String> grams2 = ngrams(s2);
+
+                    //  검사 수행
+                    if (isTitle && !isDescription)
+                        return dice(grams1, grams2) >= THRESHOLD_DICE_TITLE;
+
+                    if (!isTitle && isDescription)
+                        return jaccard(grams1, grams2) >= THRESHOLD_JACCARD_DESCRIPTION || dice(grams1, grams2) >= THRESHOLD_DICE_DESCRIPTION;
+
+                    // 유효하지 않은 기준인 경우 검사 미수행
+                    return false;
                 });
-
-        // [2] 유사하지 않은 경우 result 결과에 추가
-        if (!isSimilar) result.add(row);
     }
 
 
-    // 중복 비율 계산
-    private static double calculateJaccard(String a, String b) {
+    // 텍스트 일반화
+    private static String normalize(String text) {
 
-        // [1] 중복 계산을 위한 토큰화 수행
-        Set<String> s1 = tokenize(a);
-        Set<String> s2 = tokenize(b);
+        return Objects.isNull(text) ?
+                "" :
+                HtmlUtils.getText(text)
+                        .toLowerCase()
+                        // 괄호 안 내용 제거 (영문명, 설명 등)
+                        .replaceAll("\\([^)]*\\)", "")
+                        .replaceAll("\\[[^]]*\\]", "")
 
-        // [2] 교집합 & 합집합 계산
-        Set<String> intersection = new HashSet<>(s1); // 교집합
-        intersection.retainAll(s2);
+                        // 연속된 숫자를 하나의 토큰으로 (퍼센트, 배수 등)
+                        .replaceAll("\\d+\\.?\\d*%?배?조?억?만?원?", "숫자")
 
-        Set<String> union = new HashSet<>(s1); // 합집합
-        union.addAll(s2);
+                        // 공백 제거
+                        .replaceAll("\\s+", "")
 
-        // [3] 중복 계산
+                        // 한글, 영문, 숫자만 남김
+                        .replaceAll("[^가-힣a-z0-9]", "");
+    }
+
+
+    // N-GRAM (N글자 기준으로 단어 쪼갬. 3글자를 기준으로 토큰화와 유사한 것)
+    private static Set<String> ngrams(String s) {
+
+        Set<String> grams = new HashSet<>();
+        if (s.length() < N_GRAM) return grams;
+
+        for (int i = 0; i <= s.length() - N_GRAM; i++) {
+            grams.add(s.substring(i, i + N_GRAM));
+        }
+        return grams;
+    }
+
+
+    // JACCARD 검사 : 합집합 계산
+    private static double jaccard(Set<String> a, Set<String> b) {
+        if (a.isEmpty() && b.isEmpty()) return 1.0;
+
+        Set<String> intersection = new HashSet<>(a);
+        intersection.retainAll(b);
+
+        Set<String> union = new HashSet<>(a);
+        union.addAll(b);
+
         return union.isEmpty() ? 0.0 : (double) intersection.size() / union.size();
+    }
+
+
+    // DICE 계산 : 얼마나 단어 패턴이 겹치는가 (교집합 중심 검사)
+    private static double dice(Set<String> a, Set<String> b) {
+
+        if (a.isEmpty() && b.isEmpty()) return 1.0;
+
+        Set<String> intersection = new HashSet<>(a);
+        intersection.retainAll(b);
+
+        return (2.0 * intersection.size()) / (a.size() + b.size());
     }
 
 
@@ -147,42 +338,6 @@ public class NewsFilterUtils {
         return Arrays.stream(split)
                 .filter(token -> !token.isBlank())
                 .collect(Collectors.toSet()); // 중복 자동 제거
-    }
-
-
-    // 유사도 계산
-    private static double calculateSimilarity(String s1, String s2) {
-
-        // 거리 유사도 계산
-        int distance = LD.apply(s1, s2);
-
-        // 문자열 최대 길이 계산
-        int maxLen = Math.max(s1.length(), s2.length());
-        if (maxLen == 0) return 1.0; // 만약 빈 문자열이면 최대 유시도로 취급
-
-        // 유사도 계산 및 반환
-        return 1.0 - ((double) distance / maxLen); // 0.0 ~ 1.0 사이 값
-    }
-
-
-    // 문자열, 요약 정보가 없거나, 너무 짧지 않은지 검증
-    private static boolean isNotShort(NewsApi.Row row) {
-
-        // [1] 검증 대상
-        String title = row.getTitle();
-        String summary = row.getSummary();
-
-        // [2] 길이 비교 및 결과 반환
-        return Objects.nonNull(title) && Objects.nonNull(summary) &&
-                title.length() >= THRESHOLD_LENGTH_MIN_TITLE &&
-                summary.length() >= THRESHOLD_LENGTH_MIN_SUMMARY;
-    }
-
-
-
-    // 불필요한 단어가 포함되어 있는지 검증
-    private static boolean isNotTrivial(NewsApi.Row row, Collection<String> filterKeywords) {
-        return filterKeywords.stream().noneMatch(row.getTitle()::contains);
     }
 
 
@@ -226,7 +381,7 @@ public class NewsFilterUtils {
         String result = description;
 
         // 연속되는 짧은 줄 제거
-        result = removeShortLineClusters(result, 30, 3);
+        result = removeShortLineClusters(result, 50, 5);
 
         // 패턴 매칭되는 부분만 제거
         for (Pattern pattern : NOISE_PATTERNS)

@@ -20,8 +20,6 @@ public final class NewsRedisKey {
     private static final String KEY_PREFIX = "NEWS:";
     private static final String CACHE_PREFIX = "CACHE:" + KEY_PREFIX;
     private static final String LOCK_PREFIX = "LOCK:" + KEY_PREFIX;
-    private static final String LOCK_SYNC = LOCK_PREFIX + "SYNC:";
-
     // key name
     public static final String KEY_ANALYZE = KEY_PREFIX + "ANALYZE:${NEWS_ID}:${MEMBER_ID}";
 
@@ -31,7 +29,7 @@ public final class NewsRedisKey {
     public static final String CACHE_ANALYZE = CACHE_PREFIX + "ANALYZE";
 
     // Lock Name
-    public static final String LOCK_SYNC_MAIN = LOCK_SYNC + "MAIN";
-    public static final String LOCK_SYNC_STOCK = LOCK_SYNC + "STOCK";
+    public static final String LOCK_SYNC = LOCK_PREFIX + "SYNC";
+
 
 }

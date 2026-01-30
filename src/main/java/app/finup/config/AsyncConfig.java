@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class AsyncConfig {
 
     // 사용 상수
-    private static final String PREFIX_NORMAL = "SCHEDULER-";
+    private static final String PREFIX_NORMAL = "S-";
     private static final String PREFIX_NEWS = "NEWS-";
     private static final String PREFIX_NEWS_NAVER_API = PREFIX_NEWS + "NAVER_API-";
     private static final String PREFIX_NEWS_CRAWLING = PREFIX_NEWS + "CRAWLER-";

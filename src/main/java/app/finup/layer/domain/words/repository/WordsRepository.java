@@ -1,5 +1,6 @@
 package app.finup.layer.domain.words.repository;
 
+import app.finup.layer.domain.words.dto.WordsAiDto;
 import app.finup.layer.domain.words.entity.Words;
 import app.finup.layer.domain.words.enums.WordsLevel;
 import org.springframework.data.domain.Pageable;
@@ -69,10 +70,22 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
     @Query(value = """
         SELECT *
         FROM words
-        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%'))
-                AND embedding IS NOT NULL
+        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%')) 
+              AND embedding IS NOT NULL
         ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
         LIMIT :lim
     """, nativeQuery = true)
     List<Words> findWithSimilarByKeyword(String keyword, byte[] embedding, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM words w
+        WHERE w.term_id NOT IN :prevIds
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<Words> findWithSimilarExcludePrev(byte[] embedding, List<Long> prevIds, int lim);
+
 }

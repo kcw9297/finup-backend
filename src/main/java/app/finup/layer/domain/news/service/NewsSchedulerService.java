@@ -21,7 +21,7 @@ public interface NewsSchedulerService {
 
 
     /**
-     * 오래된 기사 삭제
+     * 뉴스 기사 청소작업 수행 (오래된 기사 정리)
      */
-    void removeOlds();
+    void clean();
 }

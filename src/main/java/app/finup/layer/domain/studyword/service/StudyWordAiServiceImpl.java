@@ -98,7 +98,7 @@ public class StudyWordAiServiceImpl implements StudyWordAiService {
         try {
             // 요청 DTO 생성 후, JSON 변환
             String json = StrUtils.toJson(StudyWordDtoMapper.toRecommendation(study, candidates.values(), latestStudyWordIds));
-            log.warn("AI REQUEST JSON : {}", json);
+            //log.warn("AI REQUEST JSON : {}", json);
 
             // 추천 수행
             List<Long> resultIds = studyWordAiManager.recommendForStudy(json);

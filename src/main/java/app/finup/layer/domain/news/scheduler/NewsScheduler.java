@@ -2,6 +2,7 @@ package app.finup.layer.domain.news.scheduler;
 
 import app.finup.common.constant.AsyncMode;
 import app.finup.common.utils.LogUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.infra.redisson.annotation.RedissonLock;
 import app.finup.layer.domain.news.constant.NewsRedisKey;
 import app.finup.layer.domain.news.service.NewsSchedulerService;
@@ -27,37 +28,31 @@ public class NewsScheduler {
     private final NewsSchedulerService newsSchedulerService;
 
 
-    // 주식 정보 초기화 스케줄링 (단 한번만 수행)
-    @RedissonLock(key = NewsRedisKey.LOCK_SYNC_MAIN)
-    @Scheduled(initialDelay = 500, fixedDelay = Long.MAX_VALUE)
+    // 기사 정보 초기화 스케줄링 (단 한번만 수행)
+    @RedissonLock(key = NewsRedisKey.LOCK_SYNC)
+    @Scheduled(initialDelay = 140000, fixedDelay = Long.MAX_VALUE)
     @Async(AsyncMode.NEWS)
-    public void initSyncMain(){
+    public void initSync(){
         LogUtils.runMethodAndShowCostLog("메인 기사 초기화", newsSchedulerService::syncMain);
+        LogUtils.runMethodAndShowCostLog("종목 기사 동기화", newsSchedulerService::syncStock);
     }
 
 
-    // 메인 뉴스 조회 및 본문 크롤링
-    @RedissonLock(key = NewsRedisKey.LOCK_SYNC_MAIN)
-    @Scheduled(cron = "0 10,40 * * * *")
+    // 메인 뉴스 조회 및 본문 크롤링 (매 시간마다)
+    @RedissonLock(key = NewsRedisKey.LOCK_SYNC)
+    @Scheduled(cron = "0 5 * * * *", zone = TimeUtils.ZONE_KOREA)
     @Async(AsyncMode.NEWS)
-    public void syncMain(){
-        LogUtils.runMethodAndShowCostLog("메인 뉴스 동기화", newsSchedulerService::syncMain);
+    public void sync(){
+        LogUtils.runMethodAndShowCostLog("메인 기사 초기화", newsSchedulerService::syncMain);
+        LogUtils.runMethodAndShowCostLog("종목 기사 동기화", newsSchedulerService::syncStock);
     }
 
 
-    // 매 시간 15분/45분 마다 종목 내 뉴스 크롤링
-    @RedissonLock(key = NewsRedisKey.LOCK_SYNC_STOCK)
-    @Scheduled(cron = "0 15,45 * * * *")
+    // 오래된 기사 정리 (매 0시마다 수행)
+    @Scheduled(cron = "0 0 0 * * *", zone = TimeUtils.ZONE_KOREA)
     @Async(AsyncMode.NEWS)
-    public void syncStock(){
-        LogUtils.runMethodAndShowCostLog("종목 뉴스 동기화", newsSchedulerService::syncStock);
+    public void clean(){
+        LogUtils.runMethodAndShowCostLog("오래된 뉴스 정리", newsSchedulerService::clean);
     }
 
-
-    // 오래된 뉴스 삭제 (Lock 불필요)
-    @Scheduled(cron = "0 0 0/3 * * *")
-    @Async(AsyncMode.NORMAL)
-    public void removeOlds(){
-        LogUtils.runMethodAndShowCostLog("오래된 뉴스 삭제", newsSchedulerService::removeOlds);
-    }
 }

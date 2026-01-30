@@ -20,6 +20,11 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HtmlUtils {
 
+    // 줄바꿈을 허용하지 않는 OUTPUT
+    private static final Document.OutputSettings NO_PRETTY_PRINT =
+            new Document.OutputSettings().prettyPrint(false);
+
+
     /**
      * 불필요한 HTML 태그 정화(제거)
      * @param text 원문 문자열
@@ -63,6 +68,15 @@ public class HtmlUtils {
      * @return 사용자가 작성한 "순수" 문자열 반환
      */
     public static String getText(String text) {
-        return Objects.isNull(text) ? null : Jsoup.parse(text).text();
+
+        return Objects.isNull(text) ? null :
+                Jsoup.clean(text, "", Safelist.none(), NO_PRETTY_PRINT)
+                .replace("&nbsp;", " ")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replace("&quot;", "\"")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 }

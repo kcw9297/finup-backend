@@ -2,10 +2,9 @@ package app.finup.layer.domain.stock.scheduler;
 
 import app.finup.common.constant.AsyncMode;
 import app.finup.common.utils.LogUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.infra.redisson.annotation.RedissonLock;
 import app.finup.infra.redisson.annotation.RedissonMultiLock;
-import app.finup.layer.domain.news.constant.NewsRedisKey;
-import app.finup.layer.domain.news.service.NewsSchedulerService;
 import app.finup.layer.domain.stock.constant.StockRedisKey;
 import app.finup.layer.domain.stock.service.StockSchedulerService;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ public class StockScheduler {
 
     // 사용 의존성
     private final StockSchedulerService stockSchedulerService;
-    private final NewsSchedulerService newsSchedulerService;
 
 
     // 주식 AT 발급 스케줄링
@@ -42,30 +40,20 @@ public class StockScheduler {
 
 
     // 주식 정보 초기화 스케줄링 (단 한번만 수행)
-    @RedissonMultiLock(keys = {StockRedisKey.LOCK_SYNC, NewsRedisKey.LOCK_SYNC_STOCK}) // MultiLock
-    @Scheduled(initialDelay = 30000, fixedDelay = Long.MAX_VALUE)
+    @RedissonMultiLock(keys = {StockRedisKey.LOCK_SYNC}) // MultiLock
+    @Scheduled(initialDelay = 10000, fixedDelay = Long.MAX_VALUE)
     @Async(AsyncMode.STOCK)
     public void initSync(){
-
-        // [1] 종목 초기화
         LogUtils.runMethodAndShowCostLog("주식 종목 초기화", stockSchedulerService::sync);
-
-        // [2] 종목 내 뉴스 초기화
-        LogUtils.runMethodAndShowCostLog("주식 종목 내 기사 초기화", newsSchedulerService::syncStock);
     }
 
 
     // 주식 정보 동기화 스케줄링
-    @RedissonMultiLock(keys = {StockRedisKey.LOCK_SYNC, NewsRedisKey.LOCK_SYNC_STOCK}) // MultiLock
-    @Scheduled(cron = "0 0,30 9-16 * * MON-FRI")
+    @RedissonMultiLock(keys = {StockRedisKey.LOCK_SYNC}) // MultiLock
+    @Scheduled(cron = "0 0 9-17 * * MON-FRI", zone = TimeUtils.ZONE_KOREA)
     @Async(AsyncMode.STOCK)
     public void sync(){
-
-        // [1] 종목 동기화
-        LogUtils.runMethodAndShowCostLog("주식 종목 동기화 시작", stockSchedulerService::sync);
-
-        // [2] 종목 내 뉴스 동기화
-        LogUtils.runMethodAndShowCostLog("주식 종목 내 기사 동기화 시작", newsSchedulerService::syncStock);
+        LogUtils.runMethodAndShowCostLog("주식 종목 동기화", stockSchedulerService::sync);
     }
 
 }

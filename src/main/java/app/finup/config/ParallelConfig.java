@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ParallelConfig {
 
     // 사용 상수
-    private static final String PREFIX = "PARALLEL-";
+    private static final String PREFIX = "P-";
     private static final String PREFIX_CRAWLING = PREFIX + "CRAWLING-";
     private static final String PREFIX_API = PREFIX + "API-";
     private static final String PREFIX_API_NEWS = PREFIX_API + "NEWS-";
@@ -45,8 +45,8 @@ public class ParallelConfig {
 
         // 스레드 설정 등록
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
-                5, // corePoolSize: 기본 스레드 개수
-                10, // maxPoolSize: 최대 스레드 (큐가 가득 차면 추가 스레드 생성을 수행하는데, 그 경우 최대 한도)
+                20, // corePoolSize: 기본 스레드 개수
+                30, // maxPoolSize: 최대 스레드 (큐가 가득 차면 추가 스레드 생성을 수행하는데, 그 경우 최대 한도)
                 60L, // keepAliveTime (스레드 최대 생존 시간)
                 TimeUnit.SECONDS,
                 new SynchronousQueue<>(),  // 작업 큐 사용 안함

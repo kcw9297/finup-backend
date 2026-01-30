@@ -196,7 +196,7 @@ public class WordsServiceImpl implements WordsService {
     private void storeRecentWord(Long memberId, String keyword) {
 
         try {
-            wordsRedisStorage.add(memberId, keyword);
+            wordsRedisStorage.storeRecentSearchKeyword(memberId, keyword);
         } catch (Exception e) {
             LogUtils.showWarn(this.getClass(), "단어 저장 실패! 원인 : %s", e.getMessage());
         }
@@ -205,19 +205,19 @@ public class WordsServiceImpl implements WordsService {
 
     @Override
     public List<String> getRecent(Long memberId) {
-        return wordsRedisStorage.getRecent(memberId, 10);
+        return wordsRedisStorage.getRecentSearchKeywords(memberId, 10);
     }
 
 
     @Override
     public void clear(Long memberId) {
-        wordsRedisStorage.clear(memberId);
+        wordsRedisStorage.clearRecentSearchKeywords(memberId);
     }
 
 
     @Override
     public void removeRecent(Long memberId, String keyword) {
-        wordsRedisStorage.remove(memberId, keyword);
+        wordsRedisStorage.removeRecentSearchKeyword(memberId, keyword);
     }
 
 

@@ -37,7 +37,7 @@ public class VideoLinkScheduler {
 
 
     /**
-     * 매 0시마다 홈 유튜브 추쳔 영상 갱신
+     * 애플리케이션 시작 시 초기화
      */
     @RedissonLock(key = VideoLinkRedisKey.LOCK_RECOMMEND_HOME_LOGOUT)
     @Scheduled(initialDelay = 5000, fixedDelay = Long.MAX_VALUE) // 최초 1회

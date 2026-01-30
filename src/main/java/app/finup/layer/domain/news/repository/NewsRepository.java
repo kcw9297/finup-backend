@@ -18,6 +18,7 @@ public interface NewsRepository extends JpaRepository<News, Long> {
         SELECT n
         FROM News n
         WHERE n.newsType = :newsType
+        ORDER BY n.publishedAt DESC
     """)
     List<News> findByNewsType(NewsType newsType);
 
@@ -62,5 +63,5 @@ public interface NewsRepository extends JpaRepository<News, Long> {
         DELETE FROM News n
         WHERE n.publishedAt < :thresholdTime
     """)
-    void removeOld(LocalDateTime thresholdTime);
+    int removeOld(LocalDateTime thresholdTime);
 }

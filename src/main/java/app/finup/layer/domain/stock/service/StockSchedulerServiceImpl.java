@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
@@ -39,6 +40,9 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
 
     // 병렬 처리를 위한 의존성
     private final ExecutorService stockApiExecutor;
+
+    // 사용 상수
+    private static final Duration DELAY_STOCK_API = Duration.ofMillis(1500);
 
 
     @Override
@@ -92,17 +96,17 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
         // [3] 주식 상세, 차트정보 조회를 모두 병렬로 수행
         // Map<StockCode, DTO>
         Map<String, StockApiDto.Detail> details =
-                callAsyncStockApi(stockCodes, stockCode -> stockClient.getDetail(stockCode, accessToken));
+                callAsyncStockApi("주식 상세 정보 조회", stockCodes, stockCode -> stockClient.getDetail(stockCode, accessToken));
 
         // Map<StockCode, List<DTO>>
         Map<String, List<StockApiDto.Candle>> dayCandles =
-                callAsyncStockApi(stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.DAY));
+                callAsyncStockApi("주식 일봉 정보 조회", stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.DAY));
 
         Map<String, List<StockApiDto.Candle>> weekCandles =
-                callAsyncStockApi(stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.WEEK));
+                callAsyncStockApi("주식 주봉 정보 조회", stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.WEEK));
 
         Map<String, List<StockApiDto.Candle>> monthCandles =
-                callAsyncStockApi(stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.MONTH));
+                callAsyncStockApi("주식 월봉 정보 조회", stockCodes, stockCode -> stockClient.getCandleList(stockCode, accessToken, CandleType.MONTH));
 
         // [4] 결과 기반 InfoDTO 생성 및 반환
         return stockCodes.stream()
@@ -112,16 +116,19 @@ public class StockSchedulerServiceImpl implements StockSchedulerService {
 
     // 주식 API 호출 병렬 처리
     private <R> Map<String, R> callAsyncStockApi(
+            String taskName,
             Set<String> stockCodes,
             Function<String, R> apiFetcher
     ) {
 
         return ParallelUtils.doParallelTask(
-                "주식 상세정보 조회 API 호출",
+                taskName,
                 stockCodes,
                 stockCode -> Map.entry(stockCode, apiFetcher.apply(stockCode)),
                 ParallelUtils.SEMAPHORE_API_STOCK,
-                stockApiExecutor
+                stockApiExecutor,
+                DELAY_STOCK_API
+
         ).stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

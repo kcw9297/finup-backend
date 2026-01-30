@@ -1,11 +1,14 @@
 package app.finup.layer.domain.news.dto;
 
+import app.finup.api.external.news.dto.NewsApi;
+import app.finup.layer.domain.news.support.NewsObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 뉴스 정보를 담기 위한 DTO 클래스
@@ -20,7 +23,7 @@ public final class NewsDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Row implements Serializable {
+    public static class Row implements Serializable, NewsObject {
 
         @Serial
         private static final long serialVersionUID = 1L;

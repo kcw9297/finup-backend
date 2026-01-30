@@ -5,6 +5,7 @@ import app.finup.common.utils.AiUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -27,7 +28,13 @@ public class OpenAIEmbeddingProvider implements EmbeddingProvider {
     // embedding에 사용할 model 의존성
     private final OpenAiEmbeddingModel embeddingModel;
 
+    // 사용 상수
+    private static final String CACHE_PREFIX = "EMBEDDING";
 
+    @Cacheable(
+            value = "embeddings",
+            key = "T(org.springframework.util.DigestUtils).md5DigestAsHex(#text.getBytes())"
+    )
     @Override
     public byte[] generate(String text) {
         return AiUtils.convertToByteArray(embeddingModel.embed(text));
