@@ -55,7 +55,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
     private static final Duration THRESHOLD_SAVE = Duration.ofDays(30); // 약 1달 정도 기사까진 보존
     private static final int AMOUNT_NEWS_MAIN = 100; // 검색 기사 수량
     private static final int AMOUNT_NEWS_STOCK = 50; // 검색 기사 수량
-    private static final Duration WAIT_STOCK_SYNC = Duration.ofMillis(500); // 대기 시간
+    private static final Duration WAIT_STOCK_SYNC = Duration.ofMillis(2000); // 대기 시간
 
 
     @CacheEvict( // 기존 캐시 삭제
@@ -274,8 +274,12 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
 
         // [1] 병렬 처리를 콜렉션 선언
         List<Supplier<List<News>>> tasks = new ArrayList<>();
-        tasks.add(() -> ParallelUtils.doParallelTask("네이버 뉴스 크롤링", naverNewsRequest, crawler, ParallelUtils.SEMAPHORE_NEWS_CRAWLING_NAVER, crawlingExecutor, Duration.ofMillis(1000)));
-        tasks.add(() -> ParallelUtils.doParallelTask("기타 뉴스 크롤링", etcNewsRequest, crawler, ParallelUtils.SEMAPHORE_NEWS_CRAWLING_ETC, crawlingExecutor, Duration.ofMillis(200)));
+        tasks.add(() -> ParallelUtils.doParallelTask(
+                "네이버 뉴스 크롤링", naverNewsRequest, crawler, ParallelUtils.SEMAPHORE_NEWS_CRAWLING_NAVER, crawlingExecutor, Duration.ofMillis(1500)
+        ));
+        tasks.add(() -> ParallelUtils.doParallelTask(
+                "기타 뉴스 크롤링", etcNewsRequest, crawler, ParallelUtils.SEMAPHORE_NEWS_CRAWLING_ETC, crawlingExecutor, Duration.ofMillis(200)
+        ));
 
         // [2] 두 뉴스 크롤링 요청을 각각 병렬 처리
         return ParallelUtils.doParallelTask(
