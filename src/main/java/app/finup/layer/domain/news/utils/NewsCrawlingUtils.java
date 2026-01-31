@@ -175,13 +175,13 @@ public class NewsCrawlingUtils {
             for (Element element : doc.select(selector)) {
                 Element el = element.clone();
                 String description = cleanText(extractTextWithLineBreaks(el));
-                if (description.length() >= LENGTH_MIN_DESCRIPTION) return HtmlUtils.getText(description);
+                if (HtmlUtils.getText(description).length() >= LENGTH_MIN_DESCRIPTION) return description;
             }
         }
 
         // 아무 내용도 찾지 못하거나, 최소 본문길이를 만족하지 못한 경우 meta 데이터에서 추출 시도
         String description = cleanText(doc.select(SELECTOR_META_DESCRIPTION).attr(CONTENT));
-        return description.length() >= LENGTH_MIN_DESCRIPTION ? HtmlUtils.getText(description) : "";
+        return HtmlUtils.getText(description).length() >= LENGTH_MIN_DESCRIPTION ? description : "";
     }
 
 
@@ -224,50 +224,112 @@ public class NewsCrawlingUtils {
     // 줄바꿈을 보존하고 HTML 태그 제거
     private static String extractTextWithLineBreaks(Element element) {
 
-        // [1] 불필요한 요소 제거
-        element.select("a").remove();
-        element.select(".relation_lst").remove();
-        element.select(".end_photo_org").remove();
-        element.select(".byline").remove();
+        // 기본 HTML 구조 태그 제거
+        element.select("header").remove();
+        element.select("footer").remove();
+        element.select("nav").remove();
+        element.select("script").remove();
+        element.select("style").remove();
+        element.select("button").remove();
+        element.select("form").remove();
+        element.select("iframe").remove();
+
+        // 광고 및 배너
+        element.select(".ad-template").remove();
+        element.select(".banner").remove();
+        element.select("[id*='banner']").remove();
+        element.select("[class*='banner']").remove();
+        element.select(".wing-banner").remove();
+
+        // SNS 및 공유 관련
+        element.select(".social-group").remove();
+        element.select(".article-sns").remove();
+        element.select(".sns").remove();
+        element.select(".reveal").remove();  // SNS 팝업
+        element.select(".quick-tool").remove();
+
+        // 네비게이션 및 메뉴
+        element.select(".breadcrumbs").remove();
+        element.select(".user-nav").remove();
+        element.select(".footer-header").remove();
+        element.select(".user-address").remove();
+
+        // 사이드바 및 관련 기사
+        element.select(".box-skin").remove();
+        element.select(".sticky").remove();
+        element.select(".sticky-container").remove();
+        element.select("aside").remove();
+        element.select(".auto-article").remove();
+
+        // 번역 및 언어
+        element.select(".translation_view").remove();
+        element.select(".user-translation").remove();
+        element.select("#google_translate_element").remove();
+        element.select(".goog-te-combo").remove();
+
+        // 댓글
+        element.select("#lv-container").remove();  // 라이브리
+        element.select("[id*='comment']").remove();
+        element.select("[class*='comment']").remove();
+
+        // 기자 정보 (이미 있지만 확실히)
+        element.select(".writer").remove();
         element.select(".journalist").remove();
         element.select(".reporter").remove();
-        element.select("em.link_news").remove();
+        element.select(".byline").remove();
+        element.select(".newsct_journalist").remove();
+        element.select(".media_journalistcard").remove();
+        element.select(".info-group").remove();  // 추가
+
+        // 저작권 및 카피라이트
+        element.select(".article-copy").remove();
+        element.select(".copyright").remove();
+        element.select("[class*='copyright']").remove();
+
+        // 링크 및 관련 기사
+        element.select("a").remove();
+        element.select(".relation_lst").remove();
         element.select(".relation_newslist").remove();
+        element.select(".media_end_linked").remove();
+        element.select(".media_end_categorize").remove();
         element.select(".kwd_tags").remove();
+
+        // 기타 불필요 요소
+        element.select(".end_photo_org").remove();
         element.select(".card-container").remove();
         element.select(".reporter_topNews").remove();
         element.select(".recommend_btn").remove();
         element.select(".ico_share").remove();
         element.select(".maj_list_wrap").remove();
-        element.select(".writer").remove();
         element.select(".view-article").remove();
-        element.select(".article-copy").remove();
-        element.select(".social-group").remove();
         element.select(".footer-menu").remove();
-        element.select(".user-address").remove();
-        element.select(".auto-article").remove();
         element.select("figcaption").remove();
         element.select("center").remove();
         element.select("h6").remove();
         element.select("div[style*='border:1px']").remove();
-        element.select(".copyright").remove();
-        element.select(".media_end_categorize").remove();
-        element.select(".newsct_journalist").remove();
         element.select("#channelBanner").remove();
-        element.select(".media_end_linked").remove();
         element.select(".promotion").remove();
         element.select(".ends_btn").remove();
         element.select(".subscribe_cta_layer").remove();
-        element.select(".media_journalistcard").remove();
 
-        // 표 관련 태그 제거
-        element.select("table").remove(); // 표는 처음부터 하위요소 일괄 제거
+        // 표 관련
+        element.select("table").remove();
 
-        // [2] 줄바꿈 삽입
+        // [날개배너 및 팝업
+        element.select(".off-canvas").remove();
+        element.select(".skip-nav").remove();
+        element.select("#back-to-top").remove();
+        element.select("#sticky-header").remove();
+
+        // 구글 애드센스
+        element.select(".adsbygoogle").remove();
+        element.select("[class*='ad-']").remove();
+
+        // 줄바꿈 삽입
         element.select("br").before("\\n");
         element.select("p").before("\\n\\n");
 
-        // [2] Jsoup.clean으로 HTML 태그 제거하면서 줄바꿈 보존
+        // Jsoup.clean으로 HTML 태그 제거하면서 줄바꿈 보존
         String text = Jsoup.clean(
                 element.html(),
                 "",
@@ -275,7 +337,7 @@ public class NewsCrawlingUtils {
                 new Document.OutputSettings().prettyPrint(false)
         );
 
-        // [3] 이스케이프된 줄바꿈을 실제 줄바꿈으로 변환
+        // 이스케이프된 줄바꿈을 실제 줄바꿈으로 변환
         return text.replace("\\n", "\n")
                 .replaceAll("\\n{3,}", "\n\n")
                 .trim();

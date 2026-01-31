@@ -69,7 +69,7 @@ public class HtmlUtils {
      */
     public static String getText(String text) {
 
-        return Objects.isNull(text) ? null :
+        return Objects.isNull(text) ? "" :
                 Jsoup.clean(text, "", Safelist.none(), NO_PRETTY_PRINT)
                 .replace("&nbsp;", " ")
                 .replace("&lt;", "<")

@@ -30,10 +30,7 @@ import java.util.stream.IntStream;
 public final class ParallelUtils {
 
     // SEMAPHORE (최대 작업 스레드 제한)
-    public static final Semaphore SEMAPHORE_UNLIMITED = new Semaphore(Integer.MAX_VALUE);
-    public static final Semaphore SEMAPHORE_NEWS_CRAWLING_NAVER = new Semaphore(3);
-    public static final Semaphore SEMAPHORE_NEWS_CRAWLING_ETC = new Semaphore(10);
-    public static final Semaphore SEMAPHORE_SYNC_STOCK = new Semaphore(5);
+    private static final int SEMAPHORE_TIMEOUT = 30;
 
     // 최대 재시도 횟수 (지금은 그냥 여기서 일괄 통제)
     private static final int MAX_RETRY = 5;
@@ -397,8 +394,8 @@ public final class ParallelUtils {
     private static <T> T runWithLimit(Semaphore semaphore, Supplier<T> task) throws InterruptedException {
 
         try {
-            // 30초 동안 작업 획득 대기 (최대 프로세스 제한)
-            if (!semaphore.tryAcquire(30, TimeUnit.SECONDS))
+            // 작업 획득대기 (5분)
+            if (!semaphore.tryAcquire(SEMAPHORE_TIMEOUT, TimeUnit.MINUTES))
                 throw new UtilsException(AppStatus.UTILS_SEMAPHORE_ACQUIRE_FAILED);
 
             // 로직 수행

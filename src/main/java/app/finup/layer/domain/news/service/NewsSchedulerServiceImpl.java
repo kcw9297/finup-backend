@@ -57,8 +57,8 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
     private static final int AMOUNT_NEWS_MAIN = 100; // 검색 기사 수량
     private static final int AMOUNT_NEWS_STOCK = 50; // 검색 기사 수량
     private static final Duration WAIT_SYNC_STOCK = Duration.ofMillis(3000);
-    private static final Duration WAIT_CRAWL_INTERVAL = Duration.ofMillis(1000);
-    private static final Duration WAIT_CRAWL_NAVER = Duration.ofMillis(1500);
+    private static final Duration WAIT_CRAWL_INTERVAL = Duration.ofMillis(2000);
+    private static final Duration WAIT_CRAWL_NAVER = Duration.ofMillis(1000);
 
 
     @CacheEvict( // 기존 캐시 삭제
@@ -134,7 +134,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 "종목 뉴스 크롤링 병렬 처리",
                 requests,
                 request -> processSyncStock(request, curEntityMap, totalSearched, totalTitleFiltered, totalSaved, successStocks, processedStocks, tryStocks, failedStocks),
-                ParallelUtils.SEMAPHORE_SYNC_STOCK,
+                new Semaphore(4),
                 syncNewsExecutor
         );
 
@@ -295,7 +295,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 "네이버 뉴스 크롤링",
                 naverNewsRequest,
                 crawler,
-                ParallelUtils.SEMAPHORE_NEWS_CRAWLING_NAVER, // 공유 세마포어 사용 (Rate Limit 방지)
+                new Semaphore(1), // 각 종목마다 내부에선 2개의 쓰레드로 수행
                 crawlingExecutor,
                 WAIT_CRAWL_NAVER
         ).stream();
@@ -305,7 +305,7 @@ public class NewsSchedulerServiceImpl implements NewsSchedulerService {
                 "기타 뉴스 크롤링",
                 etcNewsRequest,
                 crawler,
-                ParallelUtils.SEMAPHORE_NEWS_CRAWLING_ETC,
+                new Semaphore(5), // 각 종목마다 기타 언론사는 5개의 쓰레드를 갖고 수행
                 crawlingExecutor
         ).stream();
 
