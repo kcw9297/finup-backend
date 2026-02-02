@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class VideoLinkPrompt {
 
+    // placeholder
+    public static final String INPUT = "${INPUT}";
+    public static final String LATEST_SENTENCES = "${LATEST_SENTENCES}";
+
 
     public static final String PROMPT_RECOMMEND_SENTENCE_HOME =
             """

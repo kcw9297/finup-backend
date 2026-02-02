@@ -3,11 +3,6 @@ package app.finup.layer.domain.uploadfile.service;
 import app.finup.layer.domain.uploadfile.dto.UploadFileDto;
 
 import java.util.Collection;
-import java.util.List;
-
-import app.finup.layer.domain.uploadfile.entity.UploadFile;
-import org.springframework.web.multipart.MultipartFile;
-
 
 
 /**
@@ -26,18 +21,10 @@ public interface UploadFileService {
 
 
     /**
-     * 고아 파일 일괄 조회 (주인 없는 파일)
-     * @return 조회된 모든 고아파일 엔티티 리스트
-     */
-    List<UploadFileDto.Detail> getOrphanList();
-
-
-    /**
      * 파일 일괄 삭제
      * @param uploadFileIds 삭제 대상 파일번호 리스트
      */
     void removeAll(Collection<Long> uploadFileIds);
 
-    UploadFile upload(MultipartFile file);
 
 }

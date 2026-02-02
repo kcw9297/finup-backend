@@ -1,6 +1,6 @@
 package app.finup.layer.domain.videolink.redis;
 
-import app.finup.layer.domain.videolink.constant.VideoLinkCache;
+import app.finup.layer.domain.videolink.constant.VideoLinkRedisKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -26,7 +26,7 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
 
     // 사용 상수
     private static final Duration TTL_LATEST_KEYWORDS = Duration.ofHours(12); // 12시간 지속
-    private static final int MAX_STORE_AMOUNT_ID = 25; // 4개 저장
+    private static final int MAX_STORE_AMOUNT_ID = 5;
     private static final int MAX_SENTENCE_HOME = 5;
 
 
@@ -34,7 +34,7 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
     public void storeLatestRecommendedIds(List<String> videoLinkIds, Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_RECOMMENDED_VIDEO_IDS
+        String key = VideoLinkRedisKey.KEY_LATEST_RECOMMENDED_VIDEO_IDS
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] 현재 키 존재여부 확인
@@ -51,7 +51,7 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
     public List<Long> getLatestRecommendedIds(Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_RECOMMENDED_VIDEO_IDS
+        String key = VideoLinkRedisKey.KEY_LATEST_RECOMMENDED_VIDEO_IDS
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] redis 내 저장된 최근 문자열 일괄 조회
@@ -69,7 +69,7 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
     public void storeLatestSentenceForHome(String sentence, Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_SENTENCE_HOME
+        String key = VideoLinkRedisKey.KEY_LATEST_SENTENCE_HOME
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] 현재 키 존재여부 확인
@@ -86,7 +86,7 @@ public class VideoLinkRedisStorageImpl implements VideoLinkRedisStorage {
     public String getLatestSentenceForHome(Long memberId) {
 
         // [1] key 생성
-        String key = VideoLinkCache.LATEST_SENTENCE_HOME
+        String key = VideoLinkRedisKey.KEY_LATEST_SENTENCE_HOME
                 .replace("${MEMBER_ID}", String.valueOf(memberId));
 
         // [2] redis 내 저장된 최근 문장 일괄 조회

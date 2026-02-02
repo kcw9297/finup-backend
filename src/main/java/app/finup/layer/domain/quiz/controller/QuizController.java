@@ -1,6 +1,7 @@
 package app.finup.layer.domain.quiz.controller;
 
 import app.finup.common.constant.Url;
+import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.layer.domain.quiz.dto.QuizDto;
 import app.finup.layer.domain.quiz.service.QuizAiService;
@@ -31,8 +32,8 @@ public class QuizController {
      * [GET] quiz/getQuestion
      */
     @GetMapping("/getQuestion")
-    public ResponseEntity<?> getQuestion() {
-        return Api.ok(quizAiService.getQuizAi());
+    public ResponseEntity<?> getQuestion(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return Api.ok(quizAiService.generateQuestions(userDetails.getMemberId()));
     }
 
     /**
@@ -40,12 +41,12 @@ public class QuizController {
      * [POST] quiz/result
      */
     @PostMapping("/result")
-    public ResponseEntity<?> saveResult(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody QuizDto.Add rq) {
-        Long memberId = userDetails.getMemberId();
-        int score = rq.getScore();
-        log.info("memberId 잘 가져와지냐?: {}", memberId.toString());
-        log.info("score 잘 가져와지냐?: {}", score);
-        quizService.save(memberId, score);
-        return Api.ok();
+    public ResponseEntity<?> saveResult(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody QuizDto.Add rq) {
+
+        rq.setMemberId(userDetails.getMemberId());
+        quizService.record(rq);
+        return Api.ok(AppStatus.QUIZ_OK_RECORD);
     }
 }

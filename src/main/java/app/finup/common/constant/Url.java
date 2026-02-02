@@ -26,6 +26,7 @@ public class Url {
 
     /* auth */
     public static final String AUTH = API + "/auth";
+    public static final String PATTERN_AUTH = AUTH + "/**";
 
     /* uploadFile */
     public static final String UPLOAD_FILE = API + "/upload-file";
@@ -105,23 +106,13 @@ public class Url {
     /* word quiz */
     public static final String WORD_QUIZ = API + "/word-quizzes";
 
-    /* home */
-    public static final String HOME = API + "/home";
-    public static final String HOME_PUBLIC = PUBLIC + HOME;
-
-    /* exchange-rate */
-    public static final String EXCHANGE = "/exchange-rates";
-    public static final String HOME_EXCHANGE_PUBLIC = HOME_PUBLIC + EXCHANGE;
-
-    /* index-market */
-    public static final String MARKET = "/index-market";
-    public static final String HOME_MARKET_PUBLIC = HOME_PUBLIC + MARKET;
+    /* indicator */
+    public static final String INDICATOR = API + "/indicators";
+    public static final String INDICATOR_PUBLIC = PUBLIC + INDICATOR;
 
     /* quiz */
     public static final String QUIZ = API + "/quiz";
-    /* ======================================== 작성 영역 끝 ========================================================= */
 
-    /* DOMAIN - PATTERN */
-    public static final String PATTERN_AUTH = AUTH + "/**";
+    /* ======================================== 작성 영역 끝 ========================================================= */
 
 }

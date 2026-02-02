@@ -3,15 +3,17 @@ package app.finup.security.filter;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.JwtVerifyException;
 import app.finup.common.utils.Api;
-import app.finup.common.utils.StrUtils;
+import app.finup.infra.file.storage.FileStorage;
+import app.finup.security.dto.LoginMember;
+import app.finup.security.service.SecurityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import app.finup.common.manager.CookieManager;
+import app.finup.common.provider.CookieProvider;
 import app.finup.common.utils.LogUtils;
-import app.finup.infra.jwt.dto.JwtClaims;
-import app.finup.infra.jwt.provider.JwtProvider;
+import app.finup.security.dto.JwtClaims;
+import app.finup.security.jwt.provider.JwtProvider;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -40,14 +42,17 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // 사용 의존성
+    private final SecurityService securityService;
+    private final FileStorage fileStorage;
     private final JwtProvider jwtProvider;
-    private final CookieManager cookieManager;
+    private final CookieProvider cookieProvider;
 
     @Value("${jwt.cookie-name}")
-    private String jwtCookieName;
+    private String cookieName;
 
     @Value("${jwt.expiration.cookie}")
-    private Duration jwtCookieExpiration;
+    private Duration cookieExpiration;
 
     /*
         [ 인증 필터 - JWT 토큰 검증 및 재발급 처리 ]
@@ -64,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
 
             // [1] Cookie 내 포함된 AT 조회
-            String at = cookieManager.getValue(request, jwtCookieName);
+            String at = cookieProvider.getValue(request, cookieName);
             String xsrfToken = request.getHeader("X-XSRF-TOKEN");
             //LogUtils.showInfo(this.getClass(), "\nCOOKIE JWT TOKEN : %s\nHEADER XSRF-TOKEN : %s", at, xsrfToken);
 
@@ -75,14 +80,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 토큰 인증에 실패하거나, 재발급 실패 시 실패 응답 반환
         } catch (JwtVerifyException e) {
             LogUtils.showWarn(this.getClass(), "JWT 인증 실패 - 미인증 상태로 처리: %s", e.getAppStatus().getInfo());
-            cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
+            cookieProvider.invalidateCookie(response, cookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
             request.setAttribute(AppStatus.TOKEN_EXPIRED.name(), true); // 토큰이 만료되었음을 안내하는 속성 추가
             filterChain.doFilter(request, response); // 미인증 상태로 그대로 통과
 
             // 예기치 않은 오류가 발생한 경우
         } catch (Exception e) {
             LogUtils.showError(this.getClass(), "JWT 인증 실패 - 요청 중단 : %s", e.getMessage());
-            cookieManager.invalidateCookie(response, jwtCookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
+            cookieProvider.invalidateCookie(response, cookieName); // 지금 인증 쿠키는 유효하지 않으니 제거
             Api.writeFail(response, AppStatus.TOKEN_INVALID); // 필터 처리 중단 (로직 실행하지 않음)
         }
     }
@@ -115,7 +120,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtVerifyException e) {
 
             // [2] AT만료 이외의 사유인 경우 그대로 던짐 (RT 만료인 경우도 던짐)
-            if (!StrUtils.equalsStatus(e.getAppStatus(), AppStatus.TOKEN_EXPIRED))
+            if (!Objects.equals(e.getAppStatus(), AppStatus.TOKEN_EXPIRED))
                 throw e;
 
             // [3] Claims 조회 시도
@@ -132,7 +137,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String reissuedAt = jwtProvider.reissue(at);
 
             // [2] 새 쿠키 생성
-            cookieManager.createCookie(response, jwtCookieName, reissuedAt, jwtCookieExpiration);
+            cookieProvider.createCookie(response, cookieName, reissuedAt, cookieExpiration);
 
             // [3] 재발급된 토큰에서 Claims 조회 및 반환
             return jwtProvider.getClaims(reissuedAt);
@@ -152,14 +157,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // JWT Claims 정보 기반 UserDetails 생성
     private CustomUserDetails setUserDetails(JwtClaims jwtClaims) {
 
+        // [1] Claims 정보
+        Long memberId = jwtClaims.getMemberId();
+
+        // [2] 회원 정보
+        LoginMember loginMember = securityService.getLoginMember(memberId);
+
+        // [2] 회원 조회 정보
         return CustomUserDetails.builder()
-                .memberId(jwtClaims.getMemberId())
-                .email(jwtClaims.getEmail())
-                .nickname(jwtClaims.getNickname())
-                .role(jwtClaims.getRole())
-                .social(jwtClaims.getSocial())
-                .profileImageUrl(jwtClaims.getProfileImageUrl())
-                .authorities(List.of(new SimpleGrantedAuthority(MemberRole.valueOf(jwtClaims.getRole()).getAuthority())))
+                .memberId(memberId)
+                .email(loginMember.getEmail())
+                .nickname(loginMember.getNickname())
+                .role(loginMember.getRole())
+                .social(loginMember.getSocial())
+                .profileImageUrl(loginMember.getProfileImageUrl())
+                .authorities(List.of(new SimpleGrantedAuthority(MemberRole.valueOf(loginMember.getRole()).getAuthority())))
                 .build();
     }
 }

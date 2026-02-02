@@ -2,13 +2,13 @@ package app.finup.security.controller;
 
 import app.finup.common.constant.Const;
 import app.finup.common.constant.Url;
-import app.finup.layer.domain.auth.dto.AuthDtoMapper;
+import app.finup.security.dto.LoginMemberProfile;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import app.finup.common.enums.AppStatus;
-import app.finup.common.manager.CookieManager;
+import app.finup.common.provider.CookieProvider;
 import app.finup.common.utils.Api;
-import app.finup.infra.jwt.provider.JwtProvider;
+import app.finup.security.jwt.provider.JwtProvider;
 import app.finup.security.dto.CustomUserDetails;
 import app.finup.security.dto.Login;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class SecurityLoginController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
-    private final CookieManager cookieManager;
+    private final CookieProvider cookieProvider;
 
     @Value("${jwt.cookie-name}")
     private String jwtCookieName;
@@ -71,8 +71,8 @@ public class SecurityLoginController {
         String jwt = jwtProvider.login(userDetails);
 
         // [5] AT 정보를 쿠키에 담아 전달 후, 성공 응답 전달
-        cookieManager.createCookie(response, jwtCookieName, jwt, jwtCookieExpiration);
-        return Api.ok(AppStatus.AUTH_OK_LOGIN, AuthDtoMapper.toLoginMember(userDetails));
+        cookieProvider.createCookie(response, jwtCookieName, jwt, jwtCookieExpiration);
+        return Api.ok(AppStatus.AUTH_OK_LOGIN, LoginMemberProfile.of(userDetails));
     }
 
 
@@ -84,13 +84,13 @@ public class SecurityLoginController {
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
 
         // [1] 쿠키 내 AT 조회
-        String at = cookieManager.getValue(request, jwtCookieName);
+        String at = cookieProvider.getValue(request, jwtCookieName);
 
         // [2] 만약, AT가 존재하고 만료된 상태가 아니라면 토큰 무효화 수행
         if (Objects.nonNull(at) && Objects.isNull(request.getAttribute(AppStatus.TOKEN_EXPIRED.name()))) {
-            jwtProvider.logout(at); // Redis 내 RT 제거
-            cookieManager.invalidateCookie(response, jwtCookieName); // AT Cookie 무효화
-            cookieManager.invalidateCookie(response, Const.XSRF_TOKEN); // XSRF 토큰 무효화
+            jwtProvider.invalidateRefreshToken(at); // Redis 내 RT 제거
+            cookieProvider.invalidateCookie(response, jwtCookieName); // AT Cookie 무효화
+            cookieProvider.invalidateCookie(response, Const.XSRF_TOKEN); // XSRF 토큰 무효화
         }
 
         // [3] 성공 응답 반환

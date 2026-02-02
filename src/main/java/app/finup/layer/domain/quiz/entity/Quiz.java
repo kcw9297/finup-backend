@@ -21,33 +21,25 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Quiz extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quizId;
 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "member_id",
-            nullable = false
-    )
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Integer score;
 
     @CreatedDate
-    @LastModifiedDate
     private LocalDateTime regdate;
 
     @Builder
     private Quiz(Member member, Integer score) {
         this.member = member;
         this.score = score;
-        setDefault();
-    }
-
-    private void setDefault() {
-        if (this.score == null) this.score = 0;
     }
 }

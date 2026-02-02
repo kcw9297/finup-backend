@@ -1,5 +1,6 @@
 package app.finup.layer.domain.notice.scheduler;
 
+import app.finup.common.constant.AsyncMode;
 import app.finup.common.utils.LogUtils;
 import app.finup.layer.domain.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class NoticeScheduler {
     private final NoticeService noticeService;
 
     @Scheduled(fixedDelay = 10, initialDelay = 3, timeUnit = TimeUnit.SECONDS)
-    @Async("schedulerExecutor")
+    @Async(AsyncMode.NORMAL)
     public void syncViewCount() {
         noticeService.syncViewCount();
     }

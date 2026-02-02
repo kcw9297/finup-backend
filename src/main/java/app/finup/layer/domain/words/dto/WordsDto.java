@@ -2,6 +2,8 @@ package app.finup.layer.domain.words.dto;
 
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -17,54 +19,15 @@ public final class WordsDto {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Row {
+    public static class Row implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
+
         private Long termId;
         private String name;
         private String description;
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class Search {
-        private Integer pageNum;
-        private Integer pageSize;
-
-        private String keyword;
-        private String filter;
-        private String order;
-
-
-        public Search() {
-            this.keyword = "";
-            this.pageNum = 0;
-            this.pageSize = 10;
-            this.filter = "";
-            this.order = "name_asc";
-        }
-
-        public Integer getOffset() {
-            return pageNum * pageSize;
-        }
-
-        public Integer getLimit() {
-            return pageSize;
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class WordsHome {
-        private List<Row> todayWords;
-        private List<String> recentKeywords;
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class Similarity {
-        Long termId;
-        String name;
-        String description;
-        double score;
-    }
 
 }

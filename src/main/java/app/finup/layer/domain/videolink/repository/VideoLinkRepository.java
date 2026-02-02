@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.List;
  * @author kcw
  * @since 2025-12-02
  */
+@Transactional(readOnly = true)
 public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
 
     boolean existsByVideoId(String videoId);
@@ -55,6 +57,7 @@ public interface VideoLinkRepository extends JpaRepository<VideoLink, Long> {
     List<VideoLink> findSimilarWithThreshold(byte[] embedding, int lim, double threshold);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM VideoLink vl

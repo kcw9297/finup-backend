@@ -3,26 +3,25 @@ package app.finup.layer.domain.member.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
+import app.finup.infra.file.storage.FileStorage;
+import app.finup.layer.base.template.UploadFileCodeTemplate;
 import app.finup.layer.domain.auth.redis.AuthRedisStorage;
 import app.finup.layer.domain.member.dto.MemberDto;
 import app.finup.layer.domain.member.dto.MemberDtoMapper;
 import app.finup.layer.domain.member.entity.Member;
 import app.finup.layer.domain.member.mapper.MemberMapper;
 import app.finup.layer.domain.member.repository.MemberRepository;
+import app.finup.layer.domain.uploadfile.entity.UploadFile;
+import app.finup.security.constant.SecurityRedisKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import app.finup.layer.domain.uploadfile.entity.UploadFile;
-import app.finup.layer.domain.uploadfile.service.UploadFileService;
 import org.springframework.web.multipart.MultipartFile;
-import app.finup.security.dto.CustomUserDetails;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
-import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 
 
 import java.util.List;
@@ -38,11 +37,9 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
-
     private final PasswordEncoder passwordEncoder;
     private final AuthRedisStorage authRedisStorage;
-
-    private final UploadFileManager uploadFileManager;
+    private final FileStorage fileStorage;
 
 
     @Override
@@ -110,72 +107,53 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    /**
-     * 조회를 위해 사용
-     *
-     * @param memberId
-     * @return
-     */
+
+    @CacheEvict(
+            value = SecurityRedisKey.CACHE_LOGIN_MEMBER,
+            key = "#rq.memberId"
+    )
+    @Override
+    public String editNickname(MemberDto.EditNickname rq) {
+
+        // [1] 회원 조회
+        Member member = getMember(rq.getMemberId());
+
+        // [2] 닉네임 중복 체크
+        if (memberRepository.existsByNickname(rq.getNickname()))
+            throw new BusinessException(AppStatus.MEMBER_DUPLICATE_NICKNAME);
+
+        // [3] 닉네임 수정
+        member.editNickname(rq.getNickname());
+        return member.getNickname();
+    }
+
+
+    @Override
+    public void editPassword(MemberDto.EditPassword rq) {
+
+        // [1] 회원 조회
+        Member member = getMember(rq.getMemberId());
+
+        // [2] 현재 비밀번호 검증 (수정 전/후와 같은지 확인)
+        if (passwordEncoder.matches(rq.getNewPassword(), member.getPassword()))
+            throw new BusinessException(AppStatus.MEMBER_EQUAL_PASSWORD);
+
+        // [3] 새 비밀번호 암호화 후 변경
+        member.editPassword(passwordEncoder.encode(rq.getNewPassword()));
+    }
+
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
     }
 
-    /**
-     * 닉네임 수정
-     *
-     * @param
-     * @param rq 닉네임 수정 요청 DTO
-     */
-    @Override
-    public String editNickname(MemberDto.EditNickname rq) {
 
-        Long memberId = rq.getMemberId();
 
-        // [1] 회원 조회
-        Member member = getMember(memberId);
 
-        // [2] 닉네임 중복 체크 (본인 제외)
-        if (memberRepository.existsByNicknameAndMemberIdNot(rq.getNickname(), memberId)) {
-            throw new BusinessException(AppStatus.MEMBER_DUPLICATE_NICKNAME);
-        }
-
-        // [3] 닉네임 수정
-        member.editNickname(rq.getNickname());
-
-        return member.getNickname();
-    }
-
-    /**
-     * 비밀번호 수정
-     *
-     * @param
-     * @param rq 비밀번호 수정 요청 DTO
-     */
-    @Override
-    public String editPassword(MemberDto.EditPassword rq) {
-
-        Long memberId = rq.getMemberId();
-
-        // [1] 회원 조회
-        Member member = getMember(memberId);
-
-        // [2] 현재 비밀번호 검증
-        if (!passwordEncoder.matches(rq.getCurrentPassword(), member.getPassword())) {
-            throw new BusinessException(AppStatus.AUTH_BAD_CREDENTIALS);
-        }
-
-        // [3] 새 비밀번호 암호화 후 변경
-        member.editPassword(passwordEncoder.encode(rq.getNewPassword()));
-
-        return "OK";
-    }
-
-    /**
-     * 프로필 이미지 수정
-     * @param memberId 회원 번호
-     * @param file     업로드 이미지 파일
-     */
+    @CacheEvict(
+            value = SecurityRedisKey.CACHE_LOGIN_MEMBER,
+            key = "#memberId"
+    )
     @Override
     public String editProfileImage(Long memberId, MultipartFile file) {
 
@@ -187,13 +165,12 @@ public class MemberServiceImpl implements MemberService {
         // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
         if (Objects.nonNull(member.getProfileImageFile())) member.removeProfileImage().softRemove();
 
-        // [3] 새롭게 등록하는 파일 엔티티 생성 후 삽입
-        UploadFile newProfileImageFile = uploadFileManager.setEntity(file, memberId, FileOwner.MEMBER, FileType.PROFILE);
-        member.editProfileImage(newProfileImageFile);
-
-        uploadFileManager.store(file, newProfileImageFile.getFilePath());
-
-        return uploadFileManager.getFullUrl(newProfileImageFile.getFilePath());
+        // [3] 프로필 이미지 업로드 처리 후 프로필 이미지 URL 반환
+        return UploadFileCodeTemplate.uploadFileAndSaveEntity(
+                fileStorage,
+                file, memberId, FileOwner.MEMBER, FileType.PROFILE,
+                member::editProfileImage
+        );
 
     }
 
@@ -201,6 +178,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional(readOnly = true)
     public MemberDto.Detail getDetail(Long memberId) {
+
         // [1] 회원 조회 (존재 여부 검증 포함)
         Member member = memberRepository.findByIdWithProfileImage(memberId)
                 .orElseThrow(() -> new BusinessException(AppStatus.MEMBER_NOT_FOUND));
@@ -209,14 +187,12 @@ public class MemberServiceImpl implements MemberService {
         MemberDto.Detail memberDetail = MemberDtoMapper.toDetail(member);
 
         // [3] 프로필 이미지 URL 보정
-        if (member.getProfileImageFile() != null) {
-            memberDetail.setProfileImageUrl(
-                    uploadFileManager.getFullUrl(
-                            member.getProfileImageFile().getFilePath()
-                    )
-            );
-        }
+        UploadFile profileImageFile = member.getProfileImageFile();
+        if (Objects.nonNull(profileImageFile) && Objects.nonNull(profileImageFile.getFilePath()))
+            memberDetail.setProfileImageUrl(fileStorage.getUrl(profileImageFile.getFilePath()));
 
         return memberDetail;
     }
+
 }
+

@@ -3,27 +3,22 @@ package app.finup.layer.domain.studyword.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.provider.EmbeddingProvider;
-import app.finup.infra.ai.utils.AiUtils;
+import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.common.utils.AiUtils;
+import app.finup.infra.file.storage.FileStorage;
+import app.finup.layer.base.template.UploadFileCodeTemplate;
 import app.finup.layer.domain.studyword.dto.StudyWordDto;
-import app.finup.layer.domain.studyword.dto.StudyWordDtoMapper;
 import app.finup.layer.domain.studyword.entity.StudyWord;
 import app.finup.layer.domain.studyword.mapper.StudyWordMapper;
 import app.finup.layer.domain.studyword.repository.StudyWordRepository;
-import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
-import app.finup.layer.domain.uploadfile.manager.UploadFileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,8 +36,9 @@ public class StudyWordServiceImpl implements StudyWordService {
 
     private final StudyWordRepository studyWordRepository;
     private final StudyWordMapper studyWordMapper;
-    private final UploadFileManager uploadFileManager; // 파일 엔티티 및 주소 제공
     private final EmbeddingProvider embeddingProvider;
+    private final FileStorage fileStorage;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -55,7 +51,7 @@ public class StudyWordServiceImpl implements StudyWordService {
         // [2] filePath 상대주소에, 현재 프로젝트 파일 도메인 첨부
         rows.stream()
                 .filter(row -> Objects.nonNull(row.getImageUrl()))
-                .forEach(row -> row.setImageUrl(uploadFileManager.getFullUrl(row.getImageUrl())));
+                .forEach(row -> row.setImageUrl(fileStorage.getUrl(row.getImageUrl())));
 
         // [3] 검색 결과 반환 (페이징 객체로 변환)
         return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
@@ -100,17 +96,15 @@ public class StudyWordServiceImpl implements StudyWordService {
 
         // [2] 변경 전 원래 이미지 정보 추출 후, 소유자를 null로 변경
         // Soft Delete 처리 (나중에 스케줄러에서 파일 삭제)
-        if (Objects.nonNull(studyWord.getWordImageFile())) studyWord.removeImage().softRemove();
+        if (Objects.nonNull(studyWord.getWordImageFile()))
+            studyWord.removeImage().softRemove();
 
-        // [3] 새롭게 등록하는 파일 엔티티 생성 후, 삽입
-        UploadFile newImageFile = uploadFileManager.setEntity(file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD);
-        studyWord.uploadImage(newImageFile); // cascade 옵션으로 인해 자동 저장됨
-
-        // [4] 새롭게 추가된 파일 생성
-        uploadFileManager.store(file, newImageFile.getFilePath());
-
-        // [5] 업로드한 파일 주소 반환
-        return uploadFileManager.getFullUrl(newImageFile.getFilePath());
+        // [3] 파일 업로드 처리 수행 및 파일 URL 반환
+        return UploadFileCodeTemplate.uploadFileAndSaveEntity(
+                fileStorage,
+                file, studyWordId, FileOwner.STUDY_WORD, FileType.UPLOAD,
+                studyWord::uploadImage
+        );
     }
 
 
@@ -173,19 +167,5 @@ public class StudyWordServiceImpl implements StudyWordService {
         studyWord.removeImage().softRemove();
     }
 
-    @Override
-    public List<StudyWordDto.Quiz> getQuizData() {
 
-        // [1] 엔티티 조회 : 랜덤 20개
-        List<StudyWord> studyWordList = studyWordRepository.findRandomWords(PageRequest.of(0, 20));
-
-        // [2] StudyWordDto.Quiz List 생성
-        List<StudyWordDto.Quiz> result = new ArrayList<>();
-        for (StudyWord studyWord : studyWordList) {
-            StudyWordDto.Quiz quizData = StudyWordDtoMapper.toQuiz(studyWord);
-            result.add(quizData);
-        }
-        // [3] 반환
-        return result;
-    }
 }
