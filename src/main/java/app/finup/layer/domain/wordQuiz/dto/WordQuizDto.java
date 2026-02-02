@@ -2,6 +2,8 @@ package app.finup.layer.domain.wordQuiz.dto;
 
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 @Builder
@@ -11,7 +13,10 @@ public final class WordQuizDto {
     @Data
     @AllArgsConstructor
     @Builder
-    public static class Today {
+    public static class Today implements Serializable {
+
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         private Long termId;            // 기준 단어 ID
         private String question;        // 설명

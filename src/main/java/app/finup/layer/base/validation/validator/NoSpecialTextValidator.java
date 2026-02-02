@@ -35,7 +35,7 @@ public class NoSpecialTextValidator implements ConstraintValidator<NoSpecialText
 
         // 사용자 입력 오류 메세지
         if (Objects.isNull(message) || message.isBlank()) {
-            if (min == 1) message = "최대 %d자 이내 한글/영문/숫자를 입력해야 합니다.".formatted(max);
+            if (min <= 1) message = "최대 %d자 이내 한글/영문/숫자를 입력해야 합니다.".formatted(max);
             else message = "%d-%d자 사이 한글/영문/숫자를 입력해야 합니다.".formatted(min, max);
         }
     }

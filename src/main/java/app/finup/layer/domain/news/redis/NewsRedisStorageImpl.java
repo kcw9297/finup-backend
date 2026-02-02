@@ -1,47 +1,50 @@
 package app.finup.layer.domain.news.redis;
 
 import app.finup.common.utils.StrUtils;
-import com.fasterxml.jackson.core.type.TypeReference;
+import app.finup.layer.domain.news.constant.NewsRedisKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
+/**
+ * NewsRedisStorage 구현 클래스
+ * @author kcw
+ * @since 2026-01-07
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class NewsRedisStorageImpl implements NewsRedisStorage {
 
+    // 사용 의존성
     private final StringRedisTemplate srt;
 
-    @Override
-    public void saveNews(String key, Object data, Duration ttl) {
-        srt.opsForValue().set(key, StrUtils.toJson(data), ttl);
-    }
+    // 사용 상수
+    private static final Duration TTL_ANALYZE = Duration.ofHours(1); // 종목 상세 정보
+
 
     @Override
-    public <T> T getNews(String key, Class<T> clazz) {
-        String json = srt.opsForValue().get(key);
-        return Objects.isNull(json) ? null : StrUtils.fromJson(json, clazz);
+    public void storePrevAnalyze(Long newsId, Long memberId, String analyzation) {
+        srt.opsForValue().set(getKey(NewsRedisKey.KEY_ANALYZE, newsId, memberId), analyzation, TTL_ANALYZE);
     }
 
-    @Override
-    public <T> T getNews(String key, TypeReference<T> type) {
-        String json = srt.opsForValue().get(key);
-        return Objects.isNull(json) ? null : StrUtils.fromJson(json, type);
-    }
 
     @Override
-    public void deleteNews(String key) {
-        srt.delete(key);
+    public String getPrevAnalyze(Long newsId, Long memberId) {
+        return srt.opsForValue().get(getKey(NewsRedisKey.KEY_ANALYZE, newsId, memberId));
     }
 
-    @Override
-    public boolean exists(String key) {
-        return srt.hasKey(key);
+
+    // key 조립 수행
+    private String getKey(String baseKey, Long newsId, Long memberId) {
+
+        return StrUtils.fillPlaceholder(
+                baseKey,
+                Map.of(NewsRedisKey.NEWS_ID, String.valueOf(newsId), NewsRedisKey.MEMBER_ID, String.valueOf(memberId))
+        );
     }
 }

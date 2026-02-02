@@ -1,15 +1,21 @@
 package app.finup.layer.domain.words.repository;
 
+import app.finup.layer.domain.words.dto.WordsAiDto;
 import app.finup.layer.domain.words.entity.Words;
+import app.finup.layer.domain.words.enums.WordsLevel;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 public interface WordsRepository extends JpaRepository<Words, Long> {
+
     Optional<Words> findByName(@Param("name") String name);
 
     long count();
@@ -46,4 +52,40 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
 
     @Query("select w from Words w order by w.termId asc")
     List<Words> findTop10(Pageable pageable);
+
+
+    @Query("""
+        SELECT w
+        FROM Words w
+        WHERE
+            w.wordsLevel = :wordsLevel AND
+            w.termId NOT IN :excludeIds
+        ORDER BY FUNCTION('RAND')
+        LIMIT :lim
+    """)
+    List<Words> findRandomByWordLevelWithExcludeIds(WordsLevel wordsLevel, Collection<Long> excludeIds, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM words
+        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%')) 
+              AND embedding IS NOT NULL
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<Words> findWithSimilarByKeyword(String keyword, byte[] embedding, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
+        FROM words w
+        WHERE w.term_id NOT IN :prevIds
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<Words> findWithSimilarExcludePrev(byte[] embedding, List<Long> prevIds, int lim);
+
 }

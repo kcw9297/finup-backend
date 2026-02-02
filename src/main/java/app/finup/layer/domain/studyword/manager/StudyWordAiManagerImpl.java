@@ -1,7 +1,8 @@
 package app.finup.layer.domain.studyword.manager;
 
+import app.finup.common.utils.AiUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.provider.ChatProvider;
+import app.finup.infra.ai.ChatProvider;
 import app.finup.layer.domain.studyword.constant.StudyWordPrompt;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class StudyWordAiManagerImpl implements StudyWordAiManager {
 
         // [2] 답변 기반 배열로 변환 및 반환
         String response = chatProvider.query(prompt);
-        String cleanResponse = StrUtils.removeMarkdownBlock(response);
+        String cleanResponse = AiUtils.removeMarkdown(response);
         log.warn("AI RESPONSE JSON : {}, clean ver : {}", response, cleanResponse);
         return StrUtils.fromJson(cleanResponse, new TypeReference<>(){});
     }

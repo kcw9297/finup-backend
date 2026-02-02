@@ -28,19 +28,4 @@ public interface VideoService {
     List<VideoDto.Row> search(String keyword);
 
 
-    /**
-     * 홈페이지 유튜브 영상 추천 (Index 페이지)
-     * RAG, VectorDB와 관여되있지 않고, AI가 추천한 검색어 기반으로만 검색
-     * @return 추천 영상목록 DTO 리스트
-     */
-    List<VideoDto.Row> recommendForHome();
-
-
-    /**
-     * 주식 유튜브 영상 추천 (특정 상세종목)
-     * @param stockId 주식 고유번호 (6자리)
-     * @param stockName 주식 종목명 (한글)
-     * @return 추천 영상목록 DTO 리스트
-     */
-    List<VideoDto.RecommendRow> recommendForStock(String stockId, String stockName);
 }

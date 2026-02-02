@@ -38,10 +38,19 @@ spring:
           max-active: 8
           max-idle: 6
           min-idle: 3
+          max-wait: -1ms
 
 app:
   redis:
     scan-count: 100
+
+    redisson:
+      connection-pool-size: 8
+      connection-minimum-idle: 3
+      idle-connection-timeout: 10000  # 10초
+      retry-attempts: 3
+      retry-delay-min: 500
+      retry-delay-max: 1000
 
 # ===============================
 # profile - prod
@@ -64,7 +73,16 @@ spring:
           max-active: 10
           max-idle: 8
           min-idle: 5
+          max-wait: 10s
 
 app:
   redis:
     scan-count: 1000
+
+    redisson:
+      connection-pool-size: 50
+      connection-minimum-idle: 10
+      idle-connection-timeout: 30000
+      retry-attempts: 5
+      retry-delay-min: 1000
+      retry-delay-max: 2000

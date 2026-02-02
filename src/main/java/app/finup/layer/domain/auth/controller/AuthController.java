@@ -4,15 +4,14 @@ import app.finup.common.constant.Url;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.utils.Api;
 import app.finup.common.utils.LogUtils;
-import app.finup.layer.domain.auth.dto.AuthDtoMapper;
 import app.finup.layer.domain.auth.service.AuthService;
 import app.finup.security.dto.CustomUserDetails;
+import app.finup.security.dto.LoginMemberProfile;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -41,8 +40,9 @@ public class AuthController {
         // [2] UserDetails 존재 시 회원 정보를 담은 DTO 전달
         return Objects.isNull(userDetails) ?
                 Api.ok() :
-                Api.ok(AuthDtoMapper.toLoginMember(userDetails));
+                Api.ok(LoginMemberProfile.of(userDetails));
     }
+
 
     /**
      * CSRF 토큰 발급 (GET 외 요청 시, Spring Security 자동 발급)
@@ -52,6 +52,8 @@ public class AuthController {
     public ResponseEntity<?> getCsrf() {
         return Api.ok(AppStatus.AUTH_OK_ISSUE_CSRF);
     }
+
+
     /**
      * 회원가입 이메일 인증코드 발송
      * [POST] /api/auth/join/email

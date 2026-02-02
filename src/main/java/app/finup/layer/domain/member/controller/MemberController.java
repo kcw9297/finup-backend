@@ -11,6 +11,7 @@ import app.finup.security.dto.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -33,6 +35,12 @@ import java.util.List;
 public class MemberController {
 
     private final MemberService memberService;
+
+    @Value("${jwt.cookie-name}")
+    private String jwtCookieName;
+
+    @Value("${jwt.expiration.cookie}")
+    private Duration jwtCookieExpiration;
 
 
     /**
@@ -101,14 +109,9 @@ public class MemberController {
     @PatchMapping("/me/nickname")
     public ResponseEntity<?> editNickname(@AuthenticationPrincipal CustomUserDetails userDetails,
                                           @RequestBody MemberDto.EditNickname rq) {
+
         rq.setMemberId(userDetails.getMemberId());
-        // [1] 수정 요청
-        String nickname = memberService.editNickname(rq);
-
-        log.info("[EDIT_NICKNAME][SUCCESS] memberId={}, nickname={}", userDetails.getMemberId(), userDetails.getNickname());
-
-        // [2] 성공 응답
-        return Api.ok(nickname);
+        return Api.ok(AppStatus.MEMBER_OK_EDIT_NICKNAME, memberService.editNickname(rq));
     }
     /**
      * 회원 비밀번호 수정 API
@@ -125,7 +128,7 @@ public class MemberController {
         memberService.editPassword(rq);
 
         // [2] 성공 응답
-        return Api.ok();
+        return Api.ok(AppStatus.MEMBER_OK_EDIT_PASSWORD);
     }
     /**
      * 회원 프로필 이미지 수정 API
@@ -140,10 +143,10 @@ public class MemberController {
     public ResponseEntity<?> editProfileImage(@AuthenticationPrincipal CustomUserDetails userDetails,
                                               @RequestParam("file") MultipartFile file) {
 
-        memberService.editProfileImage(userDetails.getMemberId(), file);
-
-        log.info("[PROFILE_IMAGE][SUCCESS] memberId={}", userDetails.getMemberId());
-        return Api.ok(AppStatus.UPLOAD_FILE_ADD);
+        return Api.ok(
+                AppStatus.MEMBER_OK_EDIT_PROFILE,
+                memberService.editProfileImage(userDetails.getMemberId(), file)
+        );
     }
 
 }
