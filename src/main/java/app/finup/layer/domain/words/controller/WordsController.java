@@ -48,8 +48,8 @@ public class WordsController {
         String trimmed = Objects.isNull(keyword) ? "" : keyword.trim();
         List<WordsDto.Row> rows = wordsService.search(trimmed, userDetails.getMemberId());
 
-        // [2] 검색 단어 저장
-        wordsService.storeRecentWord(userDetails.getMemberId(), trimmed);
+        // [2] 검색 단어 저장 (비지 않은 경우)
+        if (!rows.isEmpty()) wordsService.storeRecentWord(userDetails.getMemberId(), trimmed);
 
         // [3] 검색 결과 반환
         return Api.ok(rows);
