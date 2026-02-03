@@ -84,7 +84,7 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
         FROM words
         WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%'))
               AND embedding IS NOT NULL
-              AND VEC_DISTANCE_COSINE(sw.embedding, :embedding) < :threshold
+              AND VEC_DISTANCE_COSINE(embedding, :embedding) < :threshold
         ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
         LIMIT :lim
     """, nativeQuery = true)
