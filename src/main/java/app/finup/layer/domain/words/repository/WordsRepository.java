@@ -81,6 +81,19 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
     @SuppressWarnings("SqlResolve")
     @Query(value = """
         SELECT *
+        FROM words
+        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%'))
+              AND embedding IS NOT NULL
+              AND VEC_DISTANCE_COSINE(sw.embedding, :embedding) < :threshold
+        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
+        LIMIT :lim
+    """, nativeQuery = true)
+    List<Words> findWithSimilarAndThresholdByKeyword(String keyword, byte[] embedding, double threshold, int lim);
+
+
+    @SuppressWarnings("SqlResolve")
+    @Query(value = """
+        SELECT *
         FROM words w
         WHERE w.term_id NOT IN :prevIds
         ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)

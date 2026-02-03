@@ -75,7 +75,7 @@ public final class IndicatorDtoMapper {
 
                     return IndicatorDto.FinancialIndexRow.builder()
                             .indexName(indexName)
-                            .todayValue(fluctuationValue)
+                            .todayValue(todayRate)
                             .todayFluctuationRate(fluctuationRate)
                             .updatedAt(TimeUtils.getNowLocalDate())
                             .build();

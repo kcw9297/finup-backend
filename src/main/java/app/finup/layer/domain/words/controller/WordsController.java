@@ -3,6 +3,7 @@ package app.finup.layer.domain.words.controller;
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
 import app.finup.layer.base.validation.annotation.Search;
+import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.service.WordsAiService;
 import app.finup.layer.domain.words.service.WordsService;
 import app.finup.security.dto.CustomUserDetails;
@@ -13,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -42,8 +44,15 @@ public class WordsController {
             @Search @RequestParam String keyword,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
+        // [1] 검색 수행
         String trimmed = Objects.isNull(keyword) ? "" : keyword.trim();
-        return Api.ok(wordsService.search(trimmed, userDetails.getMemberId()));
+        List<WordsDto.Row> rows = wordsService.search(trimmed, userDetails.getMemberId());
+
+        // [2] 검색 단어 저장
+        wordsService.storeRecentWord(userDetails.getMemberId(), trimmed);
+
+        // [3] 검색 결과 반환
+        return Api.ok(rows);
     }
 
 
