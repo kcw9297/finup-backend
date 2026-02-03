@@ -53,7 +53,7 @@ public class WordsServiceImpl implements WordsService {
     private static final int MIN_AMOUNT_WORDS = 1000;
     private static final int CHUNK_INIT_WORD = 100;
     private static final int SEARCH_AMOUNT = 20;
-    private static final double THRESHOLD_SEARCH_DISTANCE = 0.50;
+    private static final double THRESHOLD_SEARCH_DISTANCE = 0.75;
 
 
     @Override
