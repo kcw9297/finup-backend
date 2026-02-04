@@ -1,47 +1,98 @@
 package app.finup.layer.domain.news.service;
 
-import app.finup.infra.news.provider.NewsProvider;
-import app.finup.layer.domain.news.api.NewsApiClient;
-import app.finup.layer.domain.news.component.NewsContentExtractor;
+import app.finup.common.dto.Page;
+import app.finup.layer.domain.news.constant.NewsRedisKey;
 import app.finup.layer.domain.news.dto.NewsDto;
-import app.finup.layer.domain.news.redis.NewsRedisStorage;
-import com.fasterxml.jackson.core.type.TypeReference;
+import app.finup.layer.domain.news.dto.NewsDtoMapper;
+import app.finup.layer.domain.news.entity.News;
+import app.finup.layer.domain.news.enums.NewsType;
+import app.finup.layer.domain.news.repository.NewsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.util.*;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+
 /**
  * NewsService 구현 클래스
- * @author oyh
- * @since 2025-12-01
+ * @author kcw
+ * @since 2025-12-24
  */
+
 @Slf4j
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional
 public class NewsServiceImpl implements NewsService {
-    private final NewsProvider newsProvider;
 
-    /**
-     * 프론트에서 호출하는 메인 메서드
-     * GET /news/list?category=date
-     */
+    // 사용 의존성
+    private final NewsRepository newsRepository;
+
+    // 사용 상수
+    private static final int PAGE_SIZE = 10;
+
+
+    @Cacheable(
+            value = NewsRedisKey.CACHE_MAIN,
+            key = "#pageNum",
+            unless = "#result.rows.isEmpty()" // 결과가 비어있는 경우는 캐싱 중단
+    )
     @Override
-    public List<NewsDto.Row> getNews(String category) {
-        return newsProvider.getNews(category, 50);
+    @Transactional(readOnly = true)
+    public Page<NewsDto.Row> getPagedMainNewsList(int pageNum, int pageSize) {
+
+        return doPaging(
+                pageNum, pageSize,
+                pageable -> newsRepository.findByNewsTypeWithPaging(NewsType.MAIN, pageable), // 페이징 쿼리
+                () -> newsRepository.countByNewsType(NewsType.MAIN) // 카운팅 쿼리
+        );
     }
 
+
+    @Cacheable( // 캐싱 등록
+            value = NewsRedisKey.CACHE_STOCK,
+            key = "#stockCode + ':' + #pageNum",
+            unless = "#result.rows.isEmpty()"  // 결과가 비어있는 경우는 캐싱 중단
+    )
     @Override
-    public List<NewsDto.Row> getLatestNews(String category, int limit) {
-        List<NewsDto.Row> list = newsProvider.getNews(category, 50);
-        if(list == null || list.isEmpty()){
-            return List.of();
-        }
-        int toIndex = Math.min(limit, list.size());
-        return list.subList(0, toIndex);
+    @Transactional(readOnly = true)
+    public Page<NewsDto.Row> getPagedStockNewsList(String stockCode, int pageNum, int pageSize) {
+
+        return doPaging(
+                pageNum, pageSize,
+                pageable -> newsRepository.findByStockCodeWithPaging(stockCode, pageable), // 페이징 쿼리
+                () -> newsRepository.countByStockCode(stockCode) // 카운팅 쿼리
+        );
+    }
+
+
+    // 페이징 수행
+    private Page<NewsDto.Row> doPaging(
+            int pageNum, int pageSize,
+            Function<Pageable, List<News>> pagingMethod,
+            Supplier<Long> countingMethod) {
+
+        // [1] Pageable 생성
+        Pageable pageable = PageRequest.of(pageNum-1, pageSize);
+
+        // [2] 페이징 쿼리 수행
+        List<NewsDto.Row> rows = pagingMethod.apply(pageable)
+                .stream()
+                .map(NewsDtoMapper::toRow)
+                .toList();
+
+        // [3] 카운팅 쿼리 수행
+        Long count = countingMethod.get();
+
+        // [4] 페이징 결과 반환
+        return Page.of(rows, count, pageNum, pageSize, PAGE_SIZE);
     }
 
 }

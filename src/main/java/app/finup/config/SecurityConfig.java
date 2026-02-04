@@ -2,6 +2,7 @@ package app.finup.config;
 
 import app.finup.common.constant.Url;
 import app.finup.common.utils.EnvUtils;
+import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.domain.member.enums.MemberRole;
 import app.finup.layer.domain.member.repository.MemberRepository;
 import app.finup.security.filter.CsrfVerificationFilter;
@@ -49,6 +50,7 @@ public class SecurityConfig {
     // 사용 의존성
     private final Environment env;
     private final MemberRepository memberRepository;
+    private final FileStorage fileStorage;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CsrfVerificationFilter csrfVerificationFilter;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -143,7 +145,7 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return new NormalUserDetailService(memberRepository);
+        return new NormalUserDetailService(memberRepository, fileStorage);
     }
 
     @Bean

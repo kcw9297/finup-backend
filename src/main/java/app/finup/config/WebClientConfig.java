@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
@@ -25,20 +26,11 @@ import java.util.concurrent.TimeUnit;
 public class WebClientConfig {
 
     // API URL
-    @Value("${api.youtube.endpoint}")
-    private String youtubeEndpoint;
-
-    @Value("${api.naver-news.endpoint}")
-    private String naverEndPoint;
-
-    @Value(("${api.finance-dict.endpoint}"))
-    private String dataPortalEndPoint;
-
-    @Value("${API_KEXIM_ENDPOINT}")
-    private String keximEndpoint;
-
-    @Value("${API_OPENPORTAL_ENDPOINT}")
-    private String openPortalEndpoint;
+    private static final String ENDPOINT_YOUTUBE = "https://www.googleapis.com/youtube/v3";
+    private static final String ENDPOINT_NAVER_NEWS = "https://openapi.naver.com";
+    private static final String ENDPOINT_KEXIM = "https://oapi.koreaexim.go.kr/site/program/financial/exchangeJSON";
+    private static final String ENDPOINT_KIS = "https://openapi.koreainvestment.com:9443";
+    private static final String ENDPOINT_OPEN_PORTAL = "https://apis.data.go.kr/1160100/service/GetMarketIndexInfoService/getStockMarketIndex";
 
     // 필요 상수
     @Value("${api.naver-news.client.id}")
@@ -47,37 +39,35 @@ public class WebClientConfig {
     @Value("${api.naver-news.client.secret}")
     private String naverClientSecret;
 
-    @Value(("${api.kis.endpoint}"))
-    private String kisEndPoint;
-
-    @Value(("${api.kis.client.id}"))
+    @Value("${api.kis.client.id}")
     private String kisAppKey;
 
-    @Value(("${api.kis.client.secret}"))
+    @Value("${api.kis.client.secret}")
     private String kisAppSecret;
-
-    @Value(("${api.finance-dict.key}"))
-    private String dataPortalSecret;
-
-    @Value("${API_KEXIM_KEY}")
-    private String keximKey;
-
-    @Value("${API_OPENPORTAL_KEY}")
-    private String openPortalKey;
 
 
     @Bean(name = "youTubeClient") // 유튜브 API 사용을 위한 Client
     public WebClient youTubeClient() {
+
+        // 버퍼 크기를 16MB로 증가
+        // DataBufferLimitException: Exceeded limit on max bytes to buffer 예외 발생으로 인한 버퍼 증가 처리
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+                .codecs(configurer -> configurer
+                        .defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024)) // 16MB
+                .build();
+
         return WebClient.builder()
-                .baseUrl(youtubeEndpoint)
+                .baseUrl(ENDPOINT_YOUTUBE)
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .exchangeStrategies(strategies)
                 .build();
     }
 
     @Bean(name = "naverClient") // 네이버 OpenAPI 사용을 위한 Client
     public WebClient naverClient() {
         return WebClient.builder()
-                .baseUrl(naverEndPoint)
+                .baseUrl(ENDPOINT_NAVER_NEWS)
                 .defaultHeader("X-Naver-Client-Id", naverClientId)
                 .defaultHeader("X-Naver-Client-Secret", naverClientSecret)
                 .defaultHeader(HttpHeaders.USER_AGENT, "Mozilla/5.0")
@@ -87,7 +77,7 @@ public class WebClientConfig {
     @Bean(name="kisClient")
     public WebClient kisClient(){
         return WebClient.builder()
-                .baseUrl(kisEndPoint)
+                .baseUrl(ENDPOINT_KIS)
                 .defaultHeader("appkey", kisAppKey)
                 .defaultHeader("appsecret", kisAppSecret)
                 .build();
@@ -96,30 +86,22 @@ public class WebClientConfig {
     @Bean(name="kisAuthClient")
     public WebClient kisAuthClient(){
         return WebClient.builder()
-                .baseUrl(kisEndPoint)
+                .baseUrl(ENDPOINT_KIS)
                 .build();
     }
 
-    @Bean(name="xmlClient")
-    public WebClient xmlClient() {
-        return WebClient.builder()
-                .baseUrl(dataPortalEndPoint)
-                .defaultHeader("dataPortalApiKey", dataPortalEndPoint)
-                .defaultHeader("dataPortalSecret", dataPortalSecret)
-                .build();
-    }
 
     @Bean(name="keximClient")
     public WebClient keximClient() {
         return WebClient.builder()
-                .baseUrl(keximEndpoint)
+                .baseUrl(ENDPOINT_KEXIM)
                 .build();
     }
 
     @Bean(name="openPortalClient")
     public WebClient openPortalClient() {
         return WebClient.builder()
-                .baseUrl(openPortalEndpoint)
+                .baseUrl(ENDPOINT_OPEN_PORTAL)
                 .build();
     }
 

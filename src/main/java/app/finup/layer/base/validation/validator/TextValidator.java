@@ -34,7 +34,7 @@ public class TextValidator implements ConstraintValidator<Text, String> {
 
         // 사용자 입력 오류 메세지
         if (Objects.isNull(message) || message.isBlank()) {
-            if (min == 1) message = "최대 %d자 이내 내용을 입력해야 합니다.".formatted(max);
+            if (min <= 1) message = "최대 %d자 이내 내용을 입력해야 합니다.".formatted(max);
             else message = "%d-%d자 사이 내용을 입력해야 합니다.".formatted(min, max);
         }
     }

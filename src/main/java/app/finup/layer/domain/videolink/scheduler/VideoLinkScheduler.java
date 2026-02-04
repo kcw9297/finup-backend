@@ -1,15 +1,17 @@
 package app.finup.layer.domain.videolink.scheduler;
 
+import app.finup.common.constant.AsyncMode;
 import app.finup.common.utils.LogUtils;
-import app.finup.layer.domain.videolink.service.VideoLinkRecommendService;
+import app.finup.common.utils.TimeUtils;
+import app.finup.infra.redisson.annotation.RedissonLock;
+import app.finup.layer.domain.videolink.constant.VideoLinkRedisKey;
+import app.finup.layer.domain.videolink.service.VideoLinkAiService;
 import app.finup.layer.domain.videolink.service.VideoLinkService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 학습 영상과 관련한 스케줄링 요청을 처리하기 위한 클래스
@@ -23,29 +25,38 @@ import java.util.concurrent.TimeUnit;
 public class VideoLinkScheduler {
 
     private final VideoLinkService videoLinkService;
-    private final VideoLinkRecommendService videoLinkRecommendService;
+    private final VideoLinkAiService videoLinkAiService;
 
-    /**
-     * 10분마다 유튜브 영상 동기화
-     */
-    @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.HOURS)
-    //@Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES, initialDelay = 0)
-    @Async("schedulerExecutor")
+
+    // 유튜브 영상 동기화
+    @Scheduled(cron = "0 0 0 * * *", zone = TimeUtils.ZONE_KOREA)
+    @Async(AsyncMode.NORMAL)
     public void syncVideoLinks() {
-        videoLinkService.sync();
-        LogUtils.showInfo(this.getClass(), "학습 영상 동기화 수행 완료");
+        LogUtils.runMethodAndShowCostLog("학습 영상 동기화", videoLinkService::sync);
     }
 
 
     /**
-     * 매 30분마다 유튜브 홈 영상 초기화
+     * 애플리케이션 시작 시 초기화
      */
-    @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.MINUTES)
-    @Async("schedulerExecutor")
+    @RedissonLock(key = VideoLinkRedisKey.LOCK_RECOMMEND_HOME_LOGOUT)
+    @Scheduled(initialDelay = 5000, fixedDelay = Long.MAX_VALUE) // 최초 1회
+    @Async(AsyncMode.NORMAL)
     public void initHomeVideoLinks() {
-        videoLinkRecommendService.recommendForLogoutHome();
-        LogUtils.showInfo(this.getClass(), "페이지 홈 추천 영상 조회 완료");
+        LogUtils.runMethodAndShowCostLog("페이지 홈 추천 영상 초기화", videoLinkAiService::recommendForLogoutHome);
     }
+
+
+    /**
+     * 매 0시마다 홈 유튜브 추쳔 영상 갱신
+     */
+    @RedissonLock(key = VideoLinkRedisKey.LOCK_RECOMMEND_HOME_LOGOUT)
+    @Scheduled(cron = "0 0 0 * * *", zone = TimeUtils.ZONE_KOREA)
+    @Async(AsyncMode.NORMAL)
+    public void updateRecommendHomeVideoLinks() {
+        LogUtils.runMethodAndShowCostLog("페이지 홈 추천 영상 변경", videoLinkAiService::recommendForLogoutHome);
+    }
+
 
 
 }

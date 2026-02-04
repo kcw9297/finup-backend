@@ -22,27 +22,76 @@ repositories {
 	mavenCentral()
 
     // Spring AI 저장소 (필수)
-    maven { url 'https://repo.spring.io/milestone/' }
+    maven { url 'https://repo.spring.io/mtailestone/' }
     maven { url 'https://repo.spring.io/snapshot/' }
 }
 dependencies {
-    // Spring Base
-	implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // Spring Utils
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.retry:spring-retry'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // OAuth2
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // JPA
-    implementation 'org.springframework.boot:spring-boot-starter-webflux' // WebClient
+    /* 기본 라이브러리 */
 
-    // util - .env 환경설정 파일
+	implementation 'org.springframework.boot:spring-boot-starter' // base
+    implementation 'org.springframework.boot:spring-boot-starter-web' // spring web
+    implementation 'org.springframework.boot:spring-boot-starter-actuator' // 앱 통계기능 라이브러리 (IntelliJ IDE 유료 통계기능 사용)
+    implementation 'org.springframework.boot:spring-boot-starter-validation' // 검증 라이브러리
+    implementation 'org.springframework.retry:spring-retry' // 재시도 기능 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-mail' // 메일 기능 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-aop' // AOP 프록시 기능 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-webflux' // 외부 API 호출을 위한 라이브러리
+
+    /* 보안 라이브러리 */
+
+    implementation 'org.springframework.boot:spring-boot-starter-security' // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // OAuth2 (소셜 로그인)
+
+    /* 인프라 라이브러리 */
+
+    // infra - spring ai
+    implementation "org.springframework.ai:spring-ai-starter-model-openai"
+    implementation "org.springframework.ai:spring-ai-starter-vector-store-chroma"
+
+    // infra - xml file
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.poi:poi:5.2.3'
+
+    // infra - csv file
+    implementation 'com.opencsv:opencsv:5.12.0'
+
+    // infra - AWS S3 file storage (SDK v2)
+    implementation 'software.amazon.awssdk:s3:2.20.28'
+    implementation 'software.amazon.awssdk:secretsmanager:2.20.28'
+
+    // infra - database (MariaDB / MyBatis)
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // Spring data JPA
+    implementation 'org.mariadb.jdbc:mariadb-java-client' // MariaDB Driver
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3' // MyBatis
+
+    // infra - redis, redisson
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis' // Spring data redis
+    implementation 'org.springframework.session:spring-session-data-redis'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.52.0' // redisson
+    implementation 'org.apache.commons:commons-pool2' // Redis Connection-pool 설정을 위한 의존성
+
+    // infra - JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+
+    // Selenium(Headless Chrome)
+    //implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
+    //implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.26.0'
+
+    // google-guava (batch 처리 라이브러리)
+    implementation 'com.google.guava:guava:33.3.1-jre'
+
+    // text 유사도 측정 라이브러리
+    implementation 'org.apache.commons:commons-text:1.10.0'
+
+    // util - jsoup (HTML Parsing/Purify)
+    implementation("org.jsoup:jsoup:1.21.2")
+    implementation 'com.rometools:rome:1.18.0'
+
+    // util - env 환경설정 파일
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 
     // util - ItextPDF (PDF 출력)
@@ -51,29 +100,6 @@ dependencies {
     // util - jackson (시간 데이터 등을 파싱)
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
-    // util - jsoup (HTML Parsing/Purify)
-    implementation("org.jsoup:jsoup:1.21.2")
-    implementation 'com.rometools:rome:1.18.0'
-
-    // infra - JWT
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
-
-    // infra - redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.session:spring-session-data-redis'
-
-    // infra - database (MariaDB / MyBatis)
-    implementation 'org.mariadb.jdbc:mariadb-java-client' // MariaDB Driver
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3' // MyBatis
-
-    // util - Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-
     // JUnit & Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -81,41 +107,27 @@ dependencies {
     testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'
     testImplementation 'org.springframework.batch:spring-batch-test'
 
-    // spring ai
-    implementation "org.springframework.ai:spring-ai-starter-model-openai"
-    implementation "org.springframework.ai:spring-ai-starter-vector-store-chroma"
-
-    // text 유사도 
-    implementation 'org.apache.commons:commons-text:1.10.0'
-    
-    // Apache POI - 스프링이 엑셀 파일을 읽고 DB에 저장하려면 필요(Stocks 종목코드 종목명 DB 저장위해) by lky
-    implementation 'org.apache.poi:poi-ooxml:5.2.3'
-    implementation 'org.apache.poi:poi:5.2.3'
-
-    // xml 외부 API 호출
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
-
-    // Selenium(Headless Chrome)
-    implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
-    implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.26.0'
-
-    // google-guava (batch 처리)
-    implementation 'com.google.guava:guava:33.3.1-jre'
-
-    // AWS S3 (SDK v2)
-    implementation 'software.amazon.awssdk:s3:2.20.28'
-    implementation 'software.amazon.awssdk:secretsmanager:2.20.28'
-
-    implementation 'commons-codec:commons-codec:1.15'
-
-
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 dependencyManagement {
-    imports {
+    imports { // spring ai
         mavenBom "org.springframework.ai:spring-ai-bom:1.1.0"
     }
 }
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaExec).configureEach {
+    jvmArgs = [
+            '-XX:ReservedCodeCacheSize=512m', // 캐시 크기
+            '-XX:InitialCodeCacheSize=256m', // 초기 캐시 크기
+            '-XX:+UseCodeCacheFlushing', // 자동 플러싱 활성화
+            '-XX:CodeCacheExpansionSize=32m' // 확장 단위
+    ]
 }

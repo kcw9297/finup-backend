@@ -5,6 +5,7 @@ import app.finup.layer.domain.bookmark.enums.BookmarkTarget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author kcw
  * @since 2025-12-02
  */
+@Transactional(readOnly = true)
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
     @Query("""
@@ -23,6 +25,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     List<Bookmark> findByMemberId(Long memberId);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM Bookmark b
@@ -31,6 +34,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
     void deleteByMemberId(Long memberId);
 
 
+    @Transactional
     @Modifying
     @Query("""
         DELETE FROM Bookmark b

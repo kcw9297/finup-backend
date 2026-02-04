@@ -37,7 +37,7 @@ public class PartSpecialTextValidator implements ConstraintValidator<PartSpecial
 
         // 사용자 입력 오류 메세지
         if (Objects.isNull(message) || message.isBlank()) {
-            if (min == 1) message = "최대 %d자 이내 한글/영문/숫자를 입력해야 합니다.\n허용 특수문자 %s: ".formatted(max, ALLOWED_SPECIALS);
+            if (min <= 1) message = "최대 %d자 이내 한글/영문/숫자를 입력해야 합니다.\n허용 특수문자 %s: ".formatted(max, ALLOWED_SPECIALS);
             else message = "%d-%d자 사이 한글/영문/숫자를 입력해야 합니다.\n허용 특수문자 %s: ".formatted(min, max, ALLOWED_SPECIALS);
         }
     }

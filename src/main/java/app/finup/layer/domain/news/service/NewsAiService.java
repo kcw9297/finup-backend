@@ -1,11 +1,29 @@
 package app.finup.layer.domain.news.service;
 
-import app.finup.layer.domain.news.dto.NewsDto;
 
-import java.util.Map;
+/**
+ * 뉴스 AI 분석 기능 제공 인터페이스
+ * @author kcw
+ * @since 2025-12-25
+ */
 
 public interface NewsAiService {
-//    NewsDto.Ai analyze(String url);
-    NewsDto.Ai analyzeDeep(String url);
-    NewsDto.Summary analyzeLight(String summary);
+
+    /**
+     * AI 뉴스 분석
+     * @param newsId 분석 대상 뉴스번호
+     * @param memberId 분석 요청 회원번호
+     * @return 뉴스 AI 분석 결과 DTO
+     */
+    String analyze(Long newsId, Long memberId);
+
+
+    /**
+     * AI 뉴스 재 분석 (기존 캐시를 무효하고 다시 분석)
+     * @param newsId 분석 대상 뉴스번호
+     * @param memberId 분석 요청 회원번호
+     * @return 뉴스 AI 분석 결과 DTO
+     */
+    String retryAnalyze(Long newsId, Long memberId);
+
 }

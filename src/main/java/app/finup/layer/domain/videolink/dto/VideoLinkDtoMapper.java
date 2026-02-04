@@ -1,6 +1,6 @@
 package app.finup.layer.domain.videolink.dto;
 
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.videolink.entity.VideoLink;
 import lombok.*;
@@ -25,7 +25,7 @@ public final class VideoLinkDtoMapper {
                .videoId(entity.getVideoId())
                .videoUrl(entity.getVideoUrl())
                .title(entity.getTitle())
-               .duration(FormatUtils.formatDuration(entity.getDuration()))
+               .duration(TimeUtils.formatDuration(entity.getDuration()))
                .thumbnailUrl(entity.getThumbnailUrl())
                .channelTitle(entity.getChannelTitle())
                .publishedAt(entity.getPublishedAt())

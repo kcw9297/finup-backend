@@ -1,24 +1,42 @@
 package app.finup.layer.domain.stock.service;
 
-import app.finup.infra.ai.AiManager;
-import app.finup.infra.ai.PromptTemplates;
-import app.finup.layer.domain.stock.api.StockApiClient;
+
+import app.finup.common.enums.AppStatus;
+import app.finup.common.exception.BusinessException;
+import app.finup.common.utils.StrUtils;
+import app.finup.infra.ai.ChatProvider;
+import app.finup.api.external.youtube.dto.YouTubeApiDto;
+import app.finup.api.external.youtube.client.YouTubeClient;
+import app.finup.layer.base.template.AiCodeTemplate;
+import app.finup.layer.base.template.YouTubeCodeTemplate;
+import app.finup.layer.domain.stock.constant.StockPrompt;
+import app.finup.layer.domain.stock.constant.StockRedisKey;
+import app.finup.layer.domain.stock.dto.StockAiDto;
 import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
-import app.finup.layer.domain.stock.redis.StockStorage;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import app.finup.layer.domain.stock.enums.ChartType;
+import app.finup.layer.domain.stock.redis.StockRedisStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 /**
  * StockAiService 구현 클래스
- * @author lky
- * @since 2025-12-03
+ * @author kcw
+ * @since 2026-01-05
  */
 @Slf4j
 @Service
@@ -26,132 +44,225 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class StockAiServiceImpl implements StockAiService {
 
-    private final AiManager aiManager;
-    private final ObjectMapper objectMapper;
-    private final StockApiClient stockApiClient;
-    private final StockStorage stockStorage;
+    // 사용 의존성
+    private final ChatProvider chatProvider;
+    private final StockRedisStorage stockRedisStorage;
+    private final YouTubeClient youTubeClient;
 
-    //종목 분석 AI 데이터 가져오기(AI 정리, 추천 영상)
+    // 사용 상수
+    private static final int MAX_DESCRIPTION_LENGTH = 150;
+    private static final int MIN_RECOMMEND_LENGTH = 4;
+
+
+    @Cacheable(
+            value = StockRedisKey.CACHE_ANALYZE_CHART,
+            key = "#stockCode + ':' + #chartType + ':' + #memberId"
+    )
     @Override
-    public Map<String, Object> getStockAi(String code, StockDto.Detail detail) {
-        //1) 종목 AI 분석
-        Map<String, Object> detailAi = stockStorage.getDetailAi(code);
-        if (detailAi == null){
-            refreshDetailAi(code, detail);
-            detailAi = stockStorage.getDetailAi(code);
-        }else{
-            log.info("종목 AI분석 Redis에서 가져옴");
-        }
-        if (detailAi == null) {
-            return Map.of(
-                    "detailAi", Map.of("error", "AI 분석 실패"),
-                    "youtube", List.of()
+    public StockAiDto.ChartAnalyzation analyzeChart(String stockCode, Long memberId, ChartType chartType) {
+        return doAnalyzeChart(stockCode, memberId, chartType);
+    }
+
+
+    @CachePut(
+            value = StockRedisKey.CACHE_ANALYZE_CHART,
+            key = "#stockCode + ':' + #chartType + ':' + #memberId"
+    )
+    @Override
+    public StockAiDto.ChartAnalyzation retryAnalyzeChart(String stockCode, Long memberId, ChartType chartType) {
+        return doAnalyzeChart(stockCode, memberId, chartType);
+    }
+
+
+    // 차트 분석 메소드
+    private StockAiDto.ChartAnalyzation doAnalyzeChart(String stockCode, Long memberId, ChartType chartType) {
+
+        // [1] 현재 주식정보 조회
+        StockDto.Info stockInfo = getStockInfo(stockCode);
+
+        // [2] 프롬포트에 필요한 정보 조회 및 추출
+        ChartAnalyzeRequest analyzeRequest = new ChartAnalyzeRequest(chartType, getCandles(chartType, stockInfo));
+        StockAiDto.ChartAnalyzation prevAnalyze = stockRedisStorage.getPrevChartAnalyze(stockCode, memberId);
+
+        // 프롬포트 파라미터
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(StockPrompt.INPUT, StrUtils.toJson(analyzeRequest));
+        promptParams.put(StockPrompt.PREV, StrUtils.toJson(prevAnalyze));
+
+        // 프롬프트 생성
+        String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_CHART, promptParams);
+
+        // [3] 주식 종목정보 기반 AI 분석 수행
+        return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
+                chatProvider, prompt, StockAiDto.ChartAnalyzation.class,
+                result -> stockRedisStorage.storePrevChartAnalyze(stockCode, memberId, result));
+    }
+
+
+    @Cacheable(
+            value = StockRedisKey.CACHE_ANALYZE_DETAIL,
+            key = "#stockCode + ':' + #memberId"
+    )
+    @Override
+    public StockAiDto.DetailAnalyzation analyzeDetail(String stockCode, Long memberId) {
+        return doAnalyzeDetail(stockCode, memberId);
+    }
+
+
+    @CachePut(
+            value = StockRedisKey.CACHE_ANALYZE_DETAIL,
+            key = "#stockCode + ':' + #memberId"
+    )
+    @Override
+    public StockAiDto.DetailAnalyzation retryAnalyzeDetail(String stockCode, Long memberId) {
+        return doAnalyzeDetail(stockCode, memberId);
+    }
+
+
+    // 주식 종목 상세 분석 메소드
+    private StockAiDto.DetailAnalyzation doAnalyzeDetail(String stockCode, Long memberId) {
+
+        // [1] 현재 주식정보 조회
+        StockDto.Info stockInfo = getStockInfo(stockCode);
+
+        // [2] 프롬포트에 필요한 정보 조회 및 추출
+        StockDto.Detail detail = stockInfo.getDetail();
+        StockAiDto.DetailAnalyzation prevAnalyze = stockRedisStorage.getPrevDetailAnalyze(stockCode, memberId);
+
+        // 프롬포트 파라미터
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(StockPrompt.INPUT, StrUtils.toJson(detail));
+        promptParams.put(StockPrompt.PREV, StrUtils.toJson(prevAnalyze));
+
+        // 프롬프트 생성
+        String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_DETAIL, promptParams);
+
+        // [3] 주식 종목정보 기반 AI 분석 수행
+        return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
+                chatProvider, prompt, StockAiDto.DetailAnalyzation.class,
+                result -> stockRedisStorage.storePrevDetailAnalyze(stockCode, memberId, result));
+    }
+
+
+    // 차트 정보 조회
+    private List<StockDto.Candle> getCandles(ChartType chartType, StockDto.Info stockInfo) {
+
+        // [1] 주식 정보 내 차트 정보 조회
+        StockDto.Chart chart = stockInfo.getChart();
+
+        // [2] 차트 정보 내, 특정 기준 캔들 목록 반환
+        return switch (chartType) {
+            case DAY    -> chart.getDayCandles();
+            case WEEK   -> chart.getWeekCandles();
+            case MONTH  -> chart.getMonthCandles();
+        };
+    }
+
+
+    // 내부에서 사용하는 임시 DTO
+    private record ChartAnalyzeRequest(ChartType chartType, List<StockDto.Candle> candles) {}
+
+
+    @Cacheable(
+            value = StockRedisKey.CACHE_RECOMMEND_YOUTUBE,
+            key = "#stockCode + ':' + #memberId"
+    )
+    @Override
+    public List<StockAiDto.YouTubeRecommendation> recommendYouTube(String stockCode, Long memberId) {
+        return doRecommendYouTube(stockCode, memberId);
+    }
+
+
+    @CachePut(
+            value = StockRedisKey.CACHE_RECOMMEND_YOUTUBE,
+            key = "#stockCode + ':' + #memberId"
+    )
+    @Override
+    public List<StockAiDto.YouTubeRecommendation> retryRecommendYouTube(String stockCode, Long memberId) {
+        return doRecommendYouTube(stockCode, memberId);
+    }
+
+
+    // 유튜브 영상 추천 메소드
+    private List<StockAiDto.YouTubeRecommendation> doRecommendYouTube(String stockCode, Long memberId) {
+
+        // [1] 주식 정보 조회
+        StockDto.Info stockInfo = getStockInfo(stockCode);
+        String stockName = stockInfo.getDetail().getStockName();
+
+        // [2] 유튜브 검색 수행 후, 검색 결과 영상으로 다시 한번 상세 조회 수행
+        List<YouTubeApiDto.Detail> searchResponses =
+                YouTubeCodeTemplate.searchAndGetDetails(youTubeClient, stockName);
+
+        // [3] AI 프롬포트 생성
+        // Map<VideoId, YouTube.Detail>
+        Map<String, YouTubeApiDto.Detail> candidates = searchResponses.stream()
+                .collect(Collectors.toConcurrentMap(
+                        YouTubeApiDto.Detail::getVideoId,
+                        Function.identity()
+                ));
+
+        // 영상검색 결과에서, 일부만 추출하여 요청 생성 (모두 사용하면 지나친 토큰 사용)
+        List<VideoRecommendRequest> input = candidates.values().stream().map(VideoRecommendRequest::from).toList();
+        List<String> prev = stockRedisStorage.getPrevRecommendedVideoIds(stockCode, memberId);
+
+        // 프롬포트 파라미터 생성
+        Map<String, String> promptParams = new HashMap<>();
+        promptParams.put(StockPrompt.INPUT, StrUtils.toJson(input));
+        promptParams.put(StockPrompt.PREV, StrUtils.toJson(prev));
+        promptParams.put(StockPrompt.STOCK_NAME, stockName);
+        promptParams.put(StockPrompt.RECOMMEND_AMOUNT, String.valueOf(MIN_RECOMMEND_LENGTH));
+
+        // 프롬포트 생성
+        String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_RECOMMEND_YOUTUBE, promptParams);
+
+        // [4] 검색 결과 기반 AI 추천 수행
+        return AiCodeTemplate.recommendWithPrev(
+                        chatProvider, prompt, candidates, String.class, MIN_RECOMMEND_LENGTH,
+                        prevIds -> stockRedisStorage.storePrevRecommendedVideoIds(stockCode, memberId, prevIds))
+                .stream()
+                .map(StockDtoMapper::toYouTubeRecommend)
+                .toList();
+    }
+
+
+    // Redis 내 주식 상세정보 조회
+    private StockDto.Info getStockInfo(String stockCode) {
+
+        // Redis 내 상세 종목 조회
+        StockDto.Info stockInfo = stockRedisStorage.getStockInfo(stockCode);
+
+        // 만약 정보가 없는 경우 예외 반환
+        if (Objects.isNull(stockInfo)) throw new BusinessException(AppStatus.STOCK_NOT_FOUND);
+        return stockInfo;
+    }
+
+
+    // 내부에서만 사용하는 임시 DTO
+    // 추천 영상 요청을 위한 임시 클래스 (record)
+    private record VideoRecommendRequest(
+            String videoId,
+            String title,
+            String channelTitle,
+            String description,
+            Long viewCount,
+            Long likeCount,
+            Duration duration,
+            Instant publishedAt
+    ) {
+        public static VideoRecommendRequest from(YouTubeApiDto.Detail detail) {
+            return new VideoRecommendRequest(
+                    detail.getVideoId(),
+                    detail.getTitle(),
+                    detail.getChannelTitle(),
+                    StrUtils.splitWithStart(detail.getDescription(), MAX_DESCRIPTION_LENGTH),
+                    detail.getViewCount(),
+                    detail.getLikeCount(),
+                    detail.getDuration(),
+                    detail.getPublishedAt()
             );
         }
-
-        //2) 유튜브 검색 키워드
-        String keyword = (String) detailAi.get("youtubeKeyword");
-        if (keyword == null || keyword.isBlank()) {
-            log.warn("youtubeKeyword 없음, 기본 키워드 사용");
-            keyword = detail.getHtsKorIsnm(); // 종목명
-        }
-
-        //3) 유튜브 추천 영상
-        List<StockDto.YoutubeVideo> youtube = stockStorage.getYoutube(keyword);
-        if (youtube == null) {
-            refreshYoutube(keyword);
-            youtube = stockStorage.getYoutube(keyword);
-        }else{
-            log.info("종목 추천영상 Redis에서 가져옴");
-        }
-
-        //4) 반환
-        return Map.of(
-                "detailAi", detailAi,
-                "youtube", youtube
-        );
-
     }
 
-    //종목 AI분석 갱신하기
-    @Override
-    public void refreshDetailAi(String code, StockDto.Detail detail){
-        try {
-            // 1) Detail → 구조화된 Map(JSON 구조)
-            Map<String, Object> structured = convertDetailToStructuredJson(detail);
-
-            // 2) JSON 문자열로 변환
-            String detailJson = objectMapper.writerWithDefaultPrettyPrinter()
-                    .writeValueAsString(structured);
-
-            // 3) 템플릿에 삽입
-            String prompt = PromptTemplates.STOCK_ANALYSIS
-                    .replace("{detail}", detailJson);
-
-            // 4) GPT JSON 요청
-            Map<String, Object> detailAi = aiManager.runJsonPrompt(prompt);
-
-            log.info("종목 AI분석 갱신함 code={}", code);
-            stockStorage.setDetailAi(code, detailAi);
-
-        } catch (Exception e) {
-            log.error("AI 분석 생성 실패", e);
-        }
-    }
-
-    //종목 추천영상 갱신하기
-    @Override
-    public void refreshYoutube(String keyword){
-        List<StockDto.YoutubeVideo> youtube = getYoutubeVideo(keyword);
-        log.info("종목 추천영상 갱신함"+youtube);
-        stockStorage.setYoutube(keyword, youtube);
-    }
-
-    //Detail DTO Json 형식으로 변환
-    private Map<String, Object> convertDetailToStructuredJson(StockDto.Detail detail) {
-        return Map.of(
-                "basic", Map.of(
-                        "htsKorIsnm", detail.getHtsKorIsnm(),
-                        "stckShrnIscd", detail.getStckShrnIscd(),
-                        "stckPrpr", detail.getStckPrpr(),
-                        "rprsMrktKorName", detail.getRprsMrktKorName(),
-                        "bstpKorIsnm", detail.getBstpKorIsnm(),
-                        "stckFcam", detail.getStckFcam(),
-                        "htsAvls", detail.getHtsAvls(),
-                        "lstnStcn", detail.getLstnStcn()
-                ),
-                "price", Map.of(
-                        "w52Hgpr", detail.getW52Hgpr(),
-                        "w52Lwpr", detail.getW52Lwpr(),
-                        "d250Hgpr", detail.getD250Hgpr(),
-                        "d250Lwpr", detail.getD250Lwpr()
-                ),
-                "valuation", Map.of(
-                        "per", detail.getPer(),
-                        "pbr", detail.getPbr(),
-                        "eps", detail.getEps(),
-                        "bps", detail.getBps()
-                ),
-                "supply", Map.of(
-                        "frgnNtbyQty", detail.getFrgnNtbyQty(),
-                        "pgtrNtbyQty", detail.getPgtrNtbyQty(),
-                        "htsFrgnEhrt", detail.getHtsFrgnEhrt(),
-                        "volTnrt", detail.getVolTnrt()
-                ),
-                "risk", Map.of(
-                        "tempStopYn", detail.getTempStopYn(),
-                        "invtCafulYn", detail.getInvtCafulYn(),
-                        "shortOverYn", detail.getShortOverYn(),
-                        "mangIssuClsCode", detail.getMangIssuClsCode()
-                )
-        );
-    }
-
-    private List<StockDto.YoutubeVideo> getYoutubeVideo(String keyword) {
-        StockDto.YoutubeSearchResponse response = stockApiClient.fetchYoutubeVideo(keyword);
-        if (response == null || response.getItems() == null) return List.of();
-        List<StockDto.YoutubeVideo> youtubeList = StockDtoMapper.toYoutubeList(keyword, response);
-        return youtubeList;
-    }
 
 }

@@ -30,25 +30,32 @@ public interface MemberService {
 
     /**
      * 회원가입
-     *
      * @return 가입한 회원 정보
      */
     MemberDto.Row join(MemberDto.Join rq);
 
+
+    /**
+     * 회원 상세정보 조회
+     * @param memberId 대상 회원번호
+     * @return 회원 상세정보 DTO
+     */
     MemberDto.Detail getDetail(Long memberId);
+
+
     /**
      * 회원 닉네임 수정
-     * @param
      * @param rq 닉네임 수정 요청 DTO
+     * @return 수정된 이메일 문자열
      */
     String editNickname(MemberDto.EditNickname rq);
 
+
     /**
      * 회원 비밀번호 수정
-     * @param
      * @param rq 비밀번호 수정 요청 DTO
      */
-    String editPassword(MemberDto.EditPassword rq);
+    void editPassword(MemberDto.EditPassword rq);
 
     /**
      * 회원 프로필 이미지 수정

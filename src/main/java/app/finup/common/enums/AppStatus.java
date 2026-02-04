@@ -35,37 +35,71 @@ public enum AppStatus {
     /* 범용 유틸 클래스 상태 */
     UTILS_LOGIC_FAILED(500, "처리 중 오류가 발생했습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_LOGIC_FAILED"),
     UTILS_REORDER_FAILED(500, "위치를 변경할 수 없습니다. 잠시 후에 다시 시도해 주세요.", "UTILS_REORDER_FAILED"),
+    UTILS_SEMAPHORE_ACQUIRE_FAILED(500, "SEMAPHORE 쓰레드 획득에 실패했습니다!", "UTILS_SEMAPHORE_ACQUIRE_FAILED"),
+    UTILS_CRAWL_RESPONSE_EMPTY(500, "크롤링 추출 결과가 비어있습니다!", "UTILS_CRAWL_RESPONSE_EMPTY"),
+
+
+    /* Infra - Lock */
+    LOCK_ALREADY_EXISTS(500, "이미 LOCK이 존재하여 획득 실패.", "LOCK_ACQUIRE_FAILED"),
+    LOCK_ACQUIRE_FAILED(500, "기타 오류로 LOCK 획득 실패.", "LOCK_ACQUIRE_FAILED"),
 
     /* Infra - File */
-    FILE_NOT_EXIST(500, "파일이 업로드되지 않았습니다. 잠시 후에 다시 시도해 주세요.", "FILE_NOT_EXIST"),
+    FILE_NOT_EXIST(500, "파일이 존재하지 않습니다.", "FILE_NOT_EXIST"),
     FILE_EMPTY(500, "잘못된 업로드 요청입니다. 올바른 파일로 다시 시도해 주세요.", "FILE_EMPTY"),
     FILE_UPLOAD_FAILED(500, "파일 업로드에 실패했습니다.", "FILE_UPLOAD_FAILED"),
     FILE_REMOVE_FAILED(500, "파일 삭제에 실패했습니다.", "FILE_REMOVE_FAILED"),
     FILE_DOWNLOAD_FAILED(500, "파일 다운로드에 실패했습니다.", "FILE_DOWNLOAD_FAILED"),
+    FILE_EXTRACT_FAILED(500, "파일 정보 추출에 실패했습니다.", "FILE_EXTRACT_FAILED"),
 
-    /* Infra - YouTube */
-    YOUTUBE_URL_NOT_VALID(400, "유효하지 않은 YouTube URL 입니다. 다시 시도해 주세요.", "YOUTUBE_URL_NOT_VALID"),
-    YOUTUBE_ID_NOT_VALID(400, "유효하지 않은 YouTube 번호 입니다. 다시 시도해 주세요.", "YOUTUBE_ID_NOT_VALID"),
-    YOUTUBE_VIDEO_NOT_FOUND(500, "삭제되었거나 숨김 처리 된 영상입니다.", "YOUTUBE_ID_NOT_VALID"),
-    YOUTUBE_REQUEST_FAILED(500, "유튜브 영상 조회에 실패했습니다.", "YOUTUBE_REQUEST_FAILED"),
+    /* Infra - File (xml) */
+    XLSX_FILE_NOT_EXIST(500, "엑셀 파일이 존재하지 않습니다!", "XLSX_FILE_NOT_EXIST"),
+    XLSX_HEADER_NOT_EXIST(500, "엑셀 파일의 헤더가 존재하지 않습니다!", "XLSX_HEADER_NOT_EXIST"),
+    XLSX_HEADER_COLUMN_NOT_EXIST(500, "엑셀 파일의 특정 헤더 컬럼이 존재하지 않습니다!", "XLSX_HEADER_NOT_EXIST"),
+    XLSX_COLUMN_NOT_EXIST(500, "엑셀 파일의 컬럼이 존재하지 않습니다!", "XLSX_COLUMN_NOT_EXIST"),
+    XLSX_CELL_VALUE_NOT_EXIST(500, "엑셀 파일의 컬럼 값이 존재하지 않습니다!", "XLSX_CELL_VALUE_NOT_EXIST"),
+    XLSX_DUPLICATION_HEADER(500, "중복되는 헤더 값이 존재합니다!", "XLSX_DUPLICATION_HEADER"),
+    XLSX_INVALID_COLUMN_INDEX(500, "유효하지 않은 엑셀 인덱스입니다!", "XLSX_INVALID_COLUMN_INDEX"),
+    XLSX_INVALID_HEADER(500, "유효하지 않은 엑셀 헤더입니다!", "XLSX_INVALID_HEADER"),
+    XLSX_INVALID_ROW(500, "유효하지 않은 엑셀 행입니다!", "XLSX_INVALID_ROW"),
+    XLSX_EXTRACT_FAILED(500, "엑셀 파일 추출에 실패했습니다!", "XLSX_EXTRACT_FAILED"),
+    XLSX_CREATE_FAILED(500, "엑셀 파일 생성에 실패했습니다!", "XLSX_CREATE_FAILED"),
+
+    /* Infra - API */
+    API_REQUEST_FAILED(500, "API 요청에 실패했습니다.", "API_REQUEST_FAILED"),
+    API_RESPONSE_EMPTY(500, "API 요청 결과를 받아오지 못했습니다. (EMPTY)", "API_RESPONSE_EMPTY"),
+    API_RESPONSE_VALIDATION_FAILED(500, "API 요청 결과 검증에 실패했습니다!", "API_RESPONSE_VALIDATION_FAILED"),
+    API_INVALID_RESPONSE(500, "유효하지 않은 API 응답 형태입니다.", "API_INVALID_RESPONSE"),
+    API_RESPONSE_CODE_ERROR(500, "API 오류 응답이 발생했습니다.", "API_RESPONSE_CODE_ERROR"),
+    API_REQUEST_CHECK_FAILED(500, "API 요청 응답 검증에 실패했습니다.", "API_REQUEST_CHECK_FAILED"),
+    API_YOUTUBE_URL_NOT_VALID(400, "유효하지 않은 YouTube URL 입니다. 다시 시도해 주세요.", "YOUTUBE_URL_NOT_VALID"),
+    API_YOUTUBE_ID_NOT_VALID(400, "유효하지 않은 YouTube 번호 입니다. 다시 시도해 주세요.", "YOUTUBE_ID_NOT_VALID"),
+    API_YOUTUBE_VIDEO_NOT_FOUND(500, "삭제되었거나 숨김 처리 된 영상입니다.", "YOUTUBE_ID_NOT_VALID"),
+    API_YOUTUBE_REQUEST_FAILED(500, "유튜브 영상 조회에 실패했습니다.", "YOUTUBE_REQUEST_FAILED"),
+    API_NEWS_REQUEST_FAILED(500, "뉴스 조회에 실패했습니다.", "API_NEWS_REQUEST_FAILED"),
+    API_STOCK_REQUEST_FAILED(500, "주식 정보 조회에 실패했습니다.", "API_STOCK_REQUEST_FAILED"),
+    API_STOCK_AT_ISSUE_FAILED(500, "주식 API AccessToken 발급에 실패했습니다.", "API_STOCK_AT_ISSUE_FAILED"),
+    API_INDICATOR_REQUEST_FAILED(500, "환율 정보 조회에 실패했습니다.", "API_ECONOMIC_INDICATOR_REQUEST_FAILED"),
+    API_MARKET_INDEX_REQUEST_FAILED(500, "시장 지수 조회 실패했습니다.", "API_MARKET_INDEX_REQUEST_FAILED"),
 
     /* Infra - AI */
     AI_CHAT_RESPONSE_ERROR(500, "AI 분석에 실패했습니다. 잠시 후 다시 시도해 주세요.", "AI_CHAT_RESPONSE_ERROR"),
 
 
-    /* ======================================== 작성 영역 (외에는 건들이지 말 것) ====================================== */
 
-    /* 예시 - Reboard */
-    REBOARD_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 게시글입니다.", "REBOARD_NOT_FOUND"),
-    REBOARD_OK_WRITE(200, "게시글을 작성했습니다.", "REBOARD_OK_WRITE"),
-    REBOARD_OK_EDIT(200, "게시글을 수정했습니다.", "REBOARD_OK_EDIT"),
+    /* ======================================== 작성 영역 (외에는 건들이지 말 것) ====================================== */
 
     /* 파일 UploadFile */
     UPLOAD_FILE_NOT_FOUND(500, "파일이 존재하지 않습니다.", "UPLOAD_FILE_NOT_FOUND"),
     UPLOAD_FILE_ADD(200, "파일 업로드에 성공했습니다.", "UPLOAD_FILE_ADD"),
+
     /* 회원 Member */
     MEMBER_NOT_FOUND(400, "회원 정보가 존재하지 않습니다.", "MEMBER_NOT_FOUND"),
     MEMBER_DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다.", "MEMBER_DUPLICATE_NICKNAME"),
+    MEMBER_EQUAL_PASSWORD(400, "이전과 다른 비밀번호로 변경해 주세요.", "MEMBER_EQUAL_PASSWORD"),
+    MEMBER_OK_EDIT_NICKNAME(200, "닉네임을 변경했습니다.", "MEMBER_OK_EDIT_NICKNAME"),
+    MEMBER_OK_EDIT_PROFILE(200, "프로필 이미지를 변경했습니다.", "MEMBER_OK_EDIT_PROFILE"),
+    MEMBER_OK_EDIT_PASSWORD(200, "비밀번호를 변경했습니다.", "MEMBER_OK_EDIT_PASSWORD"),
+
     /* 단계 학습 Study */
     STUDY_NOT_FOUND(400, "존재하지 않거나 이미 삭제된 학습 정보입니다.", "STUDY_NOT_FOUND"),
     STUDY_NOT_UPDATABLE(400, "수정된 정보가 없습니다.", "STUDY_NOT_UPDATABLE"),
@@ -84,6 +118,13 @@ public enum AppStatus {
     STUDY_WORD_OK_REMOVE_IMAGE(200, "학습 단어를 이미지를 삭제했습니다.", "STUDY_WORD_OK_REMOVE_IMAGE"),
     WORDS_NOT_FOUND(400,"해당 단어를 찾을 수 없습니다.", "WORDS_NOT_FOUND"),
 
+    /* 주식 정보 Stock */
+    STOCK_NOT_FOUND(500, "존재하지 않는 종목입니다. 종목 목록을 다시 확인해 주세요.", "STOCK_NOT_FOUND"),
+    STOCK_AT_NOT_FOUND(500, "주식 정보를 호출할 AT가 존재하지 않습니다.", "STOCK_AT_NOT_FOUND"),
+
+    /* 뉴스 줭보 News */
+    NEWS_NOT_FOUND(500, "뉴스가 존재하지 않습니다. 뉴스 목록을 다시 확인해 주세요.", "NEWS_NOT_FOUND"),
+
     /* 내 단어장 MemberWordbook */
     WORD_NOT_FOUND(400, "존재하지 않는 단어입니다.", "WORD_NOT_FOUND"),
     MEMBER_WORDBOOK_ALREADY_EXISTS(400, "이미 존재하는 단어입니다.", "MEMBER_WORDBOOK_ALREADY_EXISTS"),
@@ -97,13 +138,11 @@ public enum AppStatus {
     VIDEO_LINK_OK_EDIT(200, "학습 영상 링크를 수정했습니다.", "VIDEO_LINK_OK_EDIT"),
     VIDEO_LINK_OK_REMOVE(200, "학습 영상을 삭제했습니다.", "VIDEO_LINK_OK_REMOVE"),
 
-
     /* 공지사항 Notice */
     NOTICE_NOT_FOUND(400, "존재하지 않는 공지사항 게시글입니다.", "NOTICE_NOT_FOUND"),
     NOTICE_OK_WRITE(200, "공지사항을 작성했습니다.", "NOTICE_OK_WRITE"),
     NOTICE_OK_EDIT(200, "공지사항을 수정했습니다.", "NOTICE_OK_EDIT"),
     NOTICE_OK_REMOVE(200, "공지사항을 삭제했습니다.", "NOTICE_OK_REMOVE"),
-
 
     /* 금융 사전 API */
     FINANCE_DICT_API_FAILED(400, "KSD 금융용어 API 호출을 실패하였습니다.", "FINANCE_DICT_API_FAILED"),
@@ -111,6 +150,15 @@ public enum AppStatus {
 
     /* 북마크 */
     BOOKMARK_ALREADY_EXISTS(400, "이미 북마크한 항목입니다.", "BOOKMARK_ALREADY_EXISTS"),
+
+    /* 수준 테스트 Quiz */
+    QUIZ_OK_RECORD(200, "퀴즈 결과가 성공적으로 저장되었습니다.", "QUIZ_OK_RECORD"),
+
+    /* 단어 퀴즈 WordQuiz */
+    WORD_QUIZ_NOT_FOUND(500, "퀴즈 단어가 존재하지 않습니다.", "WORD_QUIZ_NOT_FOUND"),
+
+    /* 지표 Indicator */
+    INDICATOR_FALLBACK_FAILED(500, "지표 Fallback 처리에 실패했습니다", "INDICATOR_FALLBACK_FAILED"),
 
     /* ======================================== 작성 영역 끝 ========================================================= */
 
@@ -120,7 +168,9 @@ public enum AppStatus {
     METHOD_NOT_ALLOWED(405, "지원하지 않는 형식입니다.", "METHOD_NOT_ALLOWED"),
     CACHE_EXPIRED(403, "정보가 만료되었습니다.", "CACHE_EXPIRED"),
     UNAUTHORIZED(401, "로그인이 필요한 서비스입니다.", "UNAUTHORIZED"),
-    ACCESS_DENIED(403, "잘못된 요청입니다.", "ACCESS_DENIED");
+    ACCESS_DENIED(403, "잘못된 요청입니다.", "ACCESS_DENIED"),
+    TOO_MANY_REQUEST(429, "시도 가능 횟수를 초과한 요청입니다!", "TOO_MANY_REQUEST");
+
 
 
     private final int httpCode;     // HTTP 코드

@@ -1,6 +1,6 @@
 package app.finup.layer.base.validation.validator;
 
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.layer.base.utils.ValidationUtils;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -31,13 +31,13 @@ public class LongRangeValidator implements ConstraintValidator<LongRange, Long> 
         nullable = annotation.nullable();
 
         // 숫자 포메팅
-        String minStr = FormatUtils.formatKoreaNumber(min);
-        String maxStr = FormatUtils.formatKoreaNumber(max);
+        String minStr = TimeUtils.formatKoreaNumber(min);
+        String maxStr = TimeUtils.formatKoreaNumber(max);
 
         // 사용자 입력 오류 메세지
         message = annotation.message();
         if (Objects.isNull(message) || message.isBlank()) {
-            if (min == 1) message = "최대 %s 이내의 양수를 입력해야 합니다.".formatted(maxStr);
+            if (min <= 1) message = "최대 %s 이내의 양수를 입력해야 합니다.".formatted(maxStr);
             else message = "%s-%s 이내의 양수를 입력해야 합니다.".formatted(minStr, maxStr);
         }
     }

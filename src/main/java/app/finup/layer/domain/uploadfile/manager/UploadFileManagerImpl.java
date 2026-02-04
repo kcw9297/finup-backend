@@ -2,7 +2,7 @@ package app.finup.layer.domain.uploadfile.manager;
 
 import app.finup.common.utils.EnvUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.file.FileProvider;
+import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.domain.uploadfile.entity.UploadFile;
 import app.finup.layer.domain.uploadfile.enums.FileOwner;
 import app.finup.layer.domain.uploadfile.enums.FileType;
@@ -27,7 +27,7 @@ import java.util.Objects;
 public class UploadFileManagerImpl implements UploadFileManager {
 
     private final Environment env; // 프로필 상태 확인
-    private final FileProvider fileProvider; // 물리적 파일 조작
+    private final FileStorage fileStorage; // 물리적 파일 조작
 
     @Value("${server.port}")
     private Integer serverPort;
@@ -76,7 +76,7 @@ public class UploadFileManagerImpl implements UploadFileManager {
         String storePath = getStorePath(filePath);
 
         // [2] 파일 업로드 수행
-        fileProvider.upload(file, storePath);
+        fileStorage.upload(file, storePath);
 
         // [3] 저장된 file fullUrl 반환 (내부 메소드 사용)
         return getFullUrl(filePath);
@@ -90,7 +90,7 @@ public class UploadFileManagerImpl implements UploadFileManager {
         String storePath = getStorePath(filePath);
 
         // [2] 파일 다운로드 처리를 위한 바이트 스트림 추출 및 반환
-        return fileProvider.download(storePath);
+        return fileStorage.download(storePath);
     }
 
 
@@ -101,7 +101,7 @@ public class UploadFileManagerImpl implements UploadFileManager {
         String storePath = getStorePath(filePath);
 
         // [2] 파일 삭제
-        fileProvider.remove(storePath);
+        fileStorage.remove(storePath);
     }
 
 

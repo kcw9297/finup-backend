@@ -15,6 +15,12 @@ spring:
     active: ${ACTIVE_PROFILE}
 
 
+## 로깅 레벨
+logging:
+  level:
+    org.openqa.selenium.devtools: ERROR
+    org.openqa.selenium.chromium: ERROR
+
 ### 서버 포트 ###
 
 server:
@@ -38,24 +44,20 @@ app:
 
 api:
   kis:
-    endpoint: ${API_KIS_ENDPOINT}
     client:
       id: ${API_KIS_CLIENT_ID}
       secret: ${API_KIS_CLIENT_SECRET}
-    local:
-      access-token: ${API_KIS_LOCAL_ACCESS_TOKEN:}  # 로컬에서 사용할 임시 토큰 (23시간마다 만료됨)
 
   naver-news:
-    endpoint: ${API_NAVER_ENDPOINT}
     client:
       id: ${API_NAVER_NEWS_CLIENT_ID}
       secret: ${API_NAVER_NEWS_CLIENT_SECRET}
 
-
   youtube:
-    endpoint: ${API_YOUTUBE_ENDPOINT}
     key: ${API_YOUTUBE_KEY}
 
-  finance-dict:
-    endpoint: ${API_FINANCE_DICT_ENDPOINT}
-    key: ${API_FINANCE_DICT_KEY}
+  kexim:
+    key: ${API_KEXIM_KEY}
+
+  open-portal:
+    key: ${API_OPENPORTAL_KEY}

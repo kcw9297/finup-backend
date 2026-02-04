@@ -2,6 +2,8 @@ package app.finup.common.dto;
 
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -12,15 +14,18 @@ import java.util.List;
  * @since 2025-11-26
  */
 @Data
-public class Page<T> {
+public class Page<T> implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private List<T> rows;       // 페이징 결과 데이터 리스트
-    private int dataCount;      // 데이터의 총 개수 (같은 조건으로 조회된 총 데이터의 수)
+    private long dataCount;     // 데이터의 총 개수 (같은 조건으로 조회된 총 데이터의 수)
     private int pageNum;        // 현재 페이지
     private int pageSize;       // 한 페이지 당 가져올 행 개수
     private int groupSize;      // 그룹당 페이지 개수
 
-    private Page(List<T> rows, int dataCount, int pageNum, int pageSize, int groupSize) {
+    private Page(List<T> rows, long dataCount, int pageNum, int pageSize, int groupSize) {
         this.rows = rows;
         this.dataCount = dataCount;
         this.pageNum = pageNum + 1;
@@ -37,7 +42,7 @@ public class Page<T> {
      * @return 생성된 페이징 객체
      * @param <T> 페이징 데이터 타입
      */
-    public static <T> Page<T> of(List<T> rows, int dataCount, int pageNum, int pageSize) {
+    public static <T> Page<T> of(List<T> rows, long dataCount, int pageNum, int pageSize) {
         return new Page<>(rows, dataCount, pageNum, pageSize, 5);
     }
 
@@ -51,7 +56,7 @@ public class Page<T> {
      * @return 생성된 페이징 객체
      * @param <T> 페이징 데이터 타입
      */
-    public static <T> Page<T> of(List<T> rows, int dataCount, int pageNum, int pageSize, int groupSize) {
+    public static <T> Page<T> of(List<T> rows, long dataCount, int pageNum, int pageSize, int groupSize) {
         return new Page<>(rows, dataCount, pageNum, pageSize, groupSize);
     }
 

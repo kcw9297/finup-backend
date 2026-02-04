@@ -4,14 +4,14 @@ import app.finup.common.constant.Const;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.common.utils.FormatUtils;
+import app.finup.common.utils.TimeUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.provider.EmbeddingProvider;
-import app.finup.infra.ai.utils.AiUtils;
-import app.finup.infra.youtube.dto.YouTube;
-import app.finup.infra.youtube.provider.YouTubeProvider;
-import app.finup.infra.youtube.utils.YouTubeUtils;
+import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.common.utils.AiUtils;
+import app.finup.api.external.youtube.dto.YouTubeApiDto;
+import app.finup.api.external.youtube.client.YouTubeClient;
+import app.finup.api.external.youtube.utils.YouTubeUtils;
 import app.finup.layer.domain.videolink.dto.VideoLinkDto;
 import app.finup.layer.domain.videolink.dto.VideoLinkDtoMapper;
 import app.finup.layer.domain.videolink.entity.VideoLink;
@@ -44,7 +44,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
     // 사용 의존성
     private final VideoLinkRepository videoLinkRepository;
     private final VideoLinkMapper videoLinkMapper;
-    private final YouTubeProvider youTubeProvider;
+    private final YouTubeClient youTubeClient;
     private final EmbeddingProvider embeddingProvider;
 
     // 사용 상수
@@ -60,7 +60,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
         Integer count = videoLinkMapper.countForSearch(rq);
 
         // [2] 페이징 객체 매핑 및 반환
-        rows.forEach(row -> row.setDuration(FormatUtils.formatDuration(row.getDuration()))); // mybatis에서 문자열로 제공됨
+        rows.forEach(row -> row.setDuration(TimeUtils.formatDuration(row.getDuration()))); // mybatis에서 문자열로 제공됨
         return Page.of(rows, count, rq.getPageNum(), rq.getPageSize());
     }
 
@@ -75,7 +75,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
             throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS, "videoUrl"); // 입력은 videoUrl로 받음
 
         // [2] YouTube 영상 메타데이터 조회 (단일 정보 조회는 캐시처리)
-        YouTube.Detail video = youTubeProvider.getVideo(videoId);
+        YouTubeApiDto.Detail video = youTubeClient.getVideo(videoId);
 
         // [3] 임베딩 텍스트 생성
         String description = StrUtils.splitWithStart(video.getDescription(), SPLIT_DESCRIPTION_LEN); // 200자까지만 사용 (null safe)
@@ -122,12 +122,12 @@ public class VideoLinkServiceImpl implements VideoLinkService {
         Lists.partition(new ArrayList<>(videoLinkMap.keySet()), 50)
                 .forEach(chunk -> {
                     // 영상 조회
-                    List<YouTube.Detail> videos = youTubeProvider.getVideos(chunk);
+                    List<YouTubeApiDto.Detail> videos = youTubeClient.getVideos(chunk);
 
                     // 조회된 영상번호 목록 (숨김 처리되거나, 삭제된 영상은 결과에 미포함)
-                    Map<String, YouTube.Detail> resultVideoMap = videos.stream()
+                    Map<String, YouTubeApiDto.Detail> resultVideoMap = videos.stream()
                             .collect(Collectors.toConcurrentMap(
-                                    YouTube.Detail::getVideoId,
+                                    YouTubeApiDto.Detail::getVideoId,
                                     Function.identity()
                             ));
 
@@ -146,7 +146,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
     }
 
     // 조회된 비디오 정보 갱신
-    private void syncVideos(Map<String, VideoLink> videoLinkMap, Map<String, YouTube.Detail> resultVideoMap) {
+    private void syncVideos(Map<String, VideoLink> videoLinkMap, Map<String, YouTubeApiDto.Detail> resultVideoMap) {
 
         // [1] embedding 변동이 필요한 경우 추출
         Map<String, String> need = resultVideoMap.entrySet()
@@ -155,7 +155,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
                 .collect(Collectors.toConcurrentMap(
                         Map.Entry::getKey,
                         entry -> {
-                            YouTube.Detail video = entry.getValue();
+                            YouTubeApiDto.Detail video = entry.getValue();
                             String description = StrUtils.splitWithStart(video.getDescription(), SPLIT_DESCRIPTION_LEN); // 200자까지만 사용 (null safe)
                             return AiUtils.generateEmbeddingText(video.getTitle(), video.getChannelTitle(), description, video.getTags());
                         }
@@ -215,7 +215,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
             throw new BusinessException(AppStatus.VIDEO_LINK_ALREADY_EXISTS, "videoUrl"); // 입력은 videoUrl로 받음
 
         // [4] 정보 수정을 위한, 영상 정보 조회
-        YouTube.Detail video = youTubeProvider.getVideo(videoId);
+        YouTubeApiDto.Detail video = youTubeClient.getVideo(videoId);
 
         // [5] 임베딩 텍스트 생성
         String description = StrUtils.splitWithStart(video.getDescription(), SPLIT_DESCRIPTION_LEN); // 200자까지만 사용
@@ -241,7 +241,7 @@ public class VideoLinkServiceImpl implements VideoLinkService {
 
 
     // 주어진 필드가 일치하는지 검증 (임베딩 필드 갱신 목적)
-    private boolean needEmbed(VideoLink videoLink, YouTube.Detail video) {
+    private boolean needEmbed(VideoLink videoLink, YouTubeApiDto.Detail video) {
 
         return !Objects.equals(videoLink.getTitle(), video.getTitle()) ||
                 !Objects.equals(videoLink.getChannelTitle(), video.getChannelTitle()) ||

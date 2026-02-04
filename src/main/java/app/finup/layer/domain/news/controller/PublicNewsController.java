@@ -1,7 +1,10 @@
 package app.finup.layer.domain.news.controller;
 
 import app.finup.common.constant.Url;
+import app.finup.common.dto.Page;
+import app.finup.common.dto.Pagination;
 import app.finup.common.utils.Api;
+import app.finup.layer.domain.news.dto.NewsDto;
 import app.finup.layer.domain.news.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,17 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class PublicNewsController {
+
+    // 사용 의존성
     private final NewsService newsService;
 
-    @GetMapping("/list")
-    public ResponseEntity<?> getNews(String category) {
-        return Api.ok(newsService.getNews(category));
+    /**
+     * 최근 순으로 메인 뉴스 조회 (무한 스크롤)
+     * [GET] /news/main
+     */
+    @GetMapping("/main")
+    public ResponseEntity<?> getPagedMainNewsList(@RequestParam int pageNum,
+                                                  @RequestParam int pageSize) {
 
+        // [1] 페이징 수행
+        Page<NewsDto.Row> page = newsService.getPagedMainNewsList(pageNum, pageSize);
+
+        // [2] 페이징 결과 반환
+        return Api.ok(page.getRows(), Pagination.of(page));
     }
-    @GetMapping("/latest")
-    public ResponseEntity<?> getLatestNews(@RequestParam(defaultValue = "date") String category,
-                                           @RequestParam(defaultValue = "10") int limit)
-    {
-        return Api.ok(newsService.getLatestNews(category, limit));
-    }
+
 }

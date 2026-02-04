@@ -1,10 +1,8 @@
 package app.finup.layer.domain.studyword.dto;
 
 import app.finup.layer.base.dto.SearchRequest;
-import app.finup.layer.base.validation.annotation.NoSpecialText;
 import app.finup.layer.base.validation.annotation.PartSpecialText;
 import app.finup.layer.base.validation.annotation.Text;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serial;
@@ -93,48 +91,5 @@ public final class StudyWordDto {
         private String meaning;
     }
 
-    /**
-     * Quiz(수준 테스트) AI prompt용
-     */
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Quiz {
-        private String name;
-        private String meaning;
-    }
-
-
-    @Getter
-    @Builder
-    public static class Recommendation {
-
-        @JsonProperty("study")
-        private StudyInfo study;
-
-        @JsonProperty("candidates")
-        private List<WordCandidate> candidates;
-
-        @JsonProperty("latestStudyWordIds")
-        private List<Long> latestStudyWordIds;
-
-        @Getter
-        @Builder
-        public static class StudyInfo {
-            private String name;
-            private String summary;
-            private String detail;
-            private int level;
-        }
-
-        @Getter
-        @Builder
-        public static class WordCandidate {
-            private Long studyWordId;
-            private String name;
-            private String meaning;
-        }
-    }
 
 }
