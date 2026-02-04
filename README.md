@@ -2,7 +2,7 @@
 #### 천재IT교육센터 Java 풀스택 과정 12기 3차 팀 프로젝트 gif 자료
 
 
-![홈페이지 전경](https://velog.velcdn.com/images/darklight_0418/post/11d10808-6af7-45f7-9593-3f0ef2d97b47/image.gif)
+![홈페이지 전경](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%ED%99%88%ED%8E%98%EC%9D%B4%EC%A7%80.gif)
 
 ---
 
@@ -18,18 +18,18 @@
             → 저장된 Redis Key 기반 인증 번호 유효 및 만료여부를 판단
 
 > 1. 인증 코드 전송 및 확인 
-![인증코드](https://velog.velcdn.com/images/darklight_0418/post/7c96b041-7ece-42e9-ab73-d2a051376aed/image.gif)
+![인증코드](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85%20%EC%9D%B8%EC%A6%9D%EC%BD%94%EB%93%9C.gif)
 ***
 > 1-1. 발송된 인증코드
-<img src="https://velog.velcdn.com/images/darklight_0418/post/a1e9002e-8391-4c7f-8279-704b4bc0b2c4/image.jpg"
+<img src="https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%9D%B4%EB%A9%94%EC%9D%BC%20%EC%9D%B8%EC%A6%9D%EC%BD%94%EB%93%9C%20%EC%A1%B0%ED%9A%8C.jpg"
      width="50%" height="50%"
      />
 ***
 > 2. 비밀번호 유효성 검사 
-![비밀번호 유효성 검사](https://velog.velcdn.com/images/darklight_0418/post/b3874a3d-3a25-40b2-8fa4-6fbfc89391ad/image.gif)
+![비밀번호 유효성 검사](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85%20%EB%B9%84%EB%B0%80%EB%B2%88%ED%98%B8%20%EC%9C%A0%ED%9A%A8%EC%84%B1%20%EA%B2%80%EC%82%AC.gif)
 ***
 > 3. 로그인
-![로그인](https://velog.velcdn.com/images/darklight_0418/post/9e11cb20-9f8d-4ecf-9b74-49c4913d93e9/image.gif)
+![로그인](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%A1%9C%EA%B7%B8%EC%9D%B8.gif)
 
 ***
 
@@ -43,10 +43,10 @@
 
 >
 - 프로필 변경
-![프로필 사진 변경](https://velog.velcdn.com/images/darklight_0418/post/10f07f50-b7ca-4c03-aaae-a0e4ed10dd00/image.gif)
+![프로필 사진 변경](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%ED%9A%8C%EC%9B%90%20%EC%A0%95%EB%B3%B4%20%EB%B3%80%EA%B2%BD.gif)
 ***
 - 비밀번호 변경 시 유효성 검사
-![비밀번호 변경 시 유효성 검사](https://velog.velcdn.com/images/darklight_0418/post/cada0334-b057-4427-8e72-4955a5f101a9/image.gif)
+![비밀번호 변경 시 유효성 검사](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%ED%9A%8C%EC%9B%90%20%EC%A0%95%EB%B3%B4%20%EB%B3%80%EA%B2%BD.gif)
 
 
 ---
@@ -64,13 +64,13 @@
 - 퀴즈 문제 및 보기 : 후보 중에서 AI 기반 선별 
 
 > 1. 수준 테스트
-![개념 테스트](https://velog.velcdn.com/images/darklight_0418/post/e3952fb6-4f1b-4f70-9937-33316b46ac71/image.gif)
+![개념 테스트](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B0%9C%EB%85%90%20%ED%85%8C%EC%8A%A4%ED%8A%B8.gif)
 ***
 > 2. 개념 학습 (개념 정리) 페이지
-![개념 학습 페이지](https://velog.velcdn.com/images/darklight_0418/post/8c3593a2-9c39-4022-a007-fe20f09680e4/image.gif)
+![개념 학습 페이지](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B0%9C%EB%85%90%20%ED%95%99%EC%8A%B5.gif)
 ***
 > 3. 개념 학습 진척도 반영
-![개념 학습 진척도 반영](https://velog.velcdn.com/images/darklight_0418/post/2e80a12e-160f-42f1-a72c-3bd8cc20f982/image.gif)
+![개념 학습 진척도 반영](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B0%9C%EB%85%90%20%ED%95%99%EC%8A%B5%20%EC%A7%84%EC%B2%99%EB%8F%84%20%EB%B0%98%EC%98%81.gif)
 
 
 ### 뉴스 학습
@@ -104,19 +104,19 @@
 
 >
 1. 뉴스 단어 재추천 및 단어 바로가기
-![뉴스 단어 재추천 및 단어 바로가기](https://velog.velcdn.com/images/darklight_0418/post/e2a61a84-d6b2-4962-9af6-65a3a2db33df/image.gif)
+![뉴스 단어 재추천 및 단어 바로가기](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%EB%8B%A8%EC%96%B4%20%EC%9E%AC%EC%B6%94%EC%B2%9C%20%EB%B0%8F%20%EB%B0%94%EB%A1%9C%EA%B0%80%EA%B8%B0.gif)
 ***
 2. 그 외 재추천 항목들
-![그 외 재추천 항목들](https://velog.velcdn.com/images/darklight_0418/post/a07a0536-1ea1-410e-bfae-f1e23459662c/image.gif)
+![그 외 재추천 항목들](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%EC%9E%AC%EC%B6%94%EC%B2%9C%20%EA%B4%80%EB%A0%A8%20%ED%95%AD%EB%AA%A9%EB%93%A4.gif)
 ***
 3. 뉴스 원문 바로가기
-![뉴스 원문 바로가기](https://velog.velcdn.com/images/darklight_0418/post/1bdb0316-3c72-44cf-a781-7db40eb52ab9/image.gif)
+![뉴스 원문 바로가기](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%EC%9B%90%EB%AC%B8%20%EB%B0%94%EB%A1%9C%EA%B0%80%EA%B8%B0.gif)
 ***
 4. 뉴스 탭 진입 후 뉴스 살펴보기
-![뉴스 탭 진입 후 뉴스 살펴보기](https://velog.velcdn.com/images/darklight_0418/post/115f929c-2f6a-433b-9d0b-a281d4eaefd5/image.gif)
+![뉴스 탭 진입 후 뉴스 살펴보기](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%ED%83%AD%20%EB%B0%8F%20%EB%89%B4%EC%8A%A4%20%ED%95%AD%EB%AA%A9.gif)
 ***
 5. 뉴스 무한 스크롤 구현
-![뉴스 무한 스크롤 구현](https://velog.velcdn.com/images/darklight_0418/post/3e25ab4b-a297-47a9-964c-c8e0ac3c3c9c/image.gif)
+![뉴스 무한 스크롤 구현](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%EB%AC%B4%ED%95%9C%20%EC%8A%A4%ED%81%AC%EB%A1%A4%20%EA%B5%AC%ED%98%84.gif)
 
 * * *
 ### 종목 학습
@@ -131,7 +131,7 @@
 
 >
 - 종목 학습 탭, 시가총액 거래대금 순위 확인
-![종목 학습 탭](https://velog.velcdn.com/images/darklight_0418/post/693f5989-83cd-4f82-b2f3-4e211b84fc6f/image.gif)
+![종목 학습 탭](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%A2%85%EB%AA%A9%20%ED%99%94%EB%A9%B4(%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1%20%EB%93%B1%20%ED%99%95%EC%9D%B8).gif)
 
 ***
 
@@ -143,7 +143,7 @@
 - AI 분석 : 현재 차트 기반 종합적, 추세, 리스크, 거래량 분석 정보
 
 >
-![종목별 차트 확인](https://velog.velcdn.com/images/darklight_0418/post/5ec6c2e1-b127-4638-900c-983cab3d6ba3/image.gif)
+![종목별 차트 확인](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%A2%85%EB%AA%A9%20%EC%B0%A8%ED%8A%B8%20%ED%99%95%EC%9D%B8.gif)
 
 ***
 
@@ -153,7 +153,7 @@
 - 여러 관점에서의 AI 분석
 - 추천 영상 : 종목명으로 유튜브 검색 API > 검색된 영상 후보를 AI 선별 후 제공하는 RAG 추천으로 제공
 
->![종목별 상세 항목 확인](https://velog.velcdn.com/images/darklight_0418/post/7df362d3-0a6f-4e2b-8797-82edf7f85c02/image.gif)
+>![종목별 상세 항목 확인](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%A2%85%EB%AA%A9%EB%B3%84%20%EC%83%81%EC%84%B8%20%ED%95%AD%EB%AA%A9%20%ED%99%95%EC%9D%B8.gif)
 
 
 ***
@@ -161,7 +161,7 @@
 - 현재 종목에 특화된 종목과 연계하여 학습하기 적절한 뉴스 목록을 제공합니다.
 제공 방식은 상단의 "뉴스 본문" 과 동일합니다.
 
->![종목별 뉴스](https://velog.velcdn.com/images/darklight_0418/post/cbba6e16-e05a-408b-938c-f69f88744b3c/image.gif)
+>![종목별 뉴스](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%A2%85%EB%AA%A9%EB%B3%84%20%EB%89%B4%EC%8A%A4.gif)
 
 
 ---
@@ -192,23 +192,23 @@
 
 >
 - 단어장 퀴즈 기능
-![단어장 퀴즈 기능](https://velog.velcdn.com/images/darklight_0418/post/5cca3d02-35d0-41ac-ad9e-02c3fa594cfa/image.gif)
+![단어장 퀴즈 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%8B%A8%EC%96%B4%EC%9E%A5%20%EB%8B%A8%EC%96%B4%ED%80%B4%EC%A6%88.gif)
 ***
 >
 - 내 단어장 기능
-![내 단어장 기능](https://velog.velcdn.com/images/darklight_0418/post/d0d5812b-fcbf-4daa-9514-545278c7ccb7/image.gif)
+![내 단어장 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%82%B4%20%EB%8B%A8%EC%96%B4%EC%9E%A5%20%EA%B8%B0%EB%8A%A5.gif)
 ***
 >
 - 내 단어장에 단어 저장하기
-![내 단어장에 단어 저장](https://velog.velcdn.com/images/darklight_0418/post/c56e0dde-495b-480c-85ab-4f06de0b24a5/image.gif)
+![내 단어장에 단어 저장](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%82%B4%20%EB%8B%A8%EC%96%B4%EC%9E%A5%EC%97%90%20%EB%8B%A8%EC%96%B4%20%EC%A0%80%EC%9E%A5.gif)
 ***
 >
 - 단어 검색 기능 (벡터 연산을 통한 상위 20개 단어 출력 및 최근 검색어 저장)
-![단어 검색 기능](https://velog.velcdn.com/images/darklight_0418/post/c821984e-bafa-4c59-9fdd-d088ce981b19/image.gif)
+![단어 검색 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%8B%A8%EC%96%B4%20%EA%B2%80%EC%83%89%20%EA%B8%B0%EB%8A%A5.gif)
 ***
 >
 - 기획재정부 시사경제용어사전 링크 (추가 학습에 용이하도록 설계)
-![기획재정부 시사경제용어사전 링크](https://velog.velcdn.com/images/darklight_0418/post/66bd3243-f45a-4a66-8479-0115ab4e451c/image.gif)
+![기획재정부 시사경제용어사전 링크](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B8%B0%EC%9E%AC%EB%B6%80%20%EC%8B%9C%EC%82%AC%EA%B2%BD%EC%A0%9C%EC%9A%A9%EC%96%B4%EC%82%AC%EC%A0%84.gif)
 
 ---
 ### 관리자 기능
@@ -221,10 +221,10 @@
 
 >
 - 회원 목록 일부 글자 마스킹 기능
-![회원 목록 일부 글자 마스킹 기능](https://velog.velcdn.com/images/darklight_0418/post/0960c147-2bae-488d-8a6b-f6f2c8bba743/image.gif)
+![회원 목록 일부 글자 마스킹 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B4%80%EB%A6%AC%EC%9E%90%20%ED%9A%8C%EC%9B%90%20%EB%AA%A9%EB%A1%9D%20%EA%B4%80%EB%A6%AC%20%EB%A7%88%EC%8A%A4%ED%82%B9.gif)
 ***
 - 회원 목록 pdf, xlsx 파일 다운로드
-![회원 목록 pdf, xlsx 파일 다운로드](https://velog.velcdn.com/images/darklight_0418/post/730a5de2-4aa9-4379-8fd8-b1cbbb350a23/image.gif)
+![회원 목록 pdf, xlsx 파일 다운로드](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%ED%9A%8C%EC%9B%90%20%EB%AA%A9%EB%A1%9D%20pdf%2C%20xlsx%20%ED%8C%8C%EC%9D%BC%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C.gif)
 
 #### 공지사항
 홈화면에서 사용자에게 최근 3개의 공지사항을 표시합니다.
@@ -233,10 +233,10 @@
 
 >
 - 공지사항 검색
-![공지사항 검색](https://velog.velcdn.com/images/darklight_0418/post/a2764684-c7f9-482c-9d9d-39fb8d3f64b6/image.gif)
+![공지사항 검색](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD%20%EA%B2%80%EC%83%89.gif)
 ***
 - 공지사항 등록
-![공지사항 등록](https://velog.velcdn.com/images/darklight_0418/post/f3088c97-e536-4acd-b06c-10f7c2a38bc3/image.gif)
+![공지사항 등록](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/main/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD%20%EB%93%B1%EB%A1%9D.gif)
 
 
 #### 개념 학습 관리
@@ -247,7 +247,7 @@
 
 >
 - 항목 조회 및 편집 기능
-![개념 학습 조회 및 편집](https://velog.velcdn.com/images/darklight_0418/post/ae9fdcc3-5edb-417d-81ac-cb72089f7b12/image.gif)
+![개념 학습 조회 및 편집](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EA%B0%9C%EB%85%90%20%ED%95%99%EC%8A%B5%20%EA%B4%80%EB%A6%AC%20-%20%ED%8E%B8%EC%A7%91%20%EC%A1%B0%ED%9A%8C.gif)
 
 
 #### 단어 관리 (개념 학습 파트, 관리자 전용)
@@ -258,10 +258,10 @@
 
 >
 - 단어 조회 및 등록 유효성 검사
-![단어 조회 및 등록 유효성 검사](https://velog.velcdn.com/images/darklight_0418/post/8bc0de78-5e19-42e6-9424-973f2fd31ad9/image.gif)
+![단어 조회 및 등록 유효성 검사](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%8B%A8%EC%96%B4%20%EC%A1%B0%ED%9A%8C%2C%20%EB%93%B1%EB%A1%9D%20%EC%9C%A0%ED%9A%A8%EC%84%B1%20%EA%B2%80%EC%82%AC.gif)
 ***
 - 단어 정렬 기능
-![단어 정렬 기능](https://velog.velcdn.com/images/darklight_0418/post/36deb800-c0e7-4886-814e-026c6dcb5e71/image.gif)
+![단어 정렬 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%8B%A8%EC%96%B4%20%EC%A0%95%EB%A0%AC%20%EA%B8%B0%EB%8A%A5.gif)
 
 #### 유튜브 영상 관리(개념 학습 파트)
 개념 학습 파트에서 볼 수 있는 추천 영상들을 등록할 수 있습니다.
@@ -271,13 +271,13 @@
 
 >
 - 유튜브 영상 목록 정렬 기능
-![유튜브 영상 목록 정렬 기능](https://velog.velcdn.com/images/darklight_0418/post/3aaff355-d534-4e62-a490-1b5da3fb79b0/image.gif)
+![유튜브 영상 목록 정렬 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%9C%A0%ED%8A%9C%EB%B8%8C%20%EC%98%81%EC%83%81%20%EC%A0%95%EB%A0%AC%20%EA%B8%B0%EB%8A%A5.gif)
 ***
 - 유튜브 영상 검색 기능
-![유튜브 영상 검색 기능](https://velog.velcdn.com/images/darklight_0418/post/f804d5b1-e198-4ea3-bf06-79d660a3a23a/image.gif)
+![유튜브 영상 검색 기능](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%9C%A0%ED%8A%9C%EB%B8%8C%20%EC%98%81%EC%83%81%20%EA%B2%80%EC%83%89%20%EA%B8%B0%EB%8A%A5.gif)
 ***
 - 유튜브 영상 등록 및 유효성 검사, 삭제
-![유튜브 영상 등록 및 유효성 검사, 삭제](https://velog.velcdn.com/images/darklight_0418/post/66d520bd-11b6-4803-95e7-261b929b1525/image.gif)
+![유튜브 영상 등록 및 유효성 검사, 삭제](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%9C%A0%ED%8A%9C%EB%B8%8C%20%EB%8B%A8%EC%96%B4%20%EB%93%B1%EB%A1%9D.gif)
 
 ***
 ## 그 외
@@ -285,10 +285,10 @@
 AI 분석, 추천 항목들은 재추천 버튼을 클릭하면 다시 AI 분석을 통한 재추천 조회 결과가 제공됩니다.
 
 > - 뉴스 해설 AI 재추천 등
-![뉴스 해설 AI 재추천](https://velog.velcdn.com/images/darklight_0418/post/1dabee73-8c11-4bbb-84d8-6cac7595a289/image.gif)
+![뉴스 해설 AI 재추천](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%EC%9E%AC%EC%B6%94%EC%B2%9C%20%EA%B4%80%EB%A0%A8%20%ED%95%AD%EB%AA%A9%EB%93%A4.gif)
 ***
 - AI 학습 단어 추천 등
-![AI 학습 단어 추천](https://velog.velcdn.com/images/darklight_0418/post/c42e5ddb-599f-47fd-b6b8-e9362945cde1/image.gif)
+![AI 학습 단어 추천](https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EB%89%B4%EC%8A%A4%20%EC%9E%AC%EC%B6%94%EC%B2%9C%20%EA%B4%80%EB%A0%A8%20%ED%95%AD%EB%AA%A9%EB%93%A4.gif)
 
 ---
 Ver 0.2 - 2026.02.02.
