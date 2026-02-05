@@ -1,8 +1,5 @@
 package app.finup.layer.domain.words.redis;
 
-import app.finup.common.utils.StrUtils;
-import app.finup.layer.base.template.RedisCodeTemplate;
-import app.finup.layer.domain.words.constant.WordsRedisKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -10,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 
 
 @Slf4j
@@ -88,40 +84,4 @@ public class WordsRedisStorageImpl implements WordsRedisStorage {
         return "recentKeyword:search:%d".formatted(memberId);
     }
 
-
-    @Override
-    public void storePrevRecommendationIds(Long newsId, Long memberId, List<Long> termIds) {
-
-        RedisCodeTemplate.addPrevList(
-                srt,
-                getRecommendationKey(newsId, memberId),
-                termIds,
-                MAX_KEY_PREV_RECOMMENDATION_NEWS,
-                TTL_KEY_PREV_RECOMMENDATION_NEWS
-        );
-    }
-
-    @Override
-    public List<Long> getPrevRecommendationIds(Long newsId, Long memberId) {
-
-        return RedisCodeTemplate.getPrevList(
-                srt,
-                getRecommendationKey(newsId, memberId),
-                Long::valueOf // Long 으로 변환
-        );
-    }
-
-
-    // key 제공 메소드 (내부 placeholder 채움)
-    private String getRecommendationKey(Long newsId, Long memberId) {
-
-        // 파라미터 Map
-        Map<String, String> params = Map.of(
-                WordsRedisKey.NEWS_ID, String.valueOf(newsId),
-                WordsRedisKey.MEMBER_ID, String.valueOf(memberId)
-        );
-
-        // key 생성 및 반환
-        return StrUtils.fillPlaceholder(WordsRedisKey.KEY_PREV_RECOMMENDATION_NEWS, params);
-    }
 }

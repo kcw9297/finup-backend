@@ -3,7 +3,7 @@ package app.finup.layer.domain.words.controller;
 import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
 import app.finup.layer.base.validation.annotation.Search;
-import app.finup.layer.domain.words.service.WordsAiService;
+import app.finup.layer.domain.words.dto.WordsDto;
 import app.finup.layer.domain.words.service.WordsService;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,7 +31,6 @@ import java.util.Objects;
 public class WordsController {
 
     private final WordsService wordsService;
-    private final WordsAiService wordsAiService;
 
 
     /**
@@ -42,8 +42,15 @@ public class WordsController {
             @Search @RequestParam String keyword,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
+        // [1] 검색 수행
         String trimmed = Objects.isNull(keyword) ? "" : keyword.trim();
-        return Api.ok(wordsService.search(trimmed, userDetails.getMemberId()));
+        List<WordsDto.Row> rows = wordsService.search(trimmed, userDetails.getMemberId());
+
+        // [2] 검색 단어 저장 (비지 않은 경우)
+        if (!rows.isEmpty()) wordsService.storeRecentWord(userDetails.getMemberId(), trimmed);
+
+        // [3] 검색 결과 반환
+        return Api.ok(rows);
     }
 
 
@@ -92,23 +99,4 @@ public class WordsController {
         return Api.ok(wordsService.getDetail(termId));
     }
 
-
-    /**
-     * 단어 추천 API
-     * [GET] /words/recommendation/news/{newsId}
-     */
-    @GetMapping("/recommendation/news/{newsId:[0-9]+}")
-    public ResponseEntity<?> getRecommendationNewsWords(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long newsId,
-            @RequestParam boolean retry) {
-
-        // 현재 요청 회원번호
-        Long memberId = userDetails.getMemberId();
-
-        // 재시도 여부에 따라 분기 처리
-        return retry ?
-                Api.ok(wordsAiService.retryAndGetRecommendationNewsWords(newsId, memberId)) :
-                Api.ok(wordsAiService.getRecommendationNewsWords(newsId, memberId));
-    }
 }

@@ -21,9 +21,18 @@ public interface WordsService {
     /**
      * 금융 용어 검색
      * @param keyword 검색 키워드
+     * @param memberId 검색 대상 회원번호
      * @return 페이징된 검색 결과(용어 목록) DTO 리스트
      */
     List<WordsDto.Row> search(String keyword, Long memberId);
+
+
+    /**
+     * 최근 검색 금융 용어 검색
+     * @param keyword 검색 키워드
+     * @param memberId 검색 대상 회원번호
+     */
+    void storeRecentWord(Long memberId, String keyword);
 
 
     /**
