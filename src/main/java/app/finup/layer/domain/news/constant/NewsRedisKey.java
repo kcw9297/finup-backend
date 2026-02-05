@@ -22,11 +22,13 @@ public final class NewsRedisKey {
     private static final String LOCK_PREFIX = "LOCK:" + KEY_PREFIX;
     // key name
     public static final String KEY_ANALYZE = KEY_PREFIX + "ANALYZE:${NEWS_ID}:${MEMBER_ID}";
+    public static final String KEY_ANALYZE_WORDS = KEY_PREFIX + "ANALYZE:WORDS:${NEWS_ID}:${MEMBER_ID}";
 
     // Cache Name
     public static final String CACHE_MAIN = CACHE_PREFIX + "MAIN";
     public static final String CACHE_STOCK = CACHE_PREFIX + "STOCK";
     public static final String CACHE_ANALYZE = CACHE_PREFIX + "ANALYZE";
+    public static final String CACHE_ANALYZE_WORDS = CACHE_ANALYZE + ":WORDS";
 
     // Lock Name
     public static final String LOCK_SYNC = LOCK_PREFIX + "SYNC";

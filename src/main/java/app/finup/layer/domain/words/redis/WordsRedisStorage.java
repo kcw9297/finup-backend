@@ -39,22 +39,4 @@ public interface WordsRedisStorage {
      */
     void removeRecentSearchKeyword(Long memberId, String keyword);
 
-
-    /**
-     * 현재 뉴스에 추천된 단어번호 저장
-     * @param newsId 추천 대상 뉴스번호
-     * @param memberId 퀴즈 응시대상 회원번호
-     * @param termIds 추천된 단어번호 목록
-     */
-    void storePrevRecommendationIds(Long newsId, Long memberId, List<Long> termIds);
-
-
-    /**
-     * 현재 뉴스에 대해 현재 사용자에게 추천되었던 단어번호 목록 조회
-     * @param newsId 추천 대상 뉴스번호
-     * @param memberId 퀴즈 응시대상 회원번호
-     * @return 이전에 추천된 단어번호 록록
-     */
-    List<Long> getPrevRecommendationIds(Long newsId, Long memberId);
-
 }

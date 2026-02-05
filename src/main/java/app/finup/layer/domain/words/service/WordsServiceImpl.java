@@ -52,8 +52,7 @@ public class WordsServiceImpl implements WordsService {
     private static final String FILE_PATH_WORDS = "base/words_with_level.csv";
     private static final int MIN_AMOUNT_WORDS = 1000;
     private static final int CHUNK_INIT_WORD = 100;
-    private static final int SEARCH_AMOUNT = 20;
-    private static final double THRESHOLD_SEARCH_DISTANCE = 0.75;
+    private static final int SEARCH_AMOUNT = 30;
 
 
     @Override
@@ -182,11 +181,7 @@ public class WordsServiceImpl implements WordsService {
 
         // [2] 검색 전, 현재 검색 단어 벡터화 후 검색 수행
         byte[] embedding = embeddingProvider.generate(keyword);
-        return wordsRepository
-                .findWithSimilarAndThresholdByKeyword(keyword, embedding, THRESHOLD_SEARCH_DISTANCE, SEARCH_AMOUNT)
-                .stream()
-                .map(WordsDtoMapper::toRow)
-                .toList();
+        return wordsRepository.findWithSimilarByKeyword(keyword, embedding, SEARCH_AMOUNT);
     }
 
 

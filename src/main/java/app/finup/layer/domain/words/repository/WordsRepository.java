@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Transactional(readOnly = true)
-public interface WordsRepository extends JpaRepository<Words, Long> {
-
-    Optional<Words> findByName(@Param("name") String name);
+public interface WordsRepository extends WordsJdbcRepository, JpaRepository<Words, Long> {
 
     long count();
 
@@ -45,14 +43,7 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
             WHERE w.termId <> :termId
             ORDER BY function('RAND')
     """)
-    List<String> findRandomNamesExclude(
-            @Param("termId") Long termId,
-            Pageable pageable
-    );// 전체 건수 (isInitialized 용)
-
-    @Query("select w from Words w order by w.termId asc")
-    List<Words> findTop10(Pageable pageable);
-
+    List<String> findRandomNamesExclude(@Param("termId") Long termId, Pageable pageable);
 
     @Query("""
         SELECT w
@@ -64,41 +55,5 @@ public interface WordsRepository extends JpaRepository<Words, Long> {
         LIMIT :lim
     """)
     List<Words> findRandomByWordLevelWithExcludeIds(WordsLevel wordsLevel, Collection<Long> excludeIds, int lim);
-
-
-    @SuppressWarnings("SqlResolve")
-    @Query(value = """
-        SELECT *
-        FROM words
-        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%')) 
-              AND embedding IS NOT NULL
-        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
-        LIMIT :lim
-    """, nativeQuery = true)
-    List<Words> findWithSimilarByKeyword(String keyword, byte[] embedding, int lim);
-
-
-    @SuppressWarnings("SqlResolve")
-    @Query(value = """
-        SELECT *
-        FROM words
-        WHERE (name LIKE CONCAT('%', :keyword, '%') OR description LIKE CONCAT('%', :keyword, '%'))
-              AND embedding IS NOT NULL
-              AND VEC_DISTANCE_COSINE(embedding, :embedding) < :threshold
-        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
-        LIMIT :lim
-    """, nativeQuery = true)
-    List<Words> findWithSimilarAndThresholdByKeyword(String keyword, byte[] embedding, double threshold, int lim);
-
-
-    @SuppressWarnings("SqlResolve")
-    @Query(value = """
-        SELECT *
-        FROM words w
-        WHERE w.term_id NOT IN :prevIds
-        ORDER BY VEC_DISTANCE_COSINE(embedding, :embedding)
-        LIMIT :lim
-    """, nativeQuery = true)
-    List<Words> findWithSimilarExcludePrev(byte[] embedding, List<Long> prevIds, int lim);
 
 }

@@ -60,7 +60,7 @@ public class NewsFilterUtils {
     private static final int THRESHOLD_LENGTH_MIN_SUMMARY = 50;
     private static final double PERCENT_BULLET_LINES = 0.6; // 전체 라인에서 "-"로 시작하는 비율
     private static final double PERCENT_SHORT_LINES = 0.6; // 전체 라인에서 "-"로 시작하는 비율
-    private static final int THRESHOLD_DESCRIPTION_MIN_LENGTH = 600; // 기사 본문 최소 길이
+    private static final int THRESHOLD_DESCRIPTION_MIN_LENGTH = 1500; // 기사 본문 최소 길이
 
     private static final List<Pattern> NOISE_PATTERNS = List.of(
             Pattern.compile(".*기사보내기.*"),  // 기사보내기 포함된 모든 줄
@@ -381,7 +381,7 @@ public class NewsFilterUtils {
         String result = description;
 
         // 연속되는 짧은 줄 제거
-        result = removeShortLineClusters(result, 50, 5);
+        result = removeShortLineClusters(result, 50, 3);
 
         // 패턴 매칭되는 부분만 제거
         for (Pattern pattern : NOISE_PATTERNS)

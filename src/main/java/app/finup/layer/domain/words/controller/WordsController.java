@@ -4,7 +4,6 @@ import app.finup.common.constant.Url;
 import app.finup.common.utils.Api;
 import app.finup.layer.base.validation.annotation.Search;
 import app.finup.layer.domain.words.dto.WordsDto;
-import app.finup.layer.domain.words.service.WordsAiService;
 import app.finup.layer.domain.words.service.WordsService;
 import app.finup.security.dto.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.Objects;
 public class WordsController {
 
     private final WordsService wordsService;
-    private final WordsAiService wordsAiService;
 
 
     /**
@@ -101,23 +99,4 @@ public class WordsController {
         return Api.ok(wordsService.getDetail(termId));
     }
 
-
-    /**
-     * 단어 추천 API
-     * [GET] /words/recommendation/news/{newsId}
-     */
-    @GetMapping("/recommendation/news/{newsId:[0-9]+}")
-    public ResponseEntity<?> getRecommendationNewsWords(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
-            @PathVariable Long newsId,
-            @RequestParam boolean retry) {
-
-        // 현재 요청 회원번호
-        Long memberId = userDetails.getMemberId();
-
-        // 재시도 여부에 따라 분기 처리
-        return retry ?
-                Api.ok(wordsAiService.retryAndGetRecommendationNewsWords(newsId, memberId)) :
-                Api.ok(wordsAiService.getRecommendationNewsWords(newsId, memberId));
-    }
 }
