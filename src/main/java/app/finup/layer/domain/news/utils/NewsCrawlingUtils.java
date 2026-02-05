@@ -47,7 +47,7 @@ public class NewsCrawlingUtils {
     // HTML 검색 요청 상수
     private static final Random RANDOM = new Random();
     private static final Duration TIMEOUT = Duration.ofSeconds(30);
-    private static final int LENGTH_MIN_DESCRIPTION = 600;
+    private static final int LENGTH_MIN_DESCRIPTION = 1500;
     private static final long BASE_DELAY_MS = 200;
 
     // 각 사이트마다 사용하는 selector
@@ -82,6 +82,7 @@ public class NewsCrawlingUtils {
     private static final String SELECTOR_META_IMAGE = "meta[property=og:image]";
 
     // 작성자 추출 selector
+    private static final String SELECTOR_META_COPYRIGHT = "meta[name=Copyright]";
     private static final String SELECTOR_META_AUTHOR = "meta[name=Author]";
     private static final String SELECTOR_META_SITE_MANE = "meta[property=og:site_name]";
     private static final String SELECTOR_IMAGE_LOGO = ".media_end_head_top_logo_img";
@@ -195,7 +196,10 @@ public class NewsCrawlingUtils {
     private static String extractPublisher(Document doc) {
 
         // [1] 추출 수행
-        String press = doc.select(SELECTOR_META_AUTHOR).attr(CONTENT);
+        String press = doc.select(SELECTOR_META_COPYRIGHT).attr(CONTENT);
+        if (!press.isBlank()) return HtmlUtils.getText(press);
+
+        press = doc.select(SELECTOR_META_AUTHOR).attr(CONTENT);
         if (!press.isBlank()) return HtmlUtils.getText(press);
 
         press = doc.select(SELECTOR_IMAGE_LOGO).attr(ALT);

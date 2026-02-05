@@ -52,6 +52,7 @@ public class WordsServiceImpl implements WordsService {
     private static final String FILE_PATH_WORDS = "base/words_with_level.csv";
     private static final int MIN_AMOUNT_WORDS = 1000;
     private static final int CHUNK_INIT_WORD = 100;
+    private static final int SEARCH_AMOUNT = 30;
 
 
     @Override
@@ -180,21 +181,12 @@ public class WordsServiceImpl implements WordsService {
 
         // [2] 검색 전, 현재 검색 단어 벡터화 후 검색 수행
         byte[] embedding = embeddingProvider.generate(keyword);
-        List<WordsDto.Row> rows = wordsRepository
-                .findWithSimilarByKeyword(keyword, embedding, 20)
-                .stream()
-                .map(WordsDtoMapper::toRow)
-                .toList();
-
-        // [3] 검색 결과가 있는 경우에만, 최근 검색어 저장
-        if (!rows.isEmpty()) storeRecentWord(memberId, keyword);
-
-        // [4] 검색 결과 반환
-        return rows;
+        return wordsRepository.findWithSimilarByKeyword(keyword, embedding, SEARCH_AMOUNT);
     }
 
-    // REDIS 내 최근 단어 저장 시도
-    private void storeRecentWord(Long memberId, String keyword) {
+
+    @Override
+    public void storeRecentWord(Long memberId, String keyword) {
 
         try {
             wordsRedisStorage.storeRecentSearchKeyword(memberId, keyword);

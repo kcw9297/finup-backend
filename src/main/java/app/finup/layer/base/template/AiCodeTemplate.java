@@ -5,7 +5,6 @@ import app.finup.common.utils.AiUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
 import app.finup.infra.ai.ChatProvider;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -170,6 +169,37 @@ public class AiCodeTemplate {
                 .map(candidates::get)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+
+    /**
+     * 이전 데이터 기반 "AI 추천 작업" 수행 (후보 데이터 없음)
+     * @param chatProvider      ChatProvider Bean
+     * @param prompt            AI 프롬포트
+     * @param responseClass     추천 결과 Class 정보 (만약, 문자열 결과를 원하면 String)
+     * @param savePrevMethod    이전 결과를 저장할 메소드(함수)
+     * @return 응답 클래스 형태로 역직렬화된 AI 분석 결과
+     */
+    public static <T> List<T> recommendWithPrevAndNoCandidates(
+            ChatProvider chatProvider,
+            String prompt,
+            Class<T> responseClass,
+            Consumer<List<T>> savePrevMethod) {
+
+        // [1] 쿼리 전달
+        String response = chatProvider.query(prompt);
+        String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
+
+        // [2] 추천 결과 확인
+        List<T> recommendations = StrUtils.fromJsonList(clean, responseClass);
+        LogUtils.showInfo(AiCodeTemplate.class, LogEmoji.ANALYSIS, "AI 추천 결과 : %s", recommendations);
+
+        // [6] 추천 결과 Id 정보 저장
+        savePrevMethod.accept(recommendations);
+
+        // [7] 결과 아이디 기반 후보 Map 내에서 추출 후 반환
+        Collections.shuffle(recommendations); // 순서 섞기
+        return recommendations.stream().filter(Objects::nonNull).toList();
     }
 
 

@@ -191,8 +191,8 @@ public class StockRedisStorageImpl implements StockRedisStorage {
         // [1] 시가총액 순으로 정렬된 Code Set 조회
         Set<String> stockCodes = srt.opsForZSet().range(key, 0, -1);
 
-        // 만약 null인 경우는 null로 반환
-        if (Objects.isNull(stockCodes) || stockCodes.isEmpty()) return null;
+        // 만약 null인 경우는 빈 리스트로 반환
+        if (Objects.isNull(stockCodes) || stockCodes.isEmpty()) return List.of();
 
         // [2] 코드에 대응하는 주식정보 일괄 조회
         HashOperations<String, Object, Object> hashOps = srt.opsForHash();
