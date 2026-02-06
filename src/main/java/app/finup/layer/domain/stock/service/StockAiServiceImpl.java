@@ -4,7 +4,8 @@ package app.finup.layer.domain.stock.service;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.ChatProvider;
+import app.finup.infra.ai.enums.ChatOption;
+import app.finup.infra.ai.provider.ChatProvider;
 import app.finup.api.external.youtube.dto.YouTubeApiDto;
 import app.finup.api.external.youtube.client.YouTubeClient;
 import app.finup.layer.base.template.AiCodeTemplate;
@@ -94,7 +95,8 @@ public class StockAiServiceImpl implements StockAiService {
 
         // [3] 주식 종목정보 기반 AI 분석 수행
         return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
-                chatProvider, prompt, StockAiDto.ChartAnalyzation.class,
+                StockAiDto.ChartAnalyzation.class,
+                () -> chatProvider.sendQuery(prompt, ChatOption.MODERATE),
                 result -> stockRedisStorage.storePrevChartAnalyze(stockCode, memberId, result));
     }
 
@@ -139,7 +141,8 @@ public class StockAiServiceImpl implements StockAiService {
 
         // [3] 주식 종목정보 기반 AI 분석 수행
         return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
-                chatProvider, prompt, StockAiDto.DetailAnalyzation.class,
+                StockAiDto.DetailAnalyzation.class,
+                () -> chatProvider.sendQuery(prompt, ChatOption.MODERATE),
                 result -> stockRedisStorage.storePrevDetailAnalyze(stockCode, memberId, result));
     }
 
@@ -218,7 +221,8 @@ public class StockAiServiceImpl implements StockAiService {
 
         // [4] 검색 결과 기반 AI 추천 수행
         return AiCodeTemplate.recommendWithPrev(
-                        chatProvider, prompt, candidates, String.class, MIN_RECOMMEND_LENGTH,
+                        candidates, String.class, MIN_RECOMMEND_LENGTH,
+                        () -> chatProvider.sendQuery(prompt, ChatOption.STRICT),
                         prevIds -> stockRedisStorage.storePrevRecommendedVideoIds(stockCode, memberId, prevIds))
                 .stream()
                 .map(StockDtoMapper::toYouTubeRecommend)

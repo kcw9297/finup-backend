@@ -3,7 +3,7 @@ package app.finup.layer.domain.studyword.service;
 import app.finup.common.dto.Page;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
-import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.infra.ai.provider.EmbeddingProvider;
 import app.finup.common.utils.AiUtils;
 import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.base.template.UploadFileCodeTemplate;
