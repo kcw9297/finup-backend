@@ -9,11 +9,6 @@ spring:
       chat:
         options:
           model: gpt-4o-mini
-          temperature: 0.2           # 0~2, 낮을수록 일관적
-          #top-p: 0.9                 # 0~1, 낮을수록 확률 높은 토큰만 (기본: 1.0)
-          #frequency-penalty: 0.0     # -2~2, 양수일 수록 단어 반복 억제 (기본 : 0)
-          presence-penalty: -0.5      # -2~2, 양수일 수록 새로운 주제로 확장 (기본 : 0)
-          #max-tokens: 1000           # 응답 최대 토큰 수 (1토큰 = 약 한글 2글자)
 
       embedding:
         options:
