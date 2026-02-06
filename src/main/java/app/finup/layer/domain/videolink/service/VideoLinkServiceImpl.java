@@ -7,7 +7,7 @@ import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.TimeUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.infra.ai.provider.EmbeddingProvider;
 import app.finup.common.utils.AiUtils;
 import app.finup.api.external.youtube.dto.YouTubeApiDto;
 import app.finup.api.external.youtube.client.YouTubeClient;

@@ -4,7 +4,6 @@ import app.finup.common.enums.LogEmoji;
 import app.finup.common.utils.AiUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.ChatProvider;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,32 +29,26 @@ public class AiCodeTemplate {
 
     /**
      * AI 쿼리 요청 후, 문자열 결과 그대로 반환
-     * @param chatProvider ChatProvider Bean
-     * @param prompt AI 프롬포트
+     * @param sendPromptMethod 프롬포트 전송 메소드
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
-    public static String sendQueryAndGetString(
-            ChatProvider chatProvider,
-            String prompt) {
-
-        String response = chatProvider.query(prompt);
+    public static String sendQueryAndGetString(Supplier<String> sendPromptMethod) {
+        String response = sendPromptMethod.get();
         return AiUtils.removeMarkdown(response);
     }
 
 
     /**
      * AI 쿼리 요청 후, 문자열 결과 그대로 반환
-     * @param chatProvider ChatProvider Bean
-     * @param prompt AI 프롬포트
+     * @param sendPromptMethod 프롬포트 전송 메소드
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static String sendQueryAndGetStringWithPrev(
-            ChatProvider chatProvider,
-            String prompt,
+            Supplier<String> sendPromptMethod,
             Consumer<String> savePrevMethod) {
 
         // [1] 쿼리 수행
-        String response = chatProvider.query(prompt);
+        String response = sendPromptMethod.get();
         String clean = AiUtils.removeMarkdown(response);
 
         // [2] 이력 저장
@@ -68,18 +62,16 @@ public class AiCodeTemplate {
 
     /**
      * AI 쿼리 요청 후, JSON 결과 반환 (이전 이력)
-     * @param chatProvider ChatProvider Bean
-     * @param prompt AI 프롬포트
-     * @param dtoClass 역직렬화 할 DTO 클래스 정보
+     * @param sendPromptMethod 프롬포트 전송 메소드
+     * @param dtoClass         역직렬화 할 DTO 클래스 정보
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <T> T sendQueryAndGetJson(
-            ChatProvider chatProvider,
-            String prompt,
+            Supplier<String> sendPromptMethod,
             Class<T> dtoClass) {
 
         // [1] 쿼리 전달
-        String response = chatProvider.query(prompt);
+        String response = sendPromptMethod.get();
         String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
 
         // [2] 결과 반환
@@ -89,20 +81,18 @@ public class AiCodeTemplate {
 
     /**
      * AI 쿼리 요청 후, JSON 결과를 저장 후 반환 (이전 이력)
-     * @param chatProvider ChatProvider Bean
-     * @param prompt AI 프롬포트
-     * @param dtoClass 역직렬화 할 DTO 클래스 정보
-     * @param savePrevMethod 이전 결과를 저장할 메소드(함수)
+     * @param dtoClass         역직렬화 할 DTO 클래스 정보
+     * @param sendPromptMethod 프롬포트 전송 메소드
+     * @param savePrevMethod   이전 결과를 저장할 메소드(함수)
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <T> T sendQueryAndGetJsonWithPrev(
-            ChatProvider chatProvider,
-            String prompt,
             Class<T> dtoClass,
+            Supplier<String> sendPromptMethod,
             Consumer<T> savePrevMethod) {
 
         // [1] 쿼리 전달
-        String response = chatProvider.query(prompt);
+        String response = sendPromptMethod.get();
         String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
 
         // [2] 이전 결과 저장
@@ -116,24 +106,22 @@ public class AiCodeTemplate {
 
     /**
      * 이전 데이터 기반 "AI 추천 작업" 수행
-     * @param chatProvider          ChatProvider Bean
-     * @param prompt                AI 프롬포트
      * @param candidates            추천 후보 Map (Map<고유ID, 데이터> 형태)
      * @param candidatesKeyClass    Candidate 후보 Map Key Class (고유ID 클래스)
      * @param minRecommendAmount    추천 최소 개수
+     * @param sendPromptMethod      프롬포트 전송 메소드
      * @param savePrevMethod        이전 결과를 저장할 메소드(함수)
      * @return T 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <K, V> List<V> recommendWithPrev(
-            ChatProvider chatProvider,
-            String prompt,
             Map<K, V> candidates,
             Class<K> candidatesKeyClass,
             int minRecommendAmount,
+            Supplier<String> sendPromptMethod,
             Consumer<List<K>> savePrevMethod) {
 
         // [1] 쿼리 전달
-        String response = chatProvider.query(prompt);
+        String response = sendPromptMethod.get();
         String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
 
         // [2] 추천 결과 확인
@@ -174,20 +162,18 @@ public class AiCodeTemplate {
 
     /**
      * 이전 데이터 기반 "AI 추천 작업" 수행 (후보 데이터 없음)
-     * @param chatProvider      ChatProvider Bean
-     * @param prompt            AI 프롬포트
-     * @param responseClass     추천 결과 Class 정보 (만약, 문자열 결과를 원하면 String)
-     * @param savePrevMethod    이전 결과를 저장할 메소드(함수)
+     * @param responseClass    추천 결과 Class 정보 (만약, 문자열 결과를 원하면 String)
+     * @param sendPromptMethod 프롬포트 전송 메소드
+     * @param savePrevMethod   이전 결과를 저장할 메소드(함수)
      * @return 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
     public static <T> List<T> recommendWithPrevAndNoCandidates(
-            ChatProvider chatProvider,
-            String prompt,
             Class<T> responseClass,
+            Supplier<String> sendPromptMethod,
             Consumer<List<T>> savePrevMethod) {
 
         // [1] 쿼리 전달
-        String response = chatProvider.query(prompt);
+        String response = sendPromptMethod.get();
         String clean = AiUtils.removeMarkdown(response); // 마크다운 등 불필요 문자 제거
 
         // [2] 추천 결과 확인

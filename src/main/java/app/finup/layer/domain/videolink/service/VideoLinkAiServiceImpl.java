@@ -4,8 +4,9 @@ import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.ChatProvider;
-import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.infra.ai.enums.ChatOption;
+import app.finup.infra.ai.provider.ChatProvider;
+import app.finup.infra.ai.provider.EmbeddingProvider;
 import app.finup.layer.base.template.AiCodeTemplate;
 import app.finup.layer.domain.study.entity.Study;
 import app.finup.layer.domain.study.repository.StudyRepository;
@@ -68,7 +69,7 @@ public class VideoLinkAiServiceImpl implements VideoLinkAiService {
         );
 
         // [2] 추천 문자열 생성
-        String sentence = AiCodeTemplate.sendQueryAndGetString(chatProvider, prompt);
+        String sentence = AiCodeTemplate.sendQueryAndGetString(() -> chatProvider.sendQuery(prompt, ChatOption.STRICT));
         LogUtils.showWarn(this.getClass(), "AI SENTENCE = %s", sentence);
 
         // [2] 추천받은 키워드 기반 embedded 배열 생성
@@ -115,7 +116,7 @@ public class VideoLinkAiServiceImpl implements VideoLinkAiService {
         );
 
         // 추천 문자열 생성
-        String sentence = AiCodeTemplate.sendQueryAndGetString(chatProvider, prompt);
+        String sentence = AiCodeTemplate.sendQueryAndGetString(() -> chatProvider.sendQuery(prompt, ChatOption.STRICT));
         LogUtils.showWarn(this.getClass(), "AI SENTENCE = %s", sentence);
 
         // [3] 추천된 키워드 기반 임베딩 배열 생성 & 이전 추천영상번호 조회
@@ -212,7 +213,8 @@ public class VideoLinkAiServiceImpl implements VideoLinkAiService {
 
         // 추천 수행 및 결과 반환
         return AiCodeTemplate.recommendWithPrev(
-                chatProvider, prompt, candidates, Long.class, RECOMMEND_AMOUNT_RESPONSE,
+                candidates, Long.class, RECOMMEND_AMOUNT_RESPONSE,
+                () -> chatProvider.sendQuery(prompt, ChatOption.STRICT),
                 result -> videoLinkRedisStorage.storeLatestRecommendedIds(result.stream().map(String::valueOf).toList(), memberId));
 
     }
