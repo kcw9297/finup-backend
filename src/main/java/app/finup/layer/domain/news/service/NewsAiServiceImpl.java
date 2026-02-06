@@ -3,7 +3,8 @@ package app.finup.layer.domain.news.service;
 import app.finup.common.enums.AppStatus;
 import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.ChatProvider;
+import app.finup.infra.ai.enums.ChatOption;
+import app.finup.infra.ai.provider.ChatProvider;
 import app.finup.layer.base.template.AiCodeTemplate;
 import app.finup.layer.domain.news.constant.NewsPrompt;
 import app.finup.layer.domain.news.constant.NewsRedisKey;
@@ -11,6 +12,7 @@ import app.finup.layer.domain.news.dto.NewsAiDto;
 import app.finup.layer.domain.news.entity.News;
 import app.finup.layer.domain.news.redis.NewsRedisStorage;
 import app.finup.layer.domain.news.repository.NewsRepository;
+import app.finup.layer.domain.news.utils.NewsFilterUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -48,7 +50,7 @@ public class NewsAiServiceImpl implements NewsAiService {
     )
     @Override
     public String getAnalysis(Long newsId, Long memberId) {
-        return processAnalysis(newsId, memberId);
+        return processAnalysisNews(newsId, memberId);
     }
 
 
@@ -58,12 +60,12 @@ public class NewsAiServiceImpl implements NewsAiService {
     )
     @Override
     public String retryAndGetAnalyze(Long newsId, Long memberId) {
-        return processAnalysis(newsId, memberId);
+        return processAnalysisNews(newsId, memberId);
     }
 
 
     // 뉴스 분석 수행
-    private String processAnalysis(Long newsId, Long memberId) {
+    private String processAnalysisNews(Long newsId, Long memberId) {
 
         // [1] 기존 뉴스 정보 조회
         News news = newsRepository
@@ -89,7 +91,7 @@ public class NewsAiServiceImpl implements NewsAiService {
 
         // [3] AI분석 수행
         return AiCodeTemplate.sendQueryAndGetStringWithPrev(
-                chatProvider, prompt,
+                () -> chatProvider.sendQuery(prompt, ChatOption.CREATIVE),
                 result -> newsRedisStorage.storePrevAnalyze(newsId, memberId, result)
         );
     }
@@ -147,9 +149,11 @@ public class NewsAiServiceImpl implements NewsAiService {
 
         // [5] 추천 수행
         return AiCodeTemplate.recommendWithPrevAndNoCandidates(
-                chatProvider, prompt, NewsAiDto.AnalysisWords.class,
-                result -> newsRedisStorage.storePrevAnalysisWords(newsId, memberId, result)
-        );
+                        NewsAiDto.AnalysisWords.class,
+                        () -> chatProvider.sendQuery(prompt, ChatOption.STRICT),
+                        result -> newsRedisStorage.storePrevAnalysisWords(newsId, memberId, result)).stream()
+            .filter(dto -> NewsFilterUtils.isNotFilteredWord(dto.getName())) // 필터 수행
+            .toList();
     }
 
 

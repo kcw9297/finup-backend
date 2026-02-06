@@ -49,6 +49,44 @@ public class NewsFilterUtils {
             "[속보]", "[영상]", "퀴즈", "챌린지", "이벤트", "당첨"
     );
 
+    // 정확히 일치하는 제외 단어
+    public static final Set<String> FILTER_ANALYSIS_WORDS = Set.of(
+            // 가격/거래
+            "주가", "주식", "매수", "매도", "거래", "거래량", "시세",
+            // 투자 주체
+            "개인투자자", "기관투자자", "외국인투자자", "개인", "기관", "외국인",
+            // 기초 지표
+            "환율", "금리", "코스피", "코스닥", "시가총액", "시총",
+            // 기초 개념
+            "실적", "수익", "손실", "이익", "차익", "배당", "투자", "수익률", "허가", "자산", "글로벌",
+            "신뢰도", "기대", "변동성", "매출", "매출액", "영업이익", "순이익", "국내시장", "해외시장",
+            // 산업명
+            "반도체", "AI", "전기차", "바이오", "it", "테크", "내수",
+            // 방향성/상태
+            "급등", "급락", "상승", "하락", "증가", "감소", "확대", "축소",
+            "호조", "부진", "성장", "둔화", "폭등", "폭락", "충격",
+            // 감정/심리
+            "기대감", "피로감", "불안감", "부담감", "안도감",
+            "강세", "약세", "상승세", "하락세",
+            // 기초 투자 행동
+            "저가 매수", "고가 매도", "분할 매수", "차익 실현", "이익 실현",
+            // 비즈니스 일반
+            "생산능력", "생산라인", "설비투자", "고객사", "공급사", "수주", "납품"
+    );
+
+    // 포함되면 제외할 패턴 (복합어 대응)
+    public static final Set<String> FILTER_ANALYSIS_WORDS_PATTERNS = Set.of(
+            "국면",
+            "효과",
+            "장세",
+            "심리",
+            "투자자",
+            "경쟁력",
+            "거래시간"
+    );
+
+
+
     // 사용 상수
     private static final int N_GRAM = 3;
     private static final double THRESHOLD_JACCARD_TITLE = 0.55;
@@ -441,5 +479,24 @@ public class NewsFilterUtils {
 
         // 필터링 결과를 줄바꿈을 기준으로 통합 및 반환
         return String.join("\n", result);
+    }
+
+
+    /**
+     * 필터 단어가 아닌지 판별
+     * @param wordName 대상 단어명
+     * @return 정상 용어이면 true, 필터 대상이면 false
+     */
+    public static boolean isNotFilteredWord(String wordName) {
+
+        // 비교 대상이 NULL이거나 공백인 경우는 true
+        if (Objects.isNull(wordName) || wordName.isBlank()) return false;
+
+        // 양끝 공백을 제거하고 소문자로 변환
+        String normalized = wordName.trim().toUpperCase();
+
+        // 비교 수행
+        return !FILTER_ANALYSIS_WORDS.contains(normalized) &&
+                FILTER_ANALYSIS_WORDS_PATTERNS.stream().noneMatch(normalized::contains);
     }
 }

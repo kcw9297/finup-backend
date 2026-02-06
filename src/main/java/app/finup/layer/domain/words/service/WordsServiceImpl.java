@@ -7,7 +7,7 @@ import app.finup.common.exception.BusinessException;
 import app.finup.common.utils.AiUtils;
 import app.finup.common.utils.LogUtils;
 import app.finup.common.utils.ParallelUtils;
-import app.finup.infra.ai.EmbeddingProvider;
+import app.finup.infra.ai.provider.EmbeddingProvider;
 import app.finup.infra.file.provider.CsvProvider;
 import app.finup.infra.file.storage.FileStorage;
 import app.finup.layer.domain.words.constant.WordsRedisKey;

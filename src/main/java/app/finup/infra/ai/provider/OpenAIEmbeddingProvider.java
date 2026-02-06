@@ -1,4 +1,4 @@
-package app.finup.infra.ai;
+package app.finup.infra.ai.provider;
 
 
 import app.finup.common.utils.AiUtils;

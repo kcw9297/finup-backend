@@ -1,7 +1,8 @@
 package app.finup.layer.domain.quiz.service;
 
 import app.finup.common.utils.StrUtils;
-import app.finup.infra.ai.ChatProvider;
+import app.finup.infra.ai.enums.ChatOption;
+import app.finup.infra.ai.provider.ChatProvider;
 import app.finup.layer.base.template.AiCodeTemplate;
 import app.finup.layer.domain.quiz.constant.QuizPrompt;
 import app.finup.layer.domain.quiz.constant.QuizRedisKey;
@@ -98,7 +99,8 @@ public class QuizAiServiceImpl implements QuizAiService {
 
         // [3] AI 추천 수행 및 결과 DTO 반환
         return AiCodeTemplate.recommendWithPrev(
-                        chatProvider, prompt, candidates, Long.class, QUESTION_AMOUNT,
+                        candidates, Long.class, QUESTION_AMOUNT,
+                        () -> chatProvider.sendQuery(prompt, ChatOption.STRICT),
                         prevIds -> quizRedisStorage.storePrevWordsIds(memberId, prevIds)).stream()
                 .map(selectedWords -> QuizDtoMapper.toQuestion(selectedWords, levelWords, AMOUNT_CHOICES))
                 .toList();
