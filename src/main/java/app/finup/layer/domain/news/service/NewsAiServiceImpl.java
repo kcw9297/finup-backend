@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * NewsAiService 구현 클래스
@@ -41,7 +42,7 @@ public class NewsAiServiceImpl implements NewsAiService {
 
     // 사용 상수
     private static final int MAX_LENGTH_DESCRIPTION = 6000;
-    private static final int AMOUNT_ANALYSIS_WORDS = 5;
+    private static final int AMOUNT_ANALYSIS_WORDS = 4;
 
 
     @Cacheable(
@@ -148,12 +149,12 @@ public class NewsAiServiceImpl implements NewsAiService {
         String prompt = StrUtils.fillPlaceholder(NewsPrompt.PROMPT_ANALYSIS_NEWS_WORDS, params);
 
         // [5] 추천 수행
-        return AiCodeTemplate.recommendWithPrevAndNoCandidates(
-                        NewsAiDto.AnalysisWords.class,
-                        () -> chatProvider.sendQuery(prompt, ChatOption.STRICT),
-                        result -> newsRedisStorage.storePrevAnalysisWords(newsId, memberId, result)).stream()
-            .filter(dto -> NewsFilterUtils.isNotFilteredWord(dto.getName())) // 필터 수행
-            .toList();
+        return AiCodeTemplate.analyzeWithPrev(
+                NewsAiDto.AnalysisWords.class,
+                () -> chatProvider.sendQuery(prompt, ChatOption.CREATIVE),
+                result -> newsRedisStorage.storePrevAnalysisWords(newsId, memberId, result)
+        );
+
     }
 
 

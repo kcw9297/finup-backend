@@ -29,7 +29,7 @@ public class NewsRedisStorageImpl implements NewsRedisStorage {
     // 사용 상수
     private static final Duration TTL_ANALYZE = Duration.ofDays(1);
     private static final Duration TTL_ANALYZE_WORDS = Duration.ofDays(1);
-    private static final int AMOUNT_PREV_ANALYSIS_WORDS_MAX = 20;
+    private static final int AMOUNT_PREV_ANALYSIS_WORDS_MAX = 10;
 
 
     @Override
