@@ -26,12 +26,24 @@ public class StockAiDto {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        private String summary;
-        private String investmentPoint;
-        private String price;
         private String valuation;
         private String flow;
-        private String risk;
+        private String profile;
+    }
+
+
+    /**
+     * 차트 분석 결과를 제공할 DTO
+     */
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class ChartMetrics {
+
+        private double priceChangeRate;   // 주가 변화율 (%)
+        private double volumeChangeRate;  // 거래량 변화율 (%)
+        private String pricePosition;     // 현재 가격 위치
     }
 
 
