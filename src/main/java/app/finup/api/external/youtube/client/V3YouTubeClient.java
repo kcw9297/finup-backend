@@ -128,11 +128,12 @@ public class V3YouTubeClient implements YouTubeClient {
                 .build();
     }
 
-
+    @Cacheable(
+            value = "YT:SEARCH:",
+            key = "#q"
+    )
     @Override
     public List<YouTubeApiDto.Row> searchVideo(String q) {
-
-        LogUtils.showWarn(this.getClass(), "호출 완료");
 
         return youTubeClient.get()
 

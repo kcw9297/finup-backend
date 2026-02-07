@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -167,7 +169,7 @@ public class AiCodeTemplate {
      * @param savePrevMethod   이전 결과를 저장할 메소드(함수)
      * @return 응답 클래스 형태로 역직렬화된 AI 분석 결과
      */
-    public static <T> List<T> recommendWithPrevAndNoCandidates(
+    public static <T> List<T> analyzeWithPrev(
             Class<T> responseClass,
             Supplier<String> sendPromptMethod,
             Consumer<List<T>> savePrevMethod) {
@@ -180,12 +182,12 @@ public class AiCodeTemplate {
         List<T> recommendations = StrUtils.fromJsonList(clean, responseClass);
         LogUtils.showInfo(AiCodeTemplate.class, LogEmoji.ANALYSIS, "AI 추천 결과 : %s", recommendations);
 
-        // [6] 추천 결과 Id 정보 저장
+        // [3] 필터 결과 저장 및 저장 수행
         savePrevMethod.accept(recommendations);
 
-        // [7] 결과 아이디 기반 후보 Map 내에서 추출 후 반환
+        // [5] 결과 아이디 기반 후보 Map 내에서 추출 후 반환
         Collections.shuffle(recommendations); // 순서 섞기
-        return recommendations.stream().filter(Objects::nonNull).toList();
+        return recommendations;
     }
 
 

@@ -1,5 +1,6 @@
 package app.finup.layer.domain.stock.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.io.Serial;
@@ -37,6 +38,7 @@ public class StockAiDto {
     /**
      * 차트 AI 분석 결과를 담을 DTO
      */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
@@ -46,10 +48,9 @@ public class StockAiDto {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        private String trend;
-        private String volatility;
-        private String volumeAnalysis;
-        private String summary;
+        private String recentTrend;
+        private String comparisonWithPast;
+        private String investorNote;
     }
 
 

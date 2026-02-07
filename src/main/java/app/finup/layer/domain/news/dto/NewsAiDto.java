@@ -2,6 +2,7 @@ package app.finup.layer.domain.news.dto;
 
 import app.finup.layer.domain.news.support.NewsObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.io.Serial;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NewsAiDto {
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
