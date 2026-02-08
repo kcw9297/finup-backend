@@ -17,6 +17,7 @@ import app.finup.layer.domain.stock.dto.StockDto;
 import app.finup.layer.domain.stock.dto.StockDtoMapper;
 import app.finup.layer.domain.stock.enums.ChartType;
 import app.finup.layer.domain.stock.redis.StockRedisStorage;
+import app.finup.layer.domain.stock.utils.ChartCalculateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -82,13 +83,23 @@ public class StockAiServiceImpl implements StockAiService {
         StockDto.Info stockInfo = getStockInfo(stockCode);
 
         // [2] 프롬포트에 필요한 정보 조회 및 추출
-        ChartAnalyzeRequest analyzeRequest = new ChartAnalyzeRequest(chartType, getCandles(chartType, stockInfo));
+        List<StockDto.Candle> targetCandles = ChartCalculateUtils.getCandles(chartType, stockInfo);
+
+        // 현재 차트 기반 수치 계산 (가격, 거래량 변동률)
+        StockAiDto.ChartMetrics metrics = ChartCalculateUtils.calculate(chartType, targetCandles);
+        log.warn("metrics = {}", metrics);
+
+        // 요청 생성
+        ChartAnalyzeRequest analyzeRequest = new ChartAnalyzeRequest(chartType, targetCandles);
         StockAiDto.ChartAnalyzation prevAnalyze = stockRedisStorage.getPrevChartAnalyze(stockCode, memberId);
 
         // 프롬포트 파라미터
         Map<String, String> promptParams = new HashMap<>();
         promptParams.put(StockPrompt.INPUT, StrUtils.toJson(analyzeRequest));
         promptParams.put(StockPrompt.PREV, StrUtils.toJson(prevAnalyze));
+        promptParams.put(StockPrompt.CHART_PRICE_CHANGE, String.format("%.1f", metrics.getPriceChangeRate()));
+        promptParams.put(StockPrompt.CHART_VOLUME_CHANGE, String.format("%.1f", metrics.getVolumeChangeRate()));
+        promptParams.put(StockPrompt.CHART_PRICE_POSITION, metrics.getPricePosition());
 
         // 프롬프트 생성
         String prompt = StrUtils.fillPlaceholder(StockPrompt.PROMPT_ANALYZE_CHART, promptParams);
@@ -96,7 +107,7 @@ public class StockAiServiceImpl implements StockAiService {
         // [3] 주식 종목정보 기반 AI 분석 수행
         return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
                 StockAiDto.ChartAnalyzation.class,
-                () -> chatProvider.sendQuery(prompt, ChatOption.MODERATE),
+                () -> chatProvider.sendQuery(prompt, ChatOption.CREATIVE),
                 result -> stockRedisStorage.storePrevChartAnalyze(stockCode, memberId, result));
     }
 
@@ -133,6 +144,7 @@ public class StockAiServiceImpl implements StockAiService {
 
         // 프롬포트 파라미터
         Map<String, String> promptParams = new HashMap<>();
+        log.warn("detail = {}", detail);
         promptParams.put(StockPrompt.INPUT, StrUtils.toJson(detail));
         promptParams.put(StockPrompt.PREV, StrUtils.toJson(prevAnalyze));
 
@@ -142,23 +154,8 @@ public class StockAiServiceImpl implements StockAiService {
         // [3] 주식 종목정보 기반 AI 분석 수행
         return AiCodeTemplate.sendQueryAndGetJsonWithPrev(
                 StockAiDto.DetailAnalyzation.class,
-                () -> chatProvider.sendQuery(prompt, ChatOption.MODERATE),
+                () -> chatProvider.sendQuery(prompt, ChatOption.CREATIVE),
                 result -> stockRedisStorage.storePrevDetailAnalyze(stockCode, memberId, result));
-    }
-
-
-    // 차트 정보 조회
-    private List<StockDto.Candle> getCandles(ChartType chartType, StockDto.Info stockInfo) {
-
-        // [1] 주식 정보 내 차트 정보 조회
-        StockDto.Chart chart = stockInfo.getChart();
-
-        // [2] 차트 정보 내, 특정 기준 캔들 목록 반환
-        return switch (chartType) {
-            case DAY    -> chart.getDayCandles();
-            case WEEK   -> chart.getWeekCandles();
-            case MONTH  -> chart.getMonthCandles();
-        };
     }
 
 
