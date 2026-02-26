@@ -1,4 +1,363 @@
->### FinUp (주식 경제 공부 플랫폼)
+<div align=center>
+
+# Finup
+
+**주식 초보 대상 주식 경제 교육 플랫폼**
+
+***
+
+### Backend
+![Java](https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+
+### Frontend
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=000)
+
+### Infra / DevOps
+![WebSocket](https://img.shields.io/badge/WebSocket-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
+![MariaDB](https://img.shields.io/badge/MariaDB-003545?style=for-the-badge&logo=mariadb&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonwebservices&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
+
+### CI/CD & Tools
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+
+
+### Period
+
+![Period](https://img.shields.io/badge/-2025.11.27_~_2025.12.19-blue?style=for-the-badge)
+
+</div>
+
+***
+
+## 📖 소개
+**FinUp**은 금융 지식 학습과 실시간 시장 정보를 통합 제공하는 웹 플랫폼입니다.
+금융 개념·용어를 학습하고, OpenAI 기반 **AI 퀴즈**로 학습 수준을 점검할 수 있습니다.
+
+***
+
+## 🔎 주요 서비스 소개
+
+### 📚 금융 학습
+
+- **금융 개념 학습** — 학습 모듈(Study) 조회 및 학습 진도 추적
+- **금융 용어 사전** — 용어 검색·상세 조회 및 AI 시맨틱 검색 (코사인 유사도)
+- **개인 단어장** — 관심 용어를 모아 관리하는 단어장(WordBook)
+- **북마크** — 학습 콘텐츠 관심 목록 저장·관리
+
+### 🤖 AI 퀴즈
+
+- **GPT-4o-mini 기반** 금융 퀴즈 자동 생성
+- 학습 모듈별 AI 맞춤 퀴즈 제공 및 즉시 결과 확인
+
+### 📰 실시간 금융 뉴스
+
+- **네이버 뉴스 API** 기반 실시간 금융 뉴스 목록 제공
+- OpenAI 기반 뉴스 본문 **AI 요약** 및 키워드 분석 제공
+- 주식 종목별 관련 뉴스 필터링
+
+### 📈 주식 시장 데이터
+
+- **KIS API** 연동 실시간 주가 조회
+- 캔들차트·거래량 차트 등 인터랙티브 차트 시각화 (Lightweight Charts, Chart.js)
+- KEXIM·OpenPortal API 기반 금융 지수·환율 등 주요 시장 지표 제공
+
+### 🔐 인증 & 보안
+
+- 이메일 인증 코드 기반 회원가입
+- JWT + HttpOnly Cookie 기반 로그인 유지
+- Spring Security 역할 기반 접근 제어 (USER / ADMIN)
+
+### 🛠️ 관리자 기능
+
+- 회원 목록 조회 및 관리 (엑셀 다운로드)
+- 학습 모듈·금융 용어·영상 링크 CRUD
+- 공지사항 작성·수정·삭제
+
+***
+
+## 📦 기술 스택
+
+| Category | Stack |
+|----------|--------|
+| **Backend** | Gradle 8.x, Spring Boot 3.5.6, Spring Security, Spring Data JPA, MyBatis, JWT, Spring Mail |
+| **Frontend** | React (Vite), JavaScript, Zustand, Material UI (MUI) |
+| **Database** | MariaDB, Hibernate |
+| **Auth** | Spring Security, BCrypt, Gmail SMTP |
+| **AI** | Spring AI (OpenAI GPT-4o-mini) |
+| **Storage** | AWS S3, AWS SDK v2 |
+| **Infra / DevOps** | AWS (EC2, RDS, S3, ElastiCache, CloudFront), Redis, Docker, Nginx |
+| **CI/CD** | GitHub Actions |
+| **API Testing** | Postman |
+| **External APIs** | KRX API, 한국수출입은행 API, 한국투자증권 API, 공공데이터포털 API, 네이버 뉴스 API, DART API, YouTube Data API v3 |
+| **Java Version** | Java 17 |
+***
+
+## 📁 프로젝트 구조
+### Backend (`finup/`)
+
+```
+finup/
+├── src/main/java/app/finup/
+│   ├── FinupApplication.java              # 애플리케이션 진입점 (@EnableScheduling)
+│   │
+│   ├── api/external/                      # 외부 API 클라이언트
+│   │   ├── stock/                         # KIS 주식 API
+│   │   ├── news/                          # 네이버 뉴스 API
+│   │   ├── financialindex/                # KEXIM 금융 지수 API
+│   │   ├── marketindex/                   # OpenPortal 시장 지수 API
+│   │   └── youtube/                       # YouTube API
+│   │
+│   ├── layer/domain/                      # 도메인별 Controller·Service·Repository
+│   │   ├── auth/                          # 인증·회원가입
+│   │   ├── member/                        # 회원 관리
+│   │   ├── stock/                         # 주식 데이터
+│   │   ├── news/                          # 금융 뉴스
+│   │   ├── study/                         # 학습 모듈
+│   │   ├── studyword/                     # 학습 단어
+│   │   ├── studyprogress/                 # 학습 진도
+│   │   ├── quiz/                          # AI 퀴즈
+│   │   ├── bookmark/                      # 북마크
+│   │   ├── notice/                        # 공지사항
+│   │   ├── words/                         # 금융 용어 사전
+│   │   ├── memberWordbook/                # 개인 단어장
+│   │   ├── videolink/                     # 학습 영상
+│   │   ├── indicator/                     # 금융 지표 (스케줄러 포함)
+│   │   └── uploadfile/                    # 파일 업로드 관리
+│   │
+│   ├── config/                            # Spring 설정
+│   │   ├── SecurityConfig.java            # Security·JWT·CORS 설정
+│   │   ├── RedisConfig.java               # Redis 세션 설정
+│   │   ├── AWSConfig.java                 # AWS S3 설정
+│   │   ├── MailConfig.java                # Gmail SMTP 설정
+│   │   ├── WebClientConfig.java           # 외부 API HTTP 클라이언트
+│   │   └── AsyncConfig.java               # 비동기·임베딩 스레드풀 설정
+│   │
+│   ├── infra/                             # 인프라·공통 서비스
+│   │   ├── ai/                            # OpenAI Chat·Embedding Provider
+│   │   ├── file/storage/                  # 파일 저장 추상화 (Local·S3)
+│   │   ├── mail/                          # 이메일 서비스
+│   │   └── redisson/                      # 분산 락·캐시
+│   │
+│   ├── security/                          # JWT 필터·핸들러·Provider
+│   └── common/                            # 공통 예외처리·AOP·유틸
+│
+├── src/main/resources/
+│   ├── application.yml                    # 메인 설정 (프로파일 분기)
+│   └── settings/
+│       ├── application-db.yml             # DB·JPA·HikariCP 설정
+│       ├── application-web.yml            # Web·JWT·Multipart 설정
+│       ├── application-mail.yml           # Gmail SMTP 설정
+│       ├── application-security.yml       # OAuth2 설정 (미구현)
+│       ├── application-ai.yml             # OpenAI 모델 설정
+│       └── application-cache.yml          # Redis·Redisson 설정
+│
+├── docker-compose.yml                     # MariaDB + Redis
+└── build.gradle
+```
+
+### Frontend (`finup-react/`)
+
+```
+finup-react/
+├── src/
+│   ├── base/                              # 공통 레이어
+│   │   ├── components/                    # 공용 UI (Bar·Card·Modal·Layout·Icon)
+│   │   ├── hooks/                         # 공통 훅 (로그인·북마크·학습진도·로그아웃)
+│   │   ├── layouts/                       # 레이아웃 (Main·Sidebar·Empty)
+│   │   ├── stores/                        # Zustand 전역 상태 (로그인·북마크·진도)
+│   │   ├── routes/                        # 라우트 가드 (Protected·Guest)
+│   │   ├── utils/                         # fetchUtils·downloadXlsx·mask 등
+│   │   ├── provider/                      # SnackbarProvider
+│   │   └── design/                        # MUI 테마 설정
+│   │
+│   └── features/                          # 기능별 모듈
+│       ├── auth/                          # 로그인
+│       ├── member/                        # 회원가입·관리 (엑셀·PDF 내보내기)
+│       ├── mypage/                        # 마이페이지·북마크
+│       ├── home/                          # 홈 (뉴스·환율·주식·워드클라우드)
+│       ├── news/                          # 금융 뉴스
+│       ├── stocks/                        # 주식 시장 (캔들·거래량 차트)
+│       ├── study/                         # 학습 모듈
+│       ├── studyword/                     # 학습 단어
+│       ├── studyprogress/                 # 학습 진도
+│       ├── word/                          # 금융 용어 사전 (시맨틱 검색)
+│       ├── wordbook/                      # 개인 단어장
+│       ├── quiz/                          # AI 퀴즈
+│       ├── notice/                        # 공지사항
+│       ├── videolink/                     # 학습 영상
+│       └── admin/                         # 관리자
+│
+├── .env                                   # 개발 환경 변수
+├── .env.production                        # 프로덕션 환경 변수
+├── vite.config.js
+└── package.json
+```
+---
+
+## 🔑 Endpoints
+
+> ✅ = 로그인 필요 · ❌ = 공개 · 🔒 = ADMIN 전용
+
+### 인증 (`/auth`, `/api/auth`, `/public/api/members`)
+
+| Method | URL                               | 인증 | Description              |
+| ------ | --------------------------------- | ---- | ------------------------ |
+| `GET`  | `/auth/me`                        | ✅   | 현재 로그인 사용자 조회  |
+| `POST` | `/api/auth/csrf`                  | ❌   | CSRF 토큰 발급           |
+| `POST` | `/api/auth/join/email`            | ❌   | 이메일 인증 코드 발송    |
+| `POST` | `/api/auth/join/email/verify`     | ❌   | 이메일 인증 코드 확인    |
+| `POST` | `/public/api/members/join`        | ❌   | 회원가입                 |
+
+### 회원 (`/api/members`)
+
+| Method  | URL                           | 인증 | Description        |
+| ------- | ----------------------------- | ---- | ------------------ |
+| `GET`   | `/api/members/list`           | 🔒   | 회원 목록 조회     |
+| `GET`   | `/api/members/me/detail`      | ✅   | 내 정보 상세 조회  |
+| `PATCH` | `/api/members/me/nickname`    | ✅   | 닉네임 변경        |
+| `PATCH` | `/api/members/me/password`    | ✅   | 비밀번호 변경      |
+
+### 금융 뉴스 (`/api/news`, `/public/api/news`)
+
+| Method | URL                                    | 인증 | Description          |
+| ------ | -------------------------------------- | ---- | -------------------- |
+| `GET`  | `/public/api/news/main`                | ❌   | 메인 뉴스 목록       |
+| `GET`  | `/api/news/stock`                      | ✅   | 주식 종목별 뉴스     |
+| `GET`  | `/api/news/{newsId}/analysis`          | ✅   | 뉴스 AI 요약 분석    |
+| `GET`  | `/api/news/{newsId}/analysis/words`    | ✅   | 뉴스 키워드 분석     |
+
+### 학습 모듈 (`/api/studies`, `/admin/api/studies`)
+
+| Method   | URL                              | 인증 | Description          |
+| -------- | -------------------------------- | ---- | -------------------- |
+| `GET`    | `/api/studies/search`            | ✅   | 학습 모듈 목록 검색  |
+| `GET`    | `/api/studies/{studyId}`         | ✅   | 학습 모듈 상세       |
+| `POST`   | `/api/studies/progress`          | ✅   | 학습 진도 시작       |
+| `PATCH`  | `/api/studies/progress`          | ✅   | 학습 진도 업데이트   |
+| `POST`   | `/admin/api/studies`             | 🔒   | 학습 모듈 등록       |
+| `PUT`    | `/admin/api/studies/{studyId}`   | 🔒   | 학습 모듈 수정       |
+| `DELETE` | `/admin/api/studies/{studyId}`   | 🔒   | 학습 모듈 삭제       |
+
+### 금융 용어 사전 (`/api/words`)
+
+| Method   | URL                                      | 인증 | Description                    |
+| -------- | ---------------------------------------- | ---- | ------------------------------ |
+| `GET`    | `/api/words/home`                        | ✅   | 홈 단어 (추천·최근 조회)       |
+| `GET`    | `/api/words/search`                      | ✅   | 용어 검색               |
+| `GET`    | `/api/words/recent-searches`             | ✅   | 최근 검색어 목록               |
+| `DELETE` | `/api/words/recent-searches/{keyword}`   | ✅   | 최근 검색어 삭제               |
+
+### 주식 (`/api/stocks`, `/public/api/stocks`)
+
+| Method | URL                             | 인증 | Description         |
+| ------ | ------------------------------- | ---- | ------------------- |
+| `GET`  | `/api/stocks/{code}`            | ✅   | 주식 상세 정보      |
+| `GET`  | `/api/stocks/{code}/chart`      | ✅   | 주가 차트 데이터    |
+| `GET`  | `/api/stocks/{code}/analysis`   | ✅   | 주식 AI 분석        |
+
+### 북마크 (`/api/bookmarks`)
+
+| Method   | URL                  | 인증 | Description    |
+| -------- | -------------------- | ---- | -------------- |
+| `GET`    | `/api/bookmarks/my`  | ✅   | 내 북마크 목록 |
+| `POST`   | `/api/bookmarks`     | ✅   | 북마크 추가    |
+| `DELETE` | `/api/bookmarks`     | ✅   | 북마크 삭제    |
+
+### 공지사항 (`/public/api/notices`, `/admin/api/notices`)
+
+| Method   | URL                                  | 인증 | Description      |
+| -------- | ------------------------------------ | ---- | ---------------- |
+| `GET`    | `/public/api/notices/search`         | ❌   | 공지사항 목록    |
+| `GET`    | `/public/api/notices/{noticeId}`     | ❌   | 공지사항 상세    |
+| `POST`   | `/admin/api/notices`                 | 🔒   | 공지사항 등록    |
+| `PUT`    | `/admin/api/notices/{noticeId}`      | 🔒   | 공지사항 수정    |
+| `DELETE` | `/admin/api/notices/{noticeId}`      | 🔒   | 공지사항 삭제    |
+
+### 금융 지표 (`/public/api/indicators`)
+
+| Method | URL                                        | 인증 | Description    |
+| ------ | ------------------------------------------ | ---- | -------------- |
+| `GET`  | `/public/api/indicators/index/financial`   | ❌   | 금융 지수 조회 |
+| `GET`  | `/public/api/indicators/index/market`      | ❌   | 시장 지수 조회 |
+
+---
+
+
+## 🌐 환경변수(.env) 설정
+
+백엔드 `.env` 파일:
+
+```dotenv
+# App
+ACTIVE_PROFILE=local
+SERVER_PORT=8080
+APP_DOMAIN=http://localhost:8080
+APP_ORIGIN=http://localhost:5173
+
+# Database
+DB_URL=jdbc:mariadb://localhost:3307/finup
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_db_password
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your_redis_password
+
+# JWT
+JWT_SECRET=your_jwt_secret
+
+# AWS S3
+AWS_ACCESS_KEY=your_aws_access_key
+AWS_SECRET_KEY=your_aws_secret_key
+S3_BUCKET_NAME=your_s3_bucket_name
+FILE_DIR=/uploads
+FILE_DOMAIN=http://localhost:8080
+
+# Gmail SMTP
+MAIL_USER=your_gmail@gmail.com
+MAIL_PASSWORD=your_gmail_app_password
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+
+# External APIs
+KIS_APP_KEY=your_kis_app_key
+KIS_APP_SECRET=your_kis_app_secret
+NAVER_CLIENT_ID=your_naver_client_id
+NAVER_CLIENT_SECRET=your_naver_client_secret
+YOUTUBE_API_KEY=your_youtube_api_key
+```
+
+프론트엔드 `.env` 파일:
+
+```dotenv
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+---
+
+## 📝 라이센스
+
+This project is for educational purposes.
+
+----
+
+<div align="center">
+Made with ☕ by the FinUp Team
+</div>
+
+--- 
+
+<details>
+<summary> 홈페이지 시연 GIF 미리보기 </summary>
 
 ![홈페이지 전경](https://raw.githubusercontent.com/DarkLight0418/Project_GIF_Files/05a52905cd2573af27ba65f37066f9ba4cb383ea/finup%20gif%20%EC%9E%90%EB%A3%8C/gif/%ED%99%88%ED%99%94%EB%A9%B4%20%ED%99%98%EC%9C%A8%20%EA%B4%80%EB%A0%A8%20%EC%A0%95%EB%B3%B4%20%ED%91%9C%EC%8B%9C.gif)
 
@@ -19,6 +378,7 @@
 ![인증코드](https://raw.githubusercontent.com/DarkLight0418/Project_GIF_Files/05a52905cd2573af27ba65f37066f9ba4cb383ea/finup%20gif%20%EC%9E%90%EB%A3%8C/gif/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85%20%EC%9D%B8%EC%A6%9D%EC%BD%94%EB%93%9C.gif)
 ***
 > 1-1. 발송된 인증코드
+***
 <img src="https://raw.githubusercontent.com/DarkLight0418/finup-markdown-test/2ec7664ef0a63bbc4a802cb8481267df809b339a/gif%20%EC%9E%90%EB%A3%8C/gif/%EC%9D%B4%EB%A9%94%EC%9D%BC%20%EC%9D%B8%EC%A6%9D%EC%BD%94%EB%93%9C%20%EC%A1%B0%ED%9A%8C.jpg"
      width="50%" height="50%"
      />
@@ -30,7 +390,7 @@
 ![로그인](https://raw.githubusercontent.com/DarkLight0418/Project_GIF_Files/927f519690d9403eca0196dde5cc57160d7e6b9d/finup%20gif%20%EC%9E%90%EB%A3%8C/gif/%EB%A1%9C%EA%B7%B8%EC%9D%B8.gif)
 ***
 > 4. 로그인 요구 기능 진입 시 반응
-![로그인 요구 기능 진입]()
+![로그인 요구 기능 진입](https://raw.githubusercontent.com/DarkLight0418/Project_GIF_Files/470e6ffefd1ad94f2b6c9af8747d1c2d46b78a1e/finup%20gif%20%EC%9E%90%EB%A3%8C/%ED%9A%8C%EC%9B%90%20%EA%B8%B0%EB%8A%A5%20%EC%A7%84%EC%9E%85%20%EC%8B%9C%20%EB%A1%9C%EA%B7%B8%EC%9D%B8%20%EC%95%88%EB%82%B4.gif)
 ***
 
 ## 회원 정보 관련
@@ -285,6 +645,8 @@ AI 분석, 추천 항목들은 재추천 버튼을 클릭하면 다시 AI 분석
 ***
 - AI 뉴스 키워드 재추천 등
 ![AI 뉴스 키워드 재추천](https://raw.githubusercontent.com/DarkLight0418/Project_GIF_Files/c87f72dfa9f0863d195b62cf047460ea06d523a2/finup%20gif%20%EC%9E%90%EB%A3%8C/%EB%89%B4%EC%8A%A4%20AI%20%ED%82%A4%EC%9B%8C%EB%93%9C%20%EC%B6%94%EC%B2%9C.gif)
+***
+- 종목 AI 분석 재분석 버튼 클릭 시 갱신
+![종목 AI 분석 재분석 버튼 클릭 시 갱신](https://raw.githubusercontent.com/DarkLight0418/Project_GIF_Files/470e6ffefd1ad94f2b6c9af8747d1c2d46b78a1e/finup%20gif%20%EC%9E%90%EB%A3%8C/%EC%A2%85%EB%AA%A9%20%EB%B6%84%EC%84%9D%20AI%20%EB%B6%84%EC%84%9D%20%EC%9E%AC%EC%B6%94%EC%B2%9C.gif)
 
----
-Ver 0.3 - 2026.02.06.
+</details>
